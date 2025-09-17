@@ -1,0 +1,174 @@
+﻿using System.Reflection;
+using System.Text;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Scalar.AspNetCore;
+
+namespace UserManagerServices.API.Extensions;
+
+/// <summary>
+/// Extension methods for configuring API layer services
+/// Provides comprehensive API infrastructure setup including documentation, versioning, and security
+/// </summary>
+public static class ServiceCollectionExtensions
+{
+    /// <summary>
+    /// Adds API layer services to the dependency injection container
+    /// </summary>
+    /// <param name="services">The service collection</param>
+    /// <param name="configuration">Application configuration</param>
+    /// <returns>The service collection for chaining</returns>
+    public static void AddApiServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Add API Explorer for documentation (required for minimal APIs)
+        services.AddEndpointsApiExplorer();
+
+        // Add CORS
+        services.AddCors(options =>
+        {
+            options.AddPolicy("DefaultCorsPolicy", policy =>
+            {
+                policy.WithOrigins(configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ??
+                                   ["http://localhost:3000"])
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+            });
+        });
+
+        // Add rate limiting
+        services.AddRateLimiter(options =>
+        {
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                    factory: partition => new FixedWindowRateLimiterOptions
+                    {
+                        AutoReplenishment = true,
+                        PermitLimit = 100,
+                        Window = TimeSpan.FromMinutes(1)
+                    }));
+
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        });
+
+        // Note: API versioning for minimal APIs is handled through route patterns
+
+        // Add JWT Authentication
+        var jwtSettings = configuration.GetSection("Jwt");
+        var secretKey = jwtSettings["SecretKey"];
+        var issuer = jwtSettings["Issuer"];
+        var audience = jwtSettings["Audience"];
+
+        if (string.IsNullOrEmpty(secretKey))
+        {
+            throw new InvalidOperationException("JWT SecretKey is not configured");
+        }
+
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false; // Set to true in production
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                    ClockSkew = TimeSpan.FromMinutes(5)
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.Headers.Append("Token-Expired", "true");
+                        }
+
+                        return Task.CompletedTask;
+                    },
+                    OnChallenge = context =>
+                    {
+                        context.HandleResponse();
+                        context.Response.StatusCode = 401;
+                        context.Response.ContentType = "application/json";
+                        var result = System.Text.Json.JsonSerializer.Serialize(new
+                        {
+                            error = "unauthorized",
+                            message = "You are not authorized to access this resource"
+                        });
+                        return context.Response.WriteAsync(result);
+                    }
+                };
+            });
+
+        // Add authorization
+        services.AddAuthorization();
+
+        // Add health checks
+        services.AddHealthChecks()
+            .AddDbContextCheck<Infrastructure.Data.ApplicationDbContext>();
+
+        // Add response compression
+        services.AddResponseCompression(options => { options.EnableForHttps = true; });
+    }
+}
+
+/// <summary>
+/// Extension methods for configuring the application pipeline
+/// </summary>
+public static class WebApplicationExtensions
+{
+    /// <summary>
+    /// Configures Scalar API documentation
+    /// </summary>
+    /// <param name="app">Web application</param>
+    /// <returns>Web application for chaining</returns>
+    public static void UseScalar(this WebApplication app)
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapOpenApi();
+            app.MapScalarApiReference(options =>
+            {
+                options.Title = "User Manager Services API";
+                options.Theme = ScalarTheme.BluePlanet;
+                options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
+            });
+        }
+    }
+
+    public static void AddScalar(this IServiceCollection services)
+    {
+        services.AddOpenApi(options =>
+        {
+            options.AddDocumentTransformer((document, context, cancellationToken) =>
+            {
+                document.Info.Title = "User Manager Services API";
+                document.Info.Description =
+                    "This is the API documentation for the User Manager Services API.";
+                document.Info.Version = "v1";
+                document.Info.Contact = new()
+                {
+                    Name = "Asia Shop user manager services",
+                    Email = "support@example.com"
+                };
+                return Task.CompletedTask;
+            });
+        });
+    }
+}
