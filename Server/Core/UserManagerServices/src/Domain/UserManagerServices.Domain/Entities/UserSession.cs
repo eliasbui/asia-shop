@@ -15,6 +15,12 @@ public class UserSession : IBaseEntity
     public string SessionToken { get; set; } = null!;
     public string RefreshToken { get; set; } = null!;
 
+    public string? OperatingSystem { get; set; } = null!;
+    
+    public string? Browser { get; set; } = null!;
+    
+    public string? Location { get; set; } = null!;
+
     [Column(TypeName = "jsonb")] public string DeviceInfo { get; set; } = null!;
 
     public string IpAddress { get; set; } = null!;
@@ -29,5 +35,4 @@ public class UserSession : IBaseEntity
     public Guid? CreatedBy { get; } = null;
     public Guid? UpdatedBy { get; } = null;
     public bool IsDeleted { get; } = false;
-    
 }

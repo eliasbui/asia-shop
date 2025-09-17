@@ -25,7 +25,7 @@ public class BaseResponse<T>
     /// <summary>
     /// Collection of validation errors
     /// </summary>
-    public IEnumerable<string> ValidationErrors { get; init; } = new List<string>();
+    public Dictionary<string, object> ValidationErrors { get; init; } = new Dictionary<string, object>();
 
     /// <summary>
     /// Additional metadata about the response
@@ -76,6 +76,17 @@ public class BaseResponse<T>
         };
     }
 
+    public static BaseResponse<T> Success(T data, string message)
+    {
+        return new BaseResponse<T>
+        {
+            IsSuccess = true,
+            Data = data,
+            StatusCode = 200,
+            Message = message
+        };
+    }
+
     /// <summary>
     /// Creates a failure response with error message
     /// </summary>
@@ -92,22 +103,6 @@ public class BaseResponse<T>
         };
     }
 
-    /// <summary>
-    /// Creates a failure response with validation errors
-    /// </summary>
-    /// <param name="validationErrors">Validation errors</param>
-    /// <returns>Failure response</returns>
-    public static BaseResponse<T> Failure(IEnumerable<string> validationErrors)
-    {
-        return new BaseResponse<T>
-        {
-            IsSuccess = false,
-            ValidationErrors = validationErrors,
-            ErrorMessage = "Validation failed",
-            StatusCode = 400,
-            Message = "Validation failed"
-        };
-    }
 
     /// <summary>
     /// Creates a failure response with error message and validation errors
@@ -115,7 +110,7 @@ public class BaseResponse<T>
     /// <param name="errorMessage">Error message</param>
     /// <param name="validationErrors">Validation errors</param>
     /// <returns>Failure response</returns>
-    public static BaseResponse<T> Failure(string errorMessage, IEnumerable<string> validationErrors)
+    public static BaseResponse<T> Failure(string errorMessage, Dictionary<string, object> validationErrors)
     {
         return new BaseResponse<T>
         {
@@ -186,7 +181,7 @@ public class BaseResponse : BaseResponse<object>
     /// </summary>
     /// <param name="validationErrors">Validation errors</param>
     /// <returns>Failure response</returns>
-    public new static BaseResponse Failure(IEnumerable<string> validationErrors)
+    public new static BaseResponse Failure(Dictionary<string, object> validationErrors)
     {
         return new BaseResponse
         {

@@ -74,7 +74,8 @@ public class GlobalExceptionHandlingMiddleware
     /// <param name="exception">Exception to process</param>
     /// <param name="errorId">Unique error identifier</param>
     /// <returns>Error response with appropriate status code</returns>
-    private static (HttpStatusCode StatusCode, object ErrorResponse) CreateErrorResponse(Exception exception, Guid errorId)
+    private static (HttpStatusCode StatusCode, object ErrorResponse) CreateErrorResponse(Exception exception,
+        Guid errorId)
     {
         return exception switch
         {
@@ -108,7 +109,11 @@ public class GlobalExceptionHandlingMiddleware
 
             DomainValidationException domainEx => (
                 HttpStatusCode.BadRequest,
-                BaseResponse.Failure(domainEx.ValidationErrors)
+                BaseResponse.Failure(new Dictionary<string, object>
+                {
+                    ["errorCode"] = domainEx.ErrorCode,
+                    ["context"] = domainEx.Context
+                })
             ),
 
             Domain.Exceptions.InvalidOperationException domainEx => (
@@ -123,21 +128,24 @@ public class GlobalExceptionHandlingMiddleware
             // FluentValidation exceptions
             ValidationException validationEx => (
                 HttpStatusCode.BadRequest,
-                BaseResponse.Failure(validationEx.Errors.Select(e => e.ErrorMessage))
+                BaseResponse.Failure(new Dictionary<string, object>
+                {
+                    ["errorCode"] = "VALIDATION_ERROR",
+                    ["errors"] = validationEx.Errors
+                })
             ),
 
             ArgumentException => (
                 HttpStatusCode.BadRequest,
                 BaseResponse.Failure("Invalid request parameters.")
             ),
-            
-            
-            
+
+
             UnauthorizedAccessException => (
                 HttpStatusCode.Unauthorized,
                 BaseResponse.Failure("Access denied. Authentication required.")
             ),
-            
+
             KeyNotFoundException => (
                 HttpStatusCode.NotFound,
                 BaseResponse.Failure("The requested resource was not found.")
@@ -146,24 +154,25 @@ public class GlobalExceptionHandlingMiddleware
                 HttpStatusCode.BadRequest,
                 BaseResponse.Failure("Invalid operation. Please check your request.")
             ),
-            
+
             TimeoutException => (
                 HttpStatusCode.RequestTimeout,
                 BaseResponse.Failure("The request timed out. Please try again.")
             ),
-            
+
             NotSupportedException => (
                 HttpStatusCode.NotImplemented,
                 BaseResponse.Failure("The requested operation is not supported.")
             ),
-            
+
             _ => (
                 HttpStatusCode.InternalServerError,
-                BaseResponse.Failure("An unexpected error occurred. Please try again later.", new Dictionary<string, object>
-                {
-                    ["errorId"] = errorId,
-                    ["timestamp"] = DateTime.UtcNow
-                })
+                BaseResponse.Failure("An unexpected error occurred. Please try again later.",
+                    new Dictionary<string, object>
+                    {
+                        ["errorId"] = errorId,
+                        ["timestamp"] = DateTime.UtcNow
+                    })
             )
         };
     }

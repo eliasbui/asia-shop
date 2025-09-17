@@ -1,0 +1,16 @@
+﻿using MediatR;
+using UserManagerServices.Application.Common.Models;
+using UserManagerServices.Application.Features.Users.Responses;
+
+namespace UserManagerServices.Application.Features.Users.Queries;
+
+/// <summary>
+/// Query for getting user API keys
+/// </summary>
+public class GetUserApiKeysQuery : IRequest<BaseResponse<UserApiKeysResponse>>
+{
+    /// <summary>
+    /// User ID whose API keys to retrieve
+    /// </summary>
+    public Guid UserId { get; set; }
+}

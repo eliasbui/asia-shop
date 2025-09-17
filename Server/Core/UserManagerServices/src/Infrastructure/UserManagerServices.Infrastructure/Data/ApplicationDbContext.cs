@@ -41,10 +41,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<UserPreference> UserPreferences { get; set; } = null!;
 
     /// <summary>
-    /// User notification settings for communication preferences
+    /// User notification settings for communication preferences (generic structure)
     /// </summary>
-    public DbSet<UserNotificationSetting> UserNotificationSettings { get; set; } = null!;
-
+    public DbSet<UserNotificationSettings> UserNotificationSettings { get; set; } = null!;
+    
     #endregion
 
     /// <summary>
@@ -83,8 +83,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<UserActivityLog>().ToTable("UserActivityLogs");
         modelBuilder.Entity<UserApiKey>().ToTable("UserApiKeys");
         modelBuilder.Entity<UserPreference>().ToTable("UserPreferences");
-        modelBuilder.Entity<UserNotificationSetting>().ToTable("UserNotificationSettings");
-        
+        modelBuilder.Entity<UserNotificationSettings>().ToTable("UserNotificationSettings");
     }
 
     /// <summary>
@@ -105,7 +104,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<UserActivityLog>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<UserApiKey>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<UserPreference>().HasQueryFilter(e => !e.IsDeleted);
-        modelBuilder.Entity<UserNotificationSetting>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserNotificationSettings>().HasQueryFilter(e => !e.IsDeleted);
     }
 
     /// <summary>

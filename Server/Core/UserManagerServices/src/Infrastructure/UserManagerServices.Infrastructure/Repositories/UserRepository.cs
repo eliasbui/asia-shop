@@ -294,4 +294,205 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     }
 
     #endregion
+
+    #region Profile and Preferences
+
+    /// <summary>
+    /// Gets user profile by user ID
+    /// </summary>
+    /// <param name="userId">User identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>User profile if found, null otherwise</returns>
+    public async Task<UserProfile?> GetUserProfileAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserProfiles
+            .FirstOrDefaultAsync(up => up.UserId == userId && !up.IsDeleted, cancellationToken);
+    }
+
+    /// <summary>
+    /// Adds a new user profile
+    /// </summary>
+    /// <param name="userProfile">User profile to add</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Task representing the operation</returns>
+    public async Task AddUserProfileAsync(UserProfile userProfile, CancellationToken cancellationToken = default)
+    {
+        await _context.UserProfiles.AddAsync(userProfile, cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets user preferences by user ID
+    /// </summary>
+    /// <param name="userId">User identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>User preferences</returns>
+    public async Task<IEnumerable<UserPreference>> GetUserPreferencesAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserPreferences
+            .Where(up => up.UserId == userId && !up.IsDeleted)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets a specific user preference by category and key
+    /// </summary>
+    /// <param name="userId">User identifier</param>
+    /// <param name="category">Preference category</param>
+    /// <param name="key">Preference key</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>User preference if found, null otherwise</returns>
+    public async Task<UserPreference?> GetUserPreferenceAsync(Guid userId, string category, string key, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserPreferences
+            .FirstOrDefaultAsync(up => up.UserId == userId && up.Category == category && up.Key == key && !up.IsDeleted, cancellationToken);
+    }
+
+    /// <summary>
+    /// Adds or updates a user preference
+    /// </summary>
+    /// <param name="userPreference">User preference to add or update</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Task representing the operation</returns>
+    public async Task AddOrUpdateUserPreferenceAsync(UserPreference userPreference, CancellationToken cancellationToken = default)
+    {
+        var existing = await GetUserPreferenceAsync(userPreference.UserId, userPreference.Category, userPreference.Key, cancellationToken);
+
+        if (existing != null)
+        {
+            // Update existing preference
+            existing.Value = userPreference.Value;
+            existing.DataType = userPreference.DataType;
+            existing.IsActive = userPreference.IsActive;
+            var entry = _context.Entry(existing);
+            entry.Property(nameof(UserPreference.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+        }
+        else
+        {
+            // Add new preference
+            await _context.UserPreferences.AddAsync(userPreference, cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Gets user notification settings by user ID
+    /// </summary>
+    /// <param name="userId">User identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>User notification settings if found, null otherwise</returns>
+    public async Task<UserNotificationSettings?> GetUserNotificationSettingsAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserNotificationSettings
+            .FirstOrDefaultAsync(uns => uns.UserId == userId && !uns.IsDeleted, cancellationToken);
+    }
+
+    /// <summary>
+    /// Adds or updates user notification settings
+    /// </summary>
+    /// <param name="notificationSettings">Notification settings to add or update</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Task representing the operation</returns>
+    public async Task AddOrUpdateNotificationSettingsAsync(UserNotificationSettings notificationSettings, CancellationToken cancellationToken = default)
+    {
+        var existing = await GetUserNotificationSettingsAsync(notificationSettings.UserId, cancellationToken);
+
+        if (existing != null)
+        {
+            // Update existing settings
+            existing.EmailEnabled = notificationSettings.EmailEnabled;
+            existing.EmailSecurityAlerts = notificationSettings.EmailSecurityAlerts;
+            existing.EmailAccountUpdates = notificationSettings.EmailAccountUpdates;
+            existing.EmailMarketing = notificationSettings.EmailMarketing;
+            existing.EmailNewsletter = notificationSettings.EmailNewsletter;
+            existing.EmailSystemNotifications = notificationSettings.EmailSystemNotifications;
+
+            existing.SmsEnabled = notificationSettings.SmsEnabled;
+            existing.SmsSecurityAlerts = notificationSettings.SmsSecurityAlerts;
+            existing.SmsAccountUpdates = notificationSettings.SmsAccountUpdates;
+            existing.SmsTwoFactorAuth = notificationSettings.SmsTwoFactorAuth;
+
+            existing.PushEnabled = notificationSettings.PushEnabled;
+            existing.PushSecurityAlerts = notificationSettings.PushSecurityAlerts;
+            existing.PushAccountUpdates = notificationSettings.PushAccountUpdates;
+            existing.PushSystemNotifications = notificationSettings.PushSystemNotifications;
+
+            existing.InAppEnabled = notificationSettings.InAppEnabled;
+            existing.InAppSecurityAlerts = notificationSettings.InAppSecurityAlerts;
+            existing.InAppAccountUpdates = notificationSettings.InAppAccountUpdates;
+            existing.InAppSystemNotifications = notificationSettings.InAppSystemNotifications;
+
+            existing.DoNotDisturb = notificationSettings.DoNotDisturb;
+            existing.DoNotDisturbStart = notificationSettings.DoNotDisturbStart;
+            existing.DoNotDisturbEnd = notificationSettings.DoNotDisturbEnd;
+            existing.TimeZone = notificationSettings.TimeZone;
+            existing.Frequency = notificationSettings.Frequency;
+
+            var entry = _context.Entry(existing);
+            entry.Property(nameof(UserNotificationSettings.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+        }
+        else
+        {
+            // Add new settings
+            await _context.UserNotificationSettings.AddAsync(notificationSettings, cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Gets user API keys by user ID
+    /// </summary>
+    /// <param name="userId">User identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>User API keys</returns>
+    public async Task<IEnumerable<UserApiKey>> GetUserApiKeysAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserApiKeys
+            .Where(uak => uak.UserId == userId && !uak.IsDeleted)
+            .OrderByDescending(uak => uak.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Gets a specific user API key by ID and user ID
+    /// </summary>
+    /// <param name="keyId">API key identifier</param>
+    /// <param name="userId">User identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>User API key if found, null otherwise</returns>
+    public async Task<UserApiKey?> GetUserApiKeyAsync(Guid keyId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.UserApiKeys
+            .FirstOrDefaultAsync(uak => uak.Id == keyId && uak.UserId == userId && !uak.IsDeleted, cancellationToken);
+    }
+
+    /// <summary>
+    /// Adds a new user API key
+    /// </summary>
+    /// <param name="apiKey">API key to add</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Task representing the operation</returns>
+    public async Task AddUserApiKeyAsync(UserApiKey apiKey, CancellationToken cancellationToken = default)
+    {
+        await _context.UserApiKeys.AddAsync(apiKey, cancellationToken);
+    }
+
+    /// <summary>
+    /// Deletes a user API key (soft delete)
+    /// </summary>
+    /// <param name="keyId">API key identifier</param>
+    /// <param name="userId">User identifier</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>True if deleted, false if not found</returns>
+    public async Task<bool> DeleteUserApiKeyAsync(Guid keyId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var apiKey = await GetUserApiKeyAsync(keyId, userId, cancellationToken);
+        if (apiKey == null)
+            return false;
+
+        var entry = _context.Entry(apiKey);
+        entry.Property(nameof(UserApiKey.IsDeleted)).CurrentValue = true;
+        entry.Property(nameof(UserApiKey.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+
+        return true;
+    }
+
+    #endregion
 }

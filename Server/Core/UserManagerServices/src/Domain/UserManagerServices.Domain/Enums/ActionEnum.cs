@@ -63,4 +63,14 @@ public enum ActionEnum
     AddRating = 58,
     RemoveRating = 59,
     AddLike = 60,
+    Register = 61,
+    PasswordChange = 62,
+    PasswordReset = 63,
+    EmailChange = 64,
+    ProfileUpdate = 65,
+    TwoFactorEnabled = 66,
+    TwoFactorDisabled = 67,
+    ApiKeyCreated = 68,
+    ApiKeyDeleted = 69,
+    SessionTerminated = 70
 }

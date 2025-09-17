@@ -131,9 +131,20 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IPasswordHashingService, PasswordHashingService>();
         services.AddScoped<ICacheService, CacheService>();
 
+        // Register HTTP client and email service
+        services.AddHttpClient<ZohoEmailService>(client =>
+        {
+            var zohoConfig = configuration.GetSection("Zoho:Email").Get<Services.ZohoEmailConfiguration>();
+            if (zohoConfig != null)
+            {
+                client.Timeout = TimeSpan.FromSeconds(zohoConfig.TimeoutSeconds);
+            }
+        });
+        services.AddScoped<IEmailService, ZohoEmailService>();
+
         return services;
     }
-    
+
 
     /// <summary>
     /// Configures Entity Framework specific settings
@@ -149,7 +160,7 @@ public static class ServiceCollectionExtensions
             // Configure connection pooling
             var maxPoolSize = configuration.GetValue<int>("Database:MaxPoolSize", 100);
             var minPoolSize = configuration.GetValue<int>("Database:MinPoolSize", 5);
-            
+
             // These would be applied in the DbContext configuration
         });
 

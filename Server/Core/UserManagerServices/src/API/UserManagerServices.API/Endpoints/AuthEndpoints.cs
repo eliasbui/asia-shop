@@ -1,10 +1,10 @@
 ﻿using System.Security.Claims;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using UserManagerServices.API.Common;
-using UserManagerServices.API.Models;
 using UserManagerServices.Application.Features.Authentication.Commands;
+using UserManagerServices.Application.Features.Authentication.Queries;
+using UserManagerServices.Application.Features.Authentication.Responses;
 
 namespace UserManagerServices.API.Endpoints;
 
@@ -25,6 +25,32 @@ public static class AuthEndpoints
         var authGroup = app.MapGroup("api/{version:apiVersion}/auth")
             .WithTags("Authentication")
             .WithOpenApi();
+
+        // POST /api/v1/auth/register
+        authGroup.MapPost("/register", RegisterAsync)
+            .WithName("Register")
+            .WithSummary("User registration")
+            .WithDescription(
+                "Registers a new user with email, password, and optional role. Returns JWT tokens if email is auto-confirmed.")
+            .AllowAnonymous()
+            .Accepts<RegisterCommand>("application/json")
+            .Produces<LoginResponse>(200, "application/json")
+            .Produces(400, contentType: "application/json", responseType: typeof(ValidationProblemDetails))
+            .Produces(409, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .WithOpenApi(operation => new(operation)
+            {
+                Summary = "User registration",
+                Description =
+                    "Registers a new user with email, password, and optional role. Returns JWT tokens if email is auto-confirmed.",
+                Responses = new()
+                {
+                    ["200"] = new() { Description = "Registration successful" },
+                    ["400"] = new() { Description = "Invalid input or validation errors" },
+                    ["409"] = new() { Description = "User already exists" },
+                    ["500"] = new() { Description = "Internal server error" }
+                }
+            });
 
         // POST /api/v1/auth/login
         authGroup.MapPost("/login", LoginAsync)
@@ -171,6 +197,55 @@ public static class AuthEndpoints
                     ["500"] = new() { Description = "Internal server error" }
                 }
             });
+
+        // POST /api/v1/auth/revoke
+        authGroup.MapPost("/revoke", RevokeTokenAsync)
+            .WithName("RevokeToken")
+            .WithSummary("Revoke tokens")
+            .WithDescription("Revokes JWT tokens. Users can revoke their own tokens, admins can revoke any user's tokens.")
+            .RequireAuthorization()
+            .Accepts<RevokeTokenCommand>("application/json")
+            .Produces(200, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .Produces(400, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .WithOpenApi(operation => new(operation)
+            {
+                Summary = "Revoke tokens",
+                Description = "Revokes JWT tokens. Users can revoke their own tokens, admins can revoke any user's tokens.",
+                Responses = new()
+                {
+                    ["200"] = new() { Description = "Token(s) revoked successfully" },
+                    ["400"] = new() { Description = "Invalid request or validation errors" },
+                    ["401"] = new() { Description = "User not authenticated" },
+                    ["403"] = new() { Description = "Insufficient permissions" },
+                    ["500"] = new() { Description = "Internal server error" }
+                }
+            });
+
+        // GET /api/v1/auth/me
+        authGroup.MapGet("/me", GetCurrentUserAsync)
+            .WithName("GetCurrentUser")
+            .WithSummary("Get current user profile")
+            .WithDescription("Gets the current authenticated user's profile information including roles, claims, and preferences")
+            .RequireAuthorization()
+            .Produces<CurrentUserResponse>(200, "application/json")
+            .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
+            .WithOpenApi(operation => new(operation)
+            {
+                Summary = "Get current user profile",
+                Description = "Gets the current authenticated user's profile information including roles, claims, and preferences",
+                Responses = new()
+                {
+                    ["200"] = new() { Description = "User profile retrieved successfully" },
+                    ["401"] = new() { Description = "User not authenticated" },
+                    ["404"] = new() { Description = "User not found" },
+                    ["500"] = new() { Description = "Internal server error" }
+                }
+            });
     }
 
     /// <summary>
@@ -294,6 +369,74 @@ public static class AuthEndpoints
         CancellationToken cancellationToken = default)
     {
         var result = await mediator.Send(command, cancellationToken);
+        return ApiHelpers.CreateResponse(result);
+    }
+
+    /// <summary>
+    /// Registers a new user
+    /// </summary>
+    /// <param name="command">Registration request</param>
+    /// <param name="context">HTTP context</param>
+    /// <param name="mediator">MediatR sender</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Registration response with tokens if successful</returns>
+    private static async Task<IResult> RegisterAsync(
+        [FromBody] RegisterCommand command,
+        HttpContext context,
+        [FromServices] ISender mediator,
+        CancellationToken cancellationToken = default)
+    {
+        command.IpAddress = ApiHelpers.GetClientIpAddress(context);
+        command.UserAgent = ApiHelpers.GetUserAgent(context);
+
+        var result = await mediator.Send(command, cancellationToken);
+        return ApiHelpers.CreateResponse(result);
+    }
+
+    /// <summary>
+    /// Revokes JWT tokens
+    /// </summary>
+    /// <param name="command">Token revocation request</param>
+    /// <param name="context">HTTP context</param>
+    /// <param name="user">Claims principal</param>
+    /// <param name="mediator">MediatR sender</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Token revocation confirmation</returns>
+    private static async Task<IResult> RevokeTokenAsync(
+        [FromBody] RevokeTokenCommand command,
+        HttpContext context,
+        ClaimsPrincipal user,
+        [FromServices] ISender mediator,
+        CancellationToken cancellationToken = default)
+    {
+        command.CurrentUserId = ApiHelpers.GetCurrentUserId(user) ?? Guid.Empty;
+        command.IpAddress = ApiHelpers.GetClientIpAddress(context);
+        command.UserAgent = ApiHelpers.GetUserAgent(context);
+
+        var result = await mediator.Send(command, cancellationToken);
+        return ApiHelpers.CreateResponse(result);
+    }
+
+    /// <summary>
+    /// Gets current authenticated user's profile information
+    /// </summary>
+    /// <param name="user">Claims principal</param>
+    /// <param name="mediator">MediatR sender</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Current user profile information</returns>
+    private static async Task<IResult> GetCurrentUserAsync(
+        ClaimsPrincipal user,
+        [FromServices] ISender mediator,
+        CancellationToken cancellationToken = default)
+    {
+        var userId = ApiHelpers.GetCurrentUserId(user);
+        if (userId == null)
+        {
+            return Results.Unauthorized();
+        }
+
+        var query = new GetCurrentUserQuery { UserId = userId.Value };
+        var result = await mediator.Send(query, cancellationToken);
         return ApiHelpers.CreateResponse(result);
     }
 }

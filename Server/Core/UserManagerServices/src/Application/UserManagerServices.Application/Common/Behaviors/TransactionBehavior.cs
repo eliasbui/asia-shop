@@ -41,7 +41,7 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
         // Only wrap commands in transactions, not queries
         if (IsQuery(requestName))
         {
-            return await next();
+            return await next(cancellationToken);
         }
 
         _logger.LogInformation("Starting transaction for {RequestName}", requestName);
@@ -50,7 +50,7 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
         {
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            var response = await next();
+            var response = await next(cancellationToken);
 
             await _unitOfWork.CommitTransactionAsync(cancellationToken);
 

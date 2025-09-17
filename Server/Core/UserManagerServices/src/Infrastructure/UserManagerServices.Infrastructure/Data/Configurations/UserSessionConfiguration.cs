@@ -27,27 +27,39 @@ public class UserSessionConfiguration : IEntityTypeConfiguration<UserSession>
         builder.Property(us => us.SessionToken)
             .HasMaxLength(512)
             .IsRequired();
-            
+
         builder.Property(us => us.RefreshToken)
             .HasMaxLength(512)
             .IsRequired();
-            
+
         builder.Property(us => us.IpAddress)
             .HasMaxLength(45)
             .IsRequired();
-            
+
         builder.Property(us => us.UserAgent)
             .HasMaxLength(1024)
             .IsRequired();
-            
+
         builder.Property(us => us.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
-            
+
         builder.Property(us => us.ExpiresAt)
             .IsRequired();
-            
+
         builder.Property(us => us.LastAccessedAt);
+
+        builder.Property(us => us.OperatingSystem)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(us => us.Browser)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(us => us.Location)
+            .HasMaxLength(100)
+            .IsRequired();
 
         // JSONB properties for PostgreSQL
         builder.Property(us => us.DeviceInfo)
@@ -58,13 +70,13 @@ public class UserSessionConfiguration : IEntityTypeConfiguration<UserSession>
         builder.Property(us => us.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(us => us.UpdatedAt);
-        
+
         builder.Property(us => us.CreatedBy);
-        
+
         builder.Property(us => us.UpdatedBy);
-        
+
         builder.Property(us => us.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -82,7 +94,7 @@ public class UserSessionConfiguration : IEntityTypeConfiguration<UserSession>
             .HasForeignKey(us => us.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_UserSessions_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(us => us.UpdatedBy)
@@ -92,30 +104,30 @@ public class UserSessionConfiguration : IEntityTypeConfiguration<UserSession>
         // Indexes
         builder.HasIndex(us => us.UserId)
             .HasDatabaseName("idx_user_sessions_user_id");
-            
+
         builder.HasIndex(us => us.SessionToken)
             .HasDatabaseName("idx_user_sessions_session_token")
             .IsUnique();
-            
+
         builder.HasIndex(us => us.RefreshToken)
             .HasDatabaseName("idx_user_sessions_refresh_token")
             .IsUnique();
-            
+
         builder.HasIndex(us => us.IsActive)
             .HasDatabaseName("idx_user_sessions_is_active");
-            
+
         builder.HasIndex(us => us.ExpiresAt)
             .HasDatabaseName("idx_user_sessions_expires_at");
-            
+
         builder.HasIndex(us => us.LastAccessedAt)
             .HasDatabaseName("idx_user_sessions_last_accessed_at");
-            
+
         builder.HasIndex(us => us.IpAddress)
             .HasDatabaseName("idx_user_sessions_ip_address");
-            
+
         builder.HasIndex(us => us.CreatedAt)
             .HasDatabaseName("idx_user_sessions_created_at");
-            
+
         builder.HasIndex(us => us.IsDeleted)
             .HasDatabaseName("idx_user_sessions_is_deleted");
 

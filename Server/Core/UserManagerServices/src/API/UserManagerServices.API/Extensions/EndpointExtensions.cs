@@ -17,6 +17,12 @@ public static class EndpointExtensions
         // Map authentication endpoints
         app.MapAuthEndpoints();
 
+        // Map user endpoints
+        app.MapUserEndpoints();
+
+        // Map admin endpoints
+        app.MapAdminEndpoints();
+
         // Map health check endpoints
         app.MapHealthEndpoints();
 
