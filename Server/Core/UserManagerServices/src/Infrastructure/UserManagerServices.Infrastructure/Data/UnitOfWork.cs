@@ -14,7 +14,6 @@ namespace UserManagerServices.Infrastructure.Data;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
-    private readonly IDapperConnectionFactory _dapperConnectionFactory;
     private readonly ILogger<UnitOfWork> _logger;
     private readonly Dictionary<Type, object> _repositories;
     private IDbContextTransaction? _currentTransaction;
@@ -91,20 +90,18 @@ public class UnitOfWork : IUnitOfWork
         ILogger<UnitOfWork> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
-        _dapperConnectionFactory =
-            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _repositories = new Dictionary<Type, object>();
 
         // Initialize specific repositories
-        Users = new UserRepository(_context, _dapperConnectionFactory);
-        Roles = new RoleRepository(_context, _dapperConnectionFactory);
-        UserSessions = new UserSessionRepository(_context, _dapperConnectionFactory);
-        UserActivityLogs = new UserActivityLogRepository(_context, _dapperConnectionFactory);
-        UserMfaSettings = new UserMfaSettingsRepository(_context, _dapperConnectionFactory);
-        UserMfaBackupCodes = new UserMfaBackupCodeRepository(_context, _dapperConnectionFactory);
-        UserMfaAuditLogs = new UserMfaAuditLogRepository(_context, _dapperConnectionFactory);
-        UserEmailOtps = new UserEmailOtpRepository(_context, _dapperConnectionFactory);
+        Users = new UserRepository(_context);
+        Roles = new RoleRepository(_context, dapperConnectionFactory);
+        UserSessions = new UserSessionRepository(_context);
+        UserActivityLogs = new UserActivityLogRepository(_context);
+        UserMfaSettings = new UserMfaSettingsRepository(_context);
+        UserMfaBackupCodes = new UserMfaBackupCodeRepository(_context);
+        UserMfaAuditLogs = new UserMfaAuditLogRepository(_context);
+        UserEmailOtps = new UserEmailOtpRepository(_context);
         UserLoginAttempts = new UserLoginAttemptRepository(_context);
         UserLockoutHistory = new UserLockoutHistoryRepository(_context);
         UserSecuritySettings = new UserSecuritySettingsRepository(_context);

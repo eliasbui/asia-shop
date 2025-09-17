@@ -15,8 +15,7 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// Initializes a new instance of the UserSessionRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory"></param>
-    public UserSessionRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
+    public UserSessionRepository(ApplicationDbContext context)
         : base(context)
     {
     }

@@ -10,18 +10,13 @@ namespace UserManagerServices.Infrastructure.Repositories;
 /// </summary>
 public class UserEmailOtpRepository : GenericRepository<UserEmailOtp>, IUserEmailOtpRepository
 {
-    private readonly IDapperConnectionFactory _dapperConnectionFactory;
-
     /// <summary>
     /// Initializes a new instance of the UserEmailOtpRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory">Dapper connection factory</param>
-    public UserEmailOtpRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
+    public UserEmailOtpRepository(ApplicationDbContext context)
         : base(context)
     {
-        _dapperConnectionFactory =
-            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     /// <summary>

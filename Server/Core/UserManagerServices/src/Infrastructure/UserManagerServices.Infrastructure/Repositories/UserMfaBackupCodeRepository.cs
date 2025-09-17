@@ -10,18 +10,13 @@ namespace UserManagerServices.Infrastructure.Repositories;
 /// </summary>
 public class UserMfaBackupCodeRepository : GenericRepository<UserMfaBackupCode>, IUserMfaBackupCodeRepository
 {
-    private readonly IDapperConnectionFactory _dapperConnectionFactory;
-
     /// <summary>
     /// Initializes a new instance of the UserMfaBackupCodeRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory">Dapper connection factory</param>
-    public UserMfaBackupCodeRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
+    public UserMfaBackupCodeRepository(ApplicationDbContext context)
         : base(context)
     {
-        _dapperConnectionFactory =
-            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     /// <summary>

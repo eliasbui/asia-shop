@@ -11,18 +11,13 @@ namespace UserManagerServices.Infrastructure.Repositories;
 /// </summary>
 public class UserMfaAuditLogRepository : GenericRepository<UserMfaAuditLog>, IUserMfaAuditLogRepository
 {
-    private readonly IDapperConnectionFactory _dapperConnectionFactory;
-
     /// <summary>
     /// Initializes a new instance of the UserMfaAuditLogRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory">Dapper connection factory</param>
-    public UserMfaAuditLogRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
+    public UserMfaAuditLogRepository(ApplicationDbContext context)
         : base(context)
     {
-        _dapperConnectionFactory =
-            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     /// <summary>

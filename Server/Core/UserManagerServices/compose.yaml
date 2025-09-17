@@ -1,6 +1,6 @@
 ﻿services:
   db:
-    image: postgres:15
+    image: postgres:latest
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -13,7 +13,6 @@
 
   redis:
     image: redis:7.0-alpine
-    command: redis-server --requirepass Abc@12345
     restart: always
     ports:
       - "6379:6379"

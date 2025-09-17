@@ -127,8 +127,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserLockoutHistoryRepository, UserLockoutHistoryRepository>();
         services.AddScoped<IUserSecuritySettingsRepository, UserSecuritySettingsRepository>();
 
-        // Register Dapper connection factory
-        services.AddScoped<IDapperConnectionFactory, DapperConnectionFactory>();
+        // Add Memory Cache
+        services.AddMemoryCache();
 
         // Register security services
         services.AddScoped<ITokenService, TokenService>();

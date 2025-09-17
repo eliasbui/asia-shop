@@ -16,8 +16,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// Initializes a new instance of the UserActivityLogRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory"></param>
-    public UserActivityLogRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
+    public UserActivityLogRepository(ApplicationDbContext context)
         : base(context)
     {
     }

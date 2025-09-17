@@ -15,7 +15,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// Initializes a new instance of the UserRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    public UserRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
+    public UserRepository(ApplicationDbContext context)
         : base(context)
     {
     }

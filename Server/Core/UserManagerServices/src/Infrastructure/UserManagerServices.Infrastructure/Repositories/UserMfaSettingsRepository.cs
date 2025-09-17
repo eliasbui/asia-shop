@@ -10,18 +10,13 @@ namespace UserManagerServices.Infrastructure.Repositories;
 /// </summary>
 public class UserMfaSettingsRepository : GenericRepository<UserMfaSettings>, IUserMfaSettingsRepository
 {
-    private readonly IDapperConnectionFactory _dapperConnectionFactory;
-
     /// <summary>
     /// Initializes a new instance of the UserMfaSettingsRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory">Dapper connection factory</param>
-    public UserMfaSettingsRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
+    public UserMfaSettingsRepository(ApplicationDbContext context)
         : base(context)
     {
-        _dapperConnectionFactory =
-            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     /// <summary>
