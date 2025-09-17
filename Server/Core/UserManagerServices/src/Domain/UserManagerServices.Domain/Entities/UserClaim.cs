@@ -1,14 +1,16 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using UserManagerServices.Domain.Common;
 
 namespace UserManagerServices.Domain.Entities;
 
+[Table("UserClaims")]
 public class UserClaim : IdentityUserClaim<Guid> ,IBaseEntity
 {
-    public Guid Id { get; }
-    public DateTime CreatedAt { get; }
-    public DateTime? UpdatedAt { get; }
-    public Guid? CreatedBy { get; }
-    public Guid? UpdatedBy { get; }
-    public bool IsDeleted { get; }
+    public new Guid Id { get; } = Guid.CreateVersion7();
+    public DateTime CreatedAt { get; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; } = null;
+    public Guid? CreatedBy { get; } = null;
+    public Guid? UpdatedBy { get; } = null;
+    public bool IsDeleted { get; } = false;
 }

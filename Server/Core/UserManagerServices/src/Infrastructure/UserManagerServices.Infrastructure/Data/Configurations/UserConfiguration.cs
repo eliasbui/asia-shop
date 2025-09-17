@@ -50,24 +50,15 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
-            
-        builder.Property(u => u.Address)
-            .HasMaxLength(200);
-            
-        builder.Property(u => u.PostalCode)
-            .HasMaxLength(20);
-            
-        builder.Property(u => u.City)
-            .HasMaxLength(100);
-            
-        builder.Property(u => u.Country)
-            .HasMaxLength(100);
-            
-        builder.Property(u => u.Province)
-            .HasMaxLength(100);
-            
-        builder.Property(u => u.Ward)
-            .HasMaxLength(100);
+        
+        builder.Property(u => u.LastLoginAt)
+            .HasColumnType("timestamp with time zone");
+        builder.Property(u => u.LastLogoutAt)
+            .HasColumnType("timestamp with time zone");
+        builder.Property(u => u.LastLoginIp)
+            .HasMaxLength(45);
+        builder.Property(u => u.LastLogoutIp)
+            .HasMaxLength(45);
         
         // Base entity properties
         builder.Property(u => u.CreatedAt)
@@ -107,7 +98,51 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         
         builder.HasIndex(u => u.IsActive)
             .HasDatabaseName("idx_users_is_active");
-            
+
+        // Self-referencing relationships for audit
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(u => u.CreatedBy)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("FK_Users_CreatedBy_Users_Id");
+
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(u => u.UpdatedBy)
+            .OnDelete(DeleteBehavior.SetNull)
+            .HasConstraintName("FK_Users_UpdatedBy_Users_Id");
+
+        // Relationships with other entities
+        builder.HasMany(u => u.UserProfiles)
+            .WithOne(up => up.User)
+            .HasForeignKey(up => up.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(u => u.UserSessions)
+            .WithOne(us => us.User)
+            .HasForeignKey(us => us.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(u => u.UserActivityLogs)
+            .WithOne(ual => ual.User)
+            .HasForeignKey(ual => ual.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasMany(u => u.UserApiKeys)
+            .WithOne(uak => uak.User)
+            .HasForeignKey(uak => uak.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(u => u.UserPreferences)
+            .WithOne(up => up.User)
+            .HasForeignKey(up => up.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(u => u.UserNotificationSettings)
+            .WithOne(uns => uns.User)
+            .HasForeignKey(uns => uns.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // Query filters
         builder.HasQueryFilter(u => !u.IsDeleted);
     }

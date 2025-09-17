@@ -15,7 +15,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// Initializes a new instance of the UserRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    public UserRepository(ApplicationDbContext context)
+    public UserRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
     }
@@ -258,7 +258,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var lowerSearchTerm = searchTerm.ToLower();
-            query = query.Where(u => 
+            query = query.Where(u =>
                 (u.FirstName != null && u.FirstName.ToLower().Contains(lowerSearchTerm)) ||
                 (u.LastName != null && u.LastName.ToLower().Contains(lowerSearchTerm)) ||
                 (u.Email != null && u.Email.ToLower().Contains(lowerSearchTerm)) ||

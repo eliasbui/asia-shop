@@ -4,20 +4,47 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
+    <!-- API Documentation -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.8.4" />
+
+    <!-- API Versioning -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
+
+    <!-- Rate Limiting -->
+    <PackageReference Include="System.Threading.RateLimiting" Version="9.0.9" />
+
+    <!-- Logging -->
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.4" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+
+    <!-- Entity Framework Tools -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+
+    <!-- Health Checks -->
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" Version="9.0.9" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Application\UserManagerServices.Application\UserManagerServices.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\UserManagerServices.Infrastructure\UserManagerServices.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
   </ItemGroup>
 
 </Project>

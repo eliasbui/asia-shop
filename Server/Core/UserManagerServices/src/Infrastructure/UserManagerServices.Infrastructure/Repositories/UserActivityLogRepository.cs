@@ -16,7 +16,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// Initializes a new instance of the UserActivityLogRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    public UserActivityLogRepository(ApplicationDbContext context) 
+    /// <param name="dapperConnectionFactory"></param>
+    public UserActivityLogRepository(ApplicationDbContext context,IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
     }
@@ -169,7 +170,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
             .GroupBy(log => log.Action)
             .Select(g => new { Action = g.Key, Count = g.Count() })
             .ToListAsync(cancellationToken);
-        
+
         return results.ToDictionary(r => r.Action, r => r.Count);
     }
 
@@ -189,7 +190,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
             .Select(g => new { Date = g.Key, Count = g.Count() })
             .OrderBy(x => x.Date)
             .ToListAsync(cancellationToken);
-        
+
         return results.ToDictionary(r => r.Date, r => r.Count);
     }
 
@@ -217,7 +218,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
             .OrderByDescending(x => x.Count)
             .Take(count)
             .ToListAsync(cancellationToken);
-        
+
         return results.ToDictionary(r => r.UserId, r => r.Count);
     }
 
@@ -237,8 +238,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
         var since = DateTime.UtcNow.AddMinutes(-timeWindow);
 
         return await _dbSet
-            .Where(log => log.IpAddress == ipAddress && 
-                         log.Action == ActionEnum.Login && 
+            .Where(log => log.IpAddress == ipAddress &&
+                         log.Action == ActionEnum.Login &&
                          log.CreatedAt >= since)
             .OrderByDescending(log => log.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -256,7 +257,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
 
         // First, get suspicious IP addresses
         var suspiciousIps = await _dbSet
-            .Where(log => log.Action == ActionEnum.Login && !log.IsSuccess && 
+            .Where(log => log.Action == ActionEnum.Login &&
                          log.CreatedAt >= since && !log.IsDeleted)
             .GroupBy(log => log.IpAddress)
             .Where(g => g.Count() >= 5)
@@ -265,7 +266,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
 
         // Then get all activities from those IPs
         return await _dbSet
-            .Where(log => suspiciousIps.Contains(log.IpAddress) && 
+            .Where(log => suspiciousIps.Contains(log.IpAddress) &&
                          log.CreatedAt >= since && !log.IsDeleted)
             .OrderByDescending(log => log.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -296,7 +297,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     #region Search and Filtering
 
     /// <summary>
-    /// Searches activity logs with multiple criteria
+    /// Searches activity logs with multiple criteria using Entity Framework
     /// </summary>
     /// <param name="userId">User identifier (optional)</param>
     /// <param name="action">Action type (optional)</param>
@@ -319,61 +320,33 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
         int pageSize = 50,
         CancellationToken cancellationToken = default)
     {
-        var whereConditions = new List<string> { @"""IsDeleted"" = false" };
-        var parameters = new DynamicParameters();
+        var query = _dbSet.Where(log => !log.IsDeleted);
 
         if (userId.HasValue)
-        {
-            whereConditions.Add(@"""UserId"" = @UserId");
-            parameters.Add("UserId", userId.Value);
-        }
+            query = query.Where(log => log.UserId == userId.Value);
 
         if (action.HasValue)
-        {
-            whereConditions.Add(@"""Action"" = @Action");
-            parameters.Add("Action", action.Value);
-        }
+            query = query.Where(log => log.Action == action.Value);
 
         if (!string.IsNullOrWhiteSpace(entity))
-        {
-            whereConditions.Add(@"""Entity"" ILIKE @Entity");
-            parameters.Add("Entity", $"%{entity}%");
-        }
+            query = query.Where(log => log.Entity != null && log.Entity.ToLower().Contains(entity.ToLower()));
 
         if (!string.IsNullOrWhiteSpace(ipAddress))
-        {
-            whereConditions.Add(@"""IpAddress"" = @IpAddress");
-            parameters.Add("IpAddress", ipAddress);
-        }
+            query = query.Where(log => log.IpAddress == ipAddress);
 
         if (startDate.HasValue)
-        {
-            whereConditions.Add(@"""CreatedAt"" >= @StartDate");
-            parameters.Add("StartDate", startDate.Value);
-        }
+            query = query.Where(log => log.CreatedAt >= startDate.Value);
 
         if (endDate.HasValue)
-        {
-            whereConditions.Add(@"""CreatedAt"" <= @EndDate");
-            parameters.Add("EndDate", endDate.Value);
-        }
+            query = query.Where(log => log.CreatedAt <= endDate.Value);
 
-        var whereClause = string.Join(" AND ", whereConditions);
-        
-        var countSql = $@"SELECT COUNT(*) FROM ""UserActivityLogs"" WHERE {whereClause}";
-        var dataSql = $@"
-            SELECT * FROM ""UserActivityLogs"" 
-            WHERE {whereClause}
-            ORDER BY ""CreatedAt"" DESC
-            LIMIT @PageSize OFFSET @Offset";
+        var totalCount = await query.CountAsync(cancellationToken);
 
-        parameters.Add("PageSize", pageSize);
-        parameters.Add("Offset", (pageNumber - 1) * pageSize);
-
-        using var connection = await _dapperConnectionFactory.CreateConnectionAsync(cancellationToken);
-        
-        var totalCount = await connection.QuerySingleAsync<int>(countSql, parameters);
-        var logs = await connection.QueryAsync<UserActivityLog>(dataSql, parameters);
+        var logs = await query
+            .OrderByDescending(log => log.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
 
         return (logs, totalCount);
     }
@@ -383,7 +356,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     #region Cleanup Operations
 
     /// <summary>
-    /// Archives old activity logs (moves to archive table or marks as archived)
+    /// Archives old activity logs (moves to archive table or marks as archived) using Entity Framework
     /// </summary>
     /// <param name="olderThanDays">Archive logs older than specified days</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -392,17 +365,21 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     {
         var cutoffDate = DateTime.UtcNow.AddDays(-olderThanDays);
 
-        const string sql = @"
-            UPDATE ""UserActivityLogs"" 
-            SET ""IsArchived"" = true, ""UpdatedAt"" = @UpdatedAt
-            WHERE ""CreatedAt"" < @CutoffDate AND ""IsArchived"" = false AND ""IsDeleted"" = false";
+        var logsToArchive = await _dbSet
+            .Where(log => log.CreatedAt < cutoffDate && !log.IsDeleted)
+            .ToListAsync(cancellationToken);
 
-        using var connection = await _dapperConnectionFactory.CreateConnectionAsync(cancellationToken);
-        return await connection.ExecuteAsync(sql, new { CutoffDate = cutoffDate, UpdatedAt = DateTime.UtcNow });
+        foreach (var log in logsToArchive)
+        {
+            var entry = _context.Entry(log);
+            entry.Property(nameof(UserActivityLog.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+        }
+
+        return logsToArchive.Count;
     }
 
     /// <summary>
-    /// Deletes old activity logs permanently
+    /// Deletes old activity logs permanently using Entity Framework
     /// </summary>
     /// <param name="olderThanDays">Delete logs older than specified days</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -411,13 +388,18 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     {
         var cutoffDate = DateTime.UtcNow.AddDays(-olderThanDays);
 
-        const string sql = @"
-            UPDATE ""UserActivityLogs"" 
-            SET ""IsDeleted"" = true, ""UpdatedAt"" = @UpdatedAt
-            WHERE ""CreatedAt"" < @CutoffDate AND ""IsDeleted"" = false";
+        var logsToDelete = await _dbSet
+            .Where(log => log.CreatedAt < cutoffDate && !log.IsDeleted)
+            .ToListAsync(cancellationToken);
 
-        using var connection = await _dapperConnectionFactory.CreateConnectionAsync(cancellationToken);
-        return await connection.ExecuteAsync(sql, new { CutoffDate = cutoffDate, UpdatedAt = DateTime.UtcNow });
+        foreach (var log in logsToDelete)
+        {
+            var entry = _context.Entry(log);
+            entry.Property(nameof(UserActivityLog.IsDeleted)).CurrentValue = true;
+            entry.Property(nameof(UserActivityLog.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+        }
+
+        return logsToDelete.Count;
     }
 
     #endregion

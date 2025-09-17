@@ -1,5 +1,4 @@
-﻿using Dapper;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using UserManagerServices.Domain.Entities;
 using UserManagerServices.Domain.Interfaces;
 using UserManagerServices.Infrastructure.Data;
@@ -8,21 +7,18 @@ namespace UserManagerServices.Infrastructure.Repositories;
 
 /// <summary>
 /// Repository implementation for UserSession entity with specialized operations
-/// Handles session management and token tracking
+/// Handles session management and token tracking using Entity Framework
 /// </summary>
 public class UserSessionRepository : GenericRepository<UserSession>, IUserSessionRepository
 {
-    private readonly IDapperConnectionFactory _dapperConnectionFactory;
-
     /// <summary>
     /// Initializes a new instance of the UserSessionRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory">Dapper connection factory</param>
-    public UserSessionRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory) 
+    /// <param name="dapperConnectionFactory"></param>
+    public UserSessionRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
-        _dapperConnectionFactory = dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     #region Session-Specific Queries
@@ -108,20 +104,25 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     #region Session Management
 
     /// <summary>
-    /// Deactivates all sessions for a user
+    /// Deactivates all sessions for a user using Entity Framework
     /// </summary>
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Number of sessions deactivated</returns>
     public async Task<int> DeactivateAllUserSessionsAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        const string sql = @"
-            UPDATE ""UserSessions"" 
-            SET ""IsActive"" = false, ""UpdatedAt"" = @UpdatedAt
-            WHERE ""UserId"" = @UserId AND ""IsActive"" = true AND ""IsDeleted"" = false";
+        var sessionsToDeactivate = await _dbSet
+            .Where(s => s.UserId == userId && s.IsActive && !s.IsDeleted)
+            .ToListAsync(cancellationToken);
 
-        using var connection = _dapperConnectionFactory.CreateConnection();
-        return await connection.ExecuteAsync(sql, new { UserId = userId, UpdatedAt = DateTime.UtcNow });
+        foreach (var session in sessionsToDeactivate)
+        {
+            session.IsActive = false;
+            var entry = _context.Entry(session);
+            entry.Property(nameof(UserSession.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+        }
+
+        return sessionsToDeactivate.Count;
     }
 
     /// <summary>
@@ -157,43 +158,44 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     }
 
     /// <summary>
-    /// Updates session last accessed time
+    /// Updates session last accessed time using Entity Framework
     /// </summary>
     /// <param name="sessionToken">Session token</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if session was updated, false if not found</returns>
     public async Task<bool> UpdateLastAccessedAsync(string sessionToken, CancellationToken cancellationToken = default)
     {
-        const string sql = @"
-            UPDATE ""UserSessions"" 
-            SET ""LastAccessedAt"" = @LastAccessedAt, ""UpdatedAt"" = @UpdatedAt
-            WHERE ""SessionToken"" = @SessionToken AND ""IsDeleted"" = false";
+        var session = await _dbSet.FirstOrDefaultAsync(s => s.SessionToken == sessionToken && !s.IsDeleted, cancellationToken);
 
-        using var connection = _dapperConnectionFactory.CreateConnection();
-        var rowsAffected = await connection.ExecuteAsync(sql, new 
-        { 
-            SessionToken = sessionToken, 
-            LastAccessedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        });
+        if (session == null) return false;
 
-        return rowsAffected > 0;
+        session.LastAccessedAt = DateTime.UtcNow;
+        var entry = _context.Entry(session);
+        entry.Property(nameof(UserSession.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+
+        return true;
     }
 
     /// <summary>
-    /// Cleans up expired sessions
+    /// Cleans up expired sessions using Entity Framework
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Number of sessions cleaned up</returns>
     public async Task<int> CleanupExpiredSessionsAsync(CancellationToken cancellationToken = default)
     {
-        const string sql = @"
-            UPDATE ""UserSessions"" 
-            SET ""IsDeleted"" = true, ""UpdatedAt"" = @UpdatedAt
-            WHERE ""ExpiresAt"" <= @Now AND ""IsDeleted"" = false";
+        var now = DateTime.UtcNow;
+        var expiredSessions = await _dbSet
+            .Where(s => s.ExpiresAt <= now && !s.IsDeleted)
+            .ToListAsync(cancellationToken);
 
-        using var connection = _dapperConnectionFactory.CreateConnection();
-        return await connection.ExecuteAsync(sql, new { Now = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+        foreach (var session in expiredSessions)
+        {
+            var entry = _context.Entry(session);
+            entry.Property(nameof(UserSession.IsDeleted)).CurrentValue = true;
+            entry.Property(nameof(UserSession.UpdatedAt)).CurrentValue = now;
+        }
+
+        return expiredSessions.Count;
     }
 
     #endregion
@@ -222,7 +224,7 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     }
 
     /// <summary>
-    /// Gets session statistics by date range
+    /// Gets session statistics by date range using Entity Framework
     /// </summary>
     /// <param name="startDate">Start date</param>
     /// <param name="endDate">End date</param>
@@ -230,16 +232,13 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <returns>Session statistics</returns>
     public async Task<Dictionary<DateTime, int>> GetSessionStatisticsAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
     {
-        const string sql = @"
-            SELECT DATE(""CreatedAt"") as Date, COUNT(*) as Count
-            FROM ""UserSessions""
-            WHERE ""CreatedAt"" >= @StartDate AND ""CreatedAt"" <= @EndDate AND ""IsDeleted"" = false
-            GROUP BY DATE(""CreatedAt"")
-            ORDER BY Date";
+        var results = await _dbSet
+            .Where(s => s.CreatedAt >= startDate && s.CreatedAt <= endDate && !s.IsDeleted)
+            .GroupBy(s => s.CreatedAt.Date)
+            .Select(g => new { Date = g.Key, Count = g.Count() })
+            .OrderBy(x => x.Date)
+            .ToListAsync(cancellationToken);
 
-        using var connection = _dapperConnectionFactory.CreateConnection();
-        var results = await connection.QueryAsync<(DateTime Date, int Count)>(sql, new { StartDate = startDate, EndDate = endDate });
-        
         return results.ToDictionary(r => r.Date, r => r.Count);
     }
 
@@ -248,27 +247,28 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     #region Security Operations
 
     /// <summary>
-    /// Gets sessions from suspicious IP addresses (multiple failed attempts)
+    /// Gets sessions from suspicious IP addresses (multiple failed attempts) using Entity Framework
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Sessions from suspicious IPs</returns>
     public async Task<IEnumerable<UserSession>> GetSuspiciousSessionsAsync(CancellationToken cancellationToken = default)
     {
-        const string sql = @"
-            SELECT DISTINCT s.*
-            FROM ""UserSessions"" s
-            WHERE s.""IpAddress"" IN (
-                SELECT ""IpAddress""
-                FROM ""UserActivityLogs""
-                WHERE ""Action"" = 'Login' AND ""IsSuccess"" = false
-                AND ""CreatedAt"" >= @Since
-                GROUP BY ""IpAddress""
-                HAVING COUNT(*) >= 5
-            )
-            AND s.""IsDeleted"" = false";
+        var since = DateTime.UtcNow.AddHours(-24);
 
-        using var connection = _dapperConnectionFactory.CreateConnection();
-        return await connection.QueryAsync<UserSession>(sql, new { Since = DateTime.UtcNow.AddHours(-24) });
+        // First get suspicious IP addresses from activity logs
+        var suspiciousIps = await _context.UserActivityLogs
+            .Where(log => log.Action == Domain.Enums.ActionEnum.Login &&
+                         log.CreatedAt >= since && !log.IsDeleted)
+            .GroupBy(log => log.IpAddress)
+            .Where(g => g.Count() >= 5)
+            .Select(g => g.Key)
+            .ToListAsync(cancellationToken);
+
+        // Then get sessions from those IPs
+        return await _dbSet
+            .Where(s => suspiciousIps.Contains(s.IpAddress) && !s.IsDeleted)
+            .Distinct()
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>

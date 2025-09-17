@@ -9,18 +9,18 @@ public sealed class Email : IEquatable<Email>
         @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
         RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-    public string Value { get; }
+    private string Value { get; }
 
     public Email(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new DomainException("Email cannot be empty.");
+            throw new DomainException("Email cannot be empty.","EMAIL_EMPTY");
         }
 
         if (!EmailRegex.IsMatch(value))
         {
-            throw new DomainException($"Invalid email format: {value}");
+            throw new DomainException($"Invalid email format: {value}","INVALID_EMAIL_FORMAT");
         }
 
         Value = value.ToLowerInvariant();
