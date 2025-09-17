@@ -82,11 +82,9 @@ public class UnitOfWork : IUnitOfWork
     /// Initializes a new instance of the UnitOfWork
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory">Dapper connection factory</param>
     /// <param name="logger">Logger instance</param>
     public UnitOfWork(
         ApplicationDbContext context,
-        IDapperConnectionFactory dapperConnectionFactory,
         ILogger<UnitOfWork> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
@@ -95,7 +93,7 @@ public class UnitOfWork : IUnitOfWork
 
         // Initialize specific repositories
         Users = new UserRepository(_context);
-        Roles = new RoleRepository(_context, dapperConnectionFactory);
+        Roles = new RoleRepository(_context);
         UserSessions = new UserSessionRepository(_context);
         UserActivityLogs = new UserActivityLogRepository(_context);
         UserMfaSettings = new UserMfaSettingsRepository(_context);

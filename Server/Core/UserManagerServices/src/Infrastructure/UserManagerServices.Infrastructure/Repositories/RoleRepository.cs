@@ -12,18 +12,13 @@ namespace UserManagerServices.Infrastructure.Repositories;
 /// </summary>
 public class RoleRepository : GenericRepository<Role>, IRoleRepository
 {
-    private readonly IDapperConnectionFactory _dapperConnectionFactory;
-
     /// <summary>
     /// Initializes a new instance of the RoleRepository
     /// </summary>
     /// <param name="context">Database context</param>
-    /// <param name="dapperConnectionFactory">Dapper connection factory</param>
-    public RoleRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
+    public RoleRepository(ApplicationDbContext context)
         : base(context)
     {
-        _dapperConnectionFactory =
-            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     #region Role-Specific Queries
@@ -145,8 +140,8 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
             })
             .OrderByDescending(x => x.UserCount)
             .ToListAsync(cancellationToken);
-#pragma warning disable CS8603 // Possible null reference return.
-        return roleStats.ToDictionary(r => r.Name, r => r.UserCount);
+        
+        return roleStats.ToDictionary(r => r.Name ?? string.Empty, r => r.UserCount);
     }
 
     #endregion
@@ -190,7 +185,7 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
     #region Search and Filtering
 
     /// <summary>
-    /// Searches roles by name and description using Dapper
+    /// Searches roles by name and description using Entity Framework
     /// </summary>
     /// <param name="searchTerm">Search term</param>
     /// <param name="isActive">Filter by active status</param>
@@ -207,43 +202,32 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
         int pageSize = 10,
         CancellationToken cancellationToken = default)
     {
-        var whereConditions = new List<string> { @"""IsDeleted"" = false" };
-        var parameters = new DynamicParameters();
+        var query = _dbSet.Where(r => !r.IsDeleted);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            whereConditions.Add(@"(""Name"" ILIKE @SearchTerm OR ""Description"" ILIKE @SearchTerm)");
-            parameters.Add("SearchTerm", $"%{searchTerm}%");
+            var lowerSearchTerm = searchTerm.ToLower();
+            query = query.Where(r => (r.Name != null && r.Name.ToLower().Contains(lowerSearchTerm)) || 
+                                   (r.Description != null && r.Description.ToLower().Contains(lowerSearchTerm)));
         }
 
         if (isActive.HasValue)
         {
-            whereConditions.Add(@"""IsActive"" = @IsActive");
-            parameters.Add("IsActive", isActive.Value);
+            query = query.Where(r => r.IsActive == isActive.Value);
         }
 
         if (isSystemRole.HasValue)
         {
-            whereConditions.Add(@"""IsSystemRole"" = @IsSystemRole");
-            parameters.Add("IsSystemRole", isSystemRole.Value);
+            query = query.Where(r => r.IsSystemRole == isSystemRole.Value);
         }
 
-        var whereClause = string.Join(" AND ", whereConditions);
+        var totalCount = await query.CountAsync(cancellationToken);
 
-        var countSql = $@"SELECT COUNT(*) FROM ""Roles"" WHERE {whereClause}";
-        var dataSql = $@"
-            SELECT * FROM ""Roles""
-            WHERE {whereClause}
-            ORDER BY ""CreatedAt"" DESC
-            LIMIT @PageSize OFFSET @Offset";
-
-        parameters.Add("PageSize", pageSize);
-        parameters.Add("Offset", (pageNumber - 1) * pageSize);
-
-        using var connection = await _dapperConnectionFactory.CreateConnectionAsync(cancellationToken);
-
-        var totalCount = await connection.QuerySingleAsync<int>(countSql, parameters);
-        var roles = await connection.QueryAsync<Role>(dataSql, parameters);
+        var roles = await query
+            .OrderByDescending(r => r.CreatedAt)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
 
         return (roles, totalCount);
     }

@@ -1,5 +1,7 @@
+using System.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using UserManagerServices.Domain.Common;
 using UserManagerServices.Domain.Entities;
 using UserManagerServices.Infrastructure.Data.Configurations;
@@ -98,6 +100,14 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
         // Configure global query filters for soft delete
         ConfigureGlobalQueryFilters(modelBuilder);
+    }
+
+    //function getConnectionAsync()
+    public async Task<IDbConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
+    {
+        var connection = new NpgsqlConnection(Database.GetConnectionString());
+        await connection.OpenAsync(cancellationToken);
+        return connection;
     }
 
     /// <summary>
