@@ -1,0 +1,25 @@
+﻿Multi-Factor Authentication Code - Asia Shop
+==========================================
+
+Hello {{FirstName}},
+
+You have requested a multi-factor authentication code for your account.
+
+Your MFA Code: {{OtpCode}}
+
+IMPORTANT: This code will expire in {{ExpiryMinutes}} minutes and can only be used once.
+
+Purpose: {{Purpose}}
+
+If you did not request this code, please ignore this email and consider changing your password immediately.
+
+Security Tips:
+- Never share this code with anyone
+- Asia Shop will never ask for this code via phone or email
+- If you suspect unauthorized access, change your password immediately
+- Consider enabling app-based authentication for better security
+
+This is an automated message from Asia Shop Security System.
+If you have any questions, please contact our support team.
+
+© 2024 Asia Shop. All rights reserved.
