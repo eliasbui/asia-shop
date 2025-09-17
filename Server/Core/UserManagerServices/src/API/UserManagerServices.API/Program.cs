@@ -37,6 +37,8 @@ try
     // Configure the HTTP request pipeline
     app.UseGlobalExceptionHandling();
     app.UseSecurityHeaders();
+    app.MapMinimalApiEndpoints();
+    
 
     if (app.Environment.IsDevelopment()) app.UseScalar();
 
@@ -51,7 +53,6 @@ try
     app.MapHealthChecks("/health");
 
     // Map minimal API endpoints
-    app.MapMinimalApiEndpoints();
 
     Log.Information("UserManagerServices API started successfully");
     await app.RunAsync();

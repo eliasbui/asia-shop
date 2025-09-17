@@ -12,7 +12,7 @@ public static class EndpointExtensions
     /// </summary>
     /// <param name="app">Web application</param>
     /// <returns>Web application for chaining</returns>
-    public static WebApplication MapMinimalApiEndpoints(this WebApplication app)
+    public static void MapMinimalApiEndpoints(this WebApplication app)
     {
         // Map authentication endpoints
         app.MapAuthEndpoints();
@@ -31,7 +31,5 @@ public static class EndpointExtensions
 
         // Map health check endpoints
         app.MapHealthEndpoints();
-
-        return app;
     }
 }
