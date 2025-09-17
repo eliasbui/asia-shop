@@ -31,7 +31,7 @@ public class CacheService : ICacheService
         _distributedCache = distributedCache ?? throw new ArgumentNullException(nameof(distributedCache));
         _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        
+
         _jsonOptions = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -48,10 +48,7 @@ public class CacheService : ICacheService
     /// <returns>Cached value if found, default otherwise</returns>
     public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(key))
-        {
-            throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
-        }
+        if (string.IsNullOrEmpty(key)) throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
 
         try
         {
@@ -77,7 +74,7 @@ public class CacheService : ICacheService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting cached value for key: {Key}", key);
-            
+
             // Try memory cache as fallback
             try
             {
@@ -105,17 +102,12 @@ public class CacheService : ICacheService
     /// <param name="expiration">Expiration time</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the operation</returns>
-    public async Task SetAsync<T>(string key, T value, TimeSpan expiration, CancellationToken cancellationToken = default)
+    public async Task SetAsync<T>(string key, T value, TimeSpan expiration,
+        CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(key))
-        {
-            throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
-        }
+        if (string.IsNullOrEmpty(key)) throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
 
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        if (value == null) throw new ArgumentNullException(nameof(value));
 
         try
         {
@@ -127,7 +119,8 @@ public class CacheService : ICacheService
 
             // Set in distributed cache
             await _distributedCache.SetStringAsync(key, serializedValue, options, cancellationToken);
-            _logger.LogDebug("Value cached in distributed cache for key: {Key} with expiration: {Expiration}", key, expiration);
+            _logger.LogDebug("Value cached in distributed cache for key: {Key} with expiration: {Expiration}", key,
+                expiration);
 
             // Also set in memory cache as backup
             var memoryOptions = new MemoryCacheEntryOptions
@@ -140,7 +133,7 @@ public class CacheService : ICacheService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error setting cached value for key: {Key}", key);
-            
+
             // Fallback to memory cache only
             try
             {
@@ -169,17 +162,12 @@ public class CacheService : ICacheService
     /// <param name="slidingExpiration">Sliding expiration time</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the operation</returns>
-    public async Task SetSlidingAsync<T>(string key, T value, TimeSpan slidingExpiration, CancellationToken cancellationToken = default)
+    public async Task SetSlidingAsync<T>(string key, T value, TimeSpan slidingExpiration,
+        CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(key))
-        {
-            throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
-        }
+        if (string.IsNullOrEmpty(key)) throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
 
-        if (value == null)
-        {
-            throw new ArgumentNullException(nameof(value));
-        }
+        if (value == null) throw new ArgumentNullException(nameof(value));
 
         try
         {
@@ -191,7 +179,9 @@ public class CacheService : ICacheService
 
             // Set in distributed cache
             await _distributedCache.SetStringAsync(key, serializedValue, options, cancellationToken);
-            _logger.LogDebug("Value cached in distributed cache for key: {Key} with sliding expiration: {SlidingExpiration}", key, slidingExpiration);
+            _logger.LogDebug(
+                "Value cached in distributed cache for key: {Key} with sliding expiration: {SlidingExpiration}", key,
+                slidingExpiration);
 
             // Also set in memory cache as backup
             var memoryOptions = new MemoryCacheEntryOptions
@@ -204,7 +194,7 @@ public class CacheService : ICacheService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error setting cached value with sliding expiration for key: {Key}", key);
-            
+
             // Fallback to memory cache only
             try
             {
@@ -218,7 +208,8 @@ public class CacheService : ICacheService
             }
             catch (Exception fallbackEx)
             {
-                _logger.LogError(fallbackEx, "Error setting fallback cached value with sliding expiration for key: {Key}", key);
+                _logger.LogError(fallbackEx,
+                    "Error setting fallback cached value with sliding expiration for key: {Key}", key);
                 throw;
             }
         }
@@ -232,10 +223,7 @@ public class CacheService : ICacheService
     /// <returns>Task representing the operation</returns>
     public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(key))
-        {
-            throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
-        }
+        if (string.IsNullOrEmpty(key)) throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
 
         try
         {
@@ -249,7 +237,7 @@ public class CacheService : ICacheService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error removing cached value for key: {Key}", key);
-            
+
             // Try to remove from memory cache at least
             try
             {
@@ -259,7 +247,7 @@ public class CacheService : ICacheService
             {
                 _logger.LogError(fallbackEx, "Error removing fallback cached value for key: {Key}", key);
             }
-            
+
             throw;
         }
     }
@@ -272,19 +260,13 @@ public class CacheService : ICacheService
     /// <returns>True if key exists, false otherwise</returns>
     public async Task<bool> ExistsAsync(string key, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrEmpty(key))
-        {
-            throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
-        }
+        if (string.IsNullOrEmpty(key)) throw new ArgumentException("Cache key cannot be null or empty", nameof(key));
 
         try
         {
             // Check distributed cache first
             var distributedValue = await _distributedCache.GetStringAsync(key, cancellationToken);
-            if (!string.IsNullOrEmpty(distributedValue))
-            {
-                return true;
-            }
+            if (!string.IsNullOrEmpty(distributedValue)) return true;
 
             // Check memory cache
             return _memoryCache.TryGetValue(key, out _);
@@ -292,7 +274,7 @@ public class CacheService : ICacheService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error checking if key exists in cache: {Key}", key);
-            
+
             // Fallback to memory cache check
             try
             {

@@ -21,7 +21,8 @@ public class UserMfaAuditLogRepository : GenericRepository<UserMfaAuditLog>, IUs
     public UserMfaAuditLogRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
-        _dapperConnectionFactory = dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
+        _dapperConnectionFactory =
+            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     /// <summary>
@@ -32,13 +33,13 @@ public class UserMfaAuditLogRepository : GenericRepository<UserMfaAuditLog>, IUs
     /// <param name="pageSize">Page size</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Paginated audit logs and total count</returns>
-    public async Task<(List<UserMfaAuditLog> logs, int totalCount)> GetPagedByUserIdAsync(Guid userId, 
+    public async Task<(List<UserMfaAuditLog> logs, int totalCount)> GetPagedByUserIdAsync(Guid userId,
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(al => al.UserId == userId);
-        
+
         var totalCount = await query.CountAsync(cancellationToken);
-        
+
         var logs = await query
             .OrderByDescending(al => al.Timestamp)
             .Skip((pageNumber - 1) * pageSize)
@@ -56,13 +57,13 @@ public class UserMfaAuditLogRepository : GenericRepository<UserMfaAuditLog>, IUs
     /// <param name="pageSize">Page size</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Paginated audit logs and total count</returns>
-    public async Task<(List<UserMfaAuditLog> logs, int totalCount)> GetPagedByActionAsync(MfaActionEnum action, 
+    public async Task<(List<UserMfaAuditLog> logs, int totalCount)> GetPagedByActionAsync(MfaActionEnum action,
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(al => al.Action == action);
-        
+
         var totalCount = await query.CountAsync(cancellationToken);
-        
+
         var logs = await query
             .Include(al => al.User)
             .OrderByDescending(al => al.Timestamp)
@@ -81,14 +82,14 @@ public class UserMfaAuditLogRepository : GenericRepository<UserMfaAuditLog>, IUs
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of failed MFA attempts</returns>
-    public async Task<List<UserMfaAuditLog>> GetFailedAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    public async Task<List<UserMfaAuditLog>> GetFailedAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Where(al => al.UserId == userId && 
-                        !al.IsSuccess && 
-                        al.Timestamp >= fromDate && 
-                        al.Timestamp <= toDate)
+            .Where(al => al.UserId == userId &&
+                         !al.IsSuccess &&
+                         al.Timestamp >= fromDate &&
+                         al.Timestamp <= toDate)
             .OrderByDescending(al => al.Timestamp)
             .ToListAsync(cancellationToken);
     }
@@ -103,11 +104,11 @@ public class UserMfaAuditLogRepository : GenericRepository<UserMfaAuditLog>, IUs
     public async Task<(List<UserMfaAuditLog> logs, int totalCount)> GetSuspiciousActivitiesAsync(
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default)
     {
-        var query = _dbSet.Where(al => al.Action == MfaActionEnum.SuspiciousActivity || 
-                                      al.RiskScore > 0.7m);
-        
+        var query = _dbSet.Where(al => al.Action == MfaActionEnum.SuspiciousActivity ||
+                                       al.RiskScore > 0.7m);
+
         var totalCount = await query.CountAsync(cancellationToken);
-        
+
         var logs = await query
             .Include(al => al.User)
             .OrderByDescending(al => al.Timestamp)
@@ -129,9 +130,9 @@ public class UserMfaAuditLogRepository : GenericRepository<UserMfaAuditLog>, IUs
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(al => al.TriggeredAlert);
-        
+
         var totalCount = await query.CountAsync(cancellationToken);
-        
+
         var logs = await query
             .Include(al => al.User)
             .OrderByDescending(al => al.Timestamp)
@@ -149,7 +150,7 @@ public class UserMfaAuditLogRepository : GenericRepository<UserMfaAuditLog>, IUs
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>MFA statistics</returns>
-    public async Task<Dictionary<string, int>> GetMfaStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    public async Task<Dictionary<string, int>> GetMfaStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         var logs = await _dbSet

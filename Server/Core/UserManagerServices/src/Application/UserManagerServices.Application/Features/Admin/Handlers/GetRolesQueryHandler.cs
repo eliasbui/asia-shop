@@ -38,7 +38,7 @@ public class GetRolesQueryHandler(
                 var searchTerm = request.SearchTerm.ToLower();
                 query = query.Where(r =>
                     r.Name!.ToLower().Contains(searchTerm) ||
-                    (r.Description.ToLower().Contains(searchTerm)));
+                    r.Description.ToLower().Contains(searchTerm));
             }
 
             // Get total count before pagination

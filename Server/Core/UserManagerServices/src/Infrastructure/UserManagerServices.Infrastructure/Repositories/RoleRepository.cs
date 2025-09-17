@@ -22,7 +22,8 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
     public RoleRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
-        _dapperConnectionFactory = dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
+        _dapperConnectionFactory =
+            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     #region Role-Specific Queries
@@ -44,7 +45,8 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
     /// <param name="normalizedName">Normalized role name</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Role if found, null otherwise</returns>
-    public async Task<Role?> GetByNormalizedNameAsync(string normalizedName, CancellationToken cancellationToken = default)
+    public async Task<Role?> GetByNormalizedNameAsync(string normalizedName,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet.FirstOrDefaultAsync(r => r.NormalizedName == normalizedName, cancellationToken);
     }
@@ -85,7 +87,8 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Roles assigned to the user</returns>
-    public async Task<IEnumerable<Role>> GetRolesByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Role>> GetRolesByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _context.UserRoles
             .Where(ur => ur.UserId == userId && !ur.IsDeleted)
@@ -124,7 +127,8 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Dictionary of role names and user counts</returns>
-    public async Task<Dictionary<string, int>> GetRoleUsageStatisticsAsync(CancellationToken cancellationToken = default)
+    public async Task<Dictionary<string, int>> GetRoleUsageStatisticsAsync(
+        CancellationToken cancellationToken = default)
     {
         var roleStats = await _context.Roles
             .Where(r => !r.IsDeleted)
@@ -141,7 +145,7 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
             })
             .OrderByDescending(x => x.UserCount)
             .ToListAsync(cancellationToken);
-        #pragma warning disable CS8603 // Possible null reference return.
+#pragma warning disable CS8603 // Possible null reference return.
         return roleStats.ToDictionary(r => r.Name, r => r.UserCount);
     }
 
@@ -156,14 +160,12 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
     /// <param name="excludeRoleId">Role ID to exclude from check (for updates)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if role name is taken, false otherwise</returns>
-    public async Task<bool> IsRoleNameTakenAsync(string roleName, Guid? excludeRoleId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> IsRoleNameTakenAsync(string roleName, Guid? excludeRoleId = null,
+        CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(r => r.Name == roleName);
 
-        if (excludeRoleId.HasValue)
-        {
-            query = query.Where(r => r.Id != excludeRoleId.Value);
-        }
+        if (excludeRoleId.HasValue) query = query.Where(r => r.Id != excludeRoleId.Value);
 
         return await query.AnyAsync(cancellationToken);
     }
@@ -177,10 +179,7 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
     public async Task<bool> CanDeleteRoleAsync(Guid roleId, CancellationToken cancellationToken = default)
     {
         var role = await _dbSet.FirstOrDefaultAsync(r => r.Id == roleId, cancellationToken);
-        if (role == null || role.IsSystemRole)
-        {
-            return false;
-        }
+        if (role == null || role.IsSystemRole) return false;
 
         var userCount = await GetUserCountInRoleAsync(roleId, cancellationToken);
         return userCount == 0;

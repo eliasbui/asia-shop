@@ -15,7 +15,8 @@ public interface IEmailService
     /// <param name="isHtml">Whether the body is HTML formatted</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the async operation</returns>
-    Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true, CancellationToken cancellationToken = default);
+    Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sends an email with CC and BCC recipients asynchronously
@@ -28,7 +29,8 @@ public interface IEmailService
     /// <param name="isHtml">Whether the body is HTML formatted</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the async operation</returns>
-    Task<bool> SendEmailAsync(string to, string? cc, string? bcc, string subject, string body, bool isHtml = true, CancellationToken cancellationToken = default);
+    Task<bool> SendEmailAsync(string to, string? cc, string? bcc, string subject, string body, bool isHtml = true,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sends an email with attachments asynchronously
@@ -40,7 +42,8 @@ public interface IEmailService
     /// <param name="isHtml">Whether the body is HTML formatted</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the async operation</returns>
-    Task<bool> SendEmailWithAttachmentsAsync(string to, string subject, string body, Dictionary<string, byte[]> attachments, bool isHtml = true, CancellationToken cancellationToken = default);
+    Task<bool> SendEmailWithAttachmentsAsync(string to, string subject, string body,
+        Dictionary<string, byte[]> attachments, bool isHtml = true, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sends a templated email asynchronously
@@ -50,5 +53,6 @@ public interface IEmailService
     /// <param name="templateData">Template data for placeholders</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the async operation</returns>
-    Task<bool> SendTemplatedEmailAsync(string to, string templateName, Dictionary<string, object> templateData, CancellationToken cancellationToken = default);
+    Task<bool> SendTemplatedEmailAsync(string to, string templateName, Dictionary<string, object> templateData,
+        CancellationToken cancellationToken = default);
 }

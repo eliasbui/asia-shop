@@ -22,7 +22,8 @@ public class GenerateBackupCodesCommandHandler : IRequestHandler<GenerateBackupC
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<BaseResponse<List<string>>> Handle(GenerateBackupCodesCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<List<string>>> Handle(GenerateBackupCodesCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -31,15 +32,16 @@ public class GenerateBackupCodesCommandHandler : IRequestHandler<GenerateBackupC
             // Check if MFA is enabled
             var isEnabled = await _mfaService.IsMfaEnabledAsync(request.UserId, cancellationToken);
             if (!isEnabled)
-            {
                 return BaseResponse<List<string>>.Failure("MFA must be enabled before generating backup codes");
-            }
 
             // Generate backup codes
-            var backupCodes = await _mfaService.GenerateBackupCodesAsync(request.UserId, request.Count, cancellationToken);
+            var backupCodes =
+                await _mfaService.GenerateBackupCodesAsync(request.UserId, request.Count, cancellationToken);
 
-            _logger.LogInformation("Generated {Count} backup codes for user {UserId}", backupCodes.Count, request.UserId);
-            return BaseResponse<List<string>>.Success(backupCodes, $"Generated {backupCodes.Count} backup codes successfully");
+            _logger.LogInformation("Generated {Count} backup codes for user {UserId}", backupCodes.Count,
+                request.UserId);
+            return BaseResponse<List<string>>.Success(backupCodes,
+                $"Generated {backupCodes.Count} backup codes successfully");
         }
         catch (InvalidOperationException ex)
         {

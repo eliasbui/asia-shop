@@ -26,7 +26,7 @@ public class SendEmailOtpCommandHandler : IRequestHandler<SendEmailOtpCommand, B
     {
         try
         {
-            _logger.LogInformation("Sending email OTP for user {UserId} with purpose {Purpose}", 
+            _logger.LogInformation("Sending email OTP for user {UserId} with purpose {Purpose}",
                 request.UserId, request.Purpose);
 
             // Check rate limiting - get recent attempts

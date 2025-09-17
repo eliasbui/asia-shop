@@ -29,7 +29,7 @@ public class DeleteApiKeyCommandHandler(
             var apiKey = await unitOfWork.Users.GetUserApiKeyAsync(request.KeyId, request.UserId, cancellationToken);
             if (apiKey == null)
             {
-                logger.LogWarning("API key not found or does not belong to user: KeyId={KeyId}, UserId={UserId}", 
+                logger.LogWarning("API key not found or does not belong to user: KeyId={KeyId}, UserId={UserId}",
                     request.KeyId, request.UserId);
                 return BaseResponse<bool>.Failure("API key not found", new Dictionary<string, object>
                 {
@@ -38,7 +38,8 @@ public class DeleteApiKeyCommandHandler(
             }
 
             // Delete the API key (soft delete)
-            var deleted = await unitOfWork.Users.DeleteUserApiKeyAsync(request.KeyId, request.UserId, cancellationToken);
+            var deleted =
+                await unitOfWork.Users.DeleteUserApiKeyAsync(request.KeyId, request.UserId, cancellationToken);
             if (!deleted)
             {
                 logger.LogWarning("Failed to delete API key {KeyId} for user: {UserId}", request.KeyId, request.UserId);
@@ -50,7 +51,8 @@ public class DeleteApiKeyCommandHandler(
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Successfully deleted API key {KeyId} for user: {UserId}", request.KeyId, request.UserId);
+            logger.LogInformation("Successfully deleted API key {KeyId} for user: {UserId}", request.KeyId,
+                request.UserId);
             return BaseResponse<bool>.Success(true, "API key deleted successfully");
         }
         catch (Exception ex)

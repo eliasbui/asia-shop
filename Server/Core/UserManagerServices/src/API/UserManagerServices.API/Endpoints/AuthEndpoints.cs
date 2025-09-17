@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using UserManagerServices.API.Common;
 using UserManagerServices.Application.Features.Authentication.Commands;
 using UserManagerServices.Application.Features.Authentication.Queries;
@@ -38,17 +39,17 @@ public static class AuthEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ValidationProblemDetails))
             .Produces(409, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "User registration",
                 Description =
                     "Registers a new user with email, password, and optional role. Returns JWT tokens if email is auto-confirmed.",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Registration successful" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["409"] = new() { Description = "User already exists" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Registration successful" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["409"] = new OpenApiResponse { Description = "User already exists" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -65,18 +66,18 @@ public static class AuthEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(423, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "User login",
                 Description =
                     "Authenticates a user with email/username and password, returns JWT access token and refresh token",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Login successful" },
-                    ["400"] = new() { Description = "Invalid credentials or validation errors" },
-                    ["401"] = new() { Description = "Authentication failed" },
-                    ["423"] = new() { Description = "Account locked due to multiple failed attempts" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Login successful" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid credentials or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "Authentication failed" },
+                    ["423"] = new OpenApiResponse { Description = "Account locked due to multiple failed attempts" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -90,16 +91,16 @@ public static class AuthEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "User logout",
                 Description = "Logs out the current user by blacklisting their JWT token",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Logout successful" },
-                    ["400"] = new() { Description = "Invalid token or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Logout successful" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid token or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -114,16 +115,16 @@ public static class AuthEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Refresh JWT token",
                 Description = "Generates new JWT access token using a valid refresh token",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Token refresh successful" },
-                    ["400"] = new() { Description = "Invalid refresh token" },
-                    ["401"] = new() { Description = "Refresh token expired or invalid" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Token refresh successful" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid refresh token" },
+                    ["401"] = new OpenApiResponse { Description = "Refresh token expired or invalid" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -138,16 +139,16 @@ public static class AuthEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Change password",
                 Description = "Changes the current user's password",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Password changed successfully" },
-                    ["400"] = new() { Description = "Invalid current password or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Password changed successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid current password or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -162,16 +163,16 @@ public static class AuthEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Forgot password",
                 Description = "Initiates password reset process by sending reset email to the user",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Password reset email sent" },
-                    ["400"] = new() { Description = "Invalid email or validation errors" },
-                    ["404"] = new() { Description = "User not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Password reset email sent" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid email or validation errors" },
+                    ["404"] = new OpenApiResponse { Description = "User not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -186,15 +187,15 @@ public static class AuthEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Reset password",
                 Description = "Resets user password using a valid reset token",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Password reset successful" },
-                    ["400"] = new() { Description = "Invalid reset token or validation errors" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Password reset successful" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid reset token or validation errors" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -202,7 +203,8 @@ public static class AuthEndpoints
         authGroup.MapPost("/revoke", RevokeTokenAsync)
             .WithName("RevokeToken")
             .WithSummary("Revoke tokens")
-            .WithDescription("Revokes JWT tokens. Users can revoke their own tokens, admins can revoke any user's tokens.")
+            .WithDescription(
+                "Revokes JWT tokens. Users can revoke their own tokens, admins can revoke any user's tokens.")
             .RequireAuthorization()
             .Accepts<RevokeTokenCommand>("application/json")
             .Produces(200, contentType: "application/json", responseType: typeof(ProblemDetails))
@@ -210,17 +212,18 @@ public static class AuthEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Revoke tokens",
-                Description = "Revokes JWT tokens. Users can revoke their own tokens, admins can revoke any user's tokens.",
-                Responses = new()
+                Description =
+                    "Revokes JWT tokens. Users can revoke their own tokens, admins can revoke any user's tokens.",
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Token(s) revoked successfully" },
-                    ["400"] = new() { Description = "Invalid request or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "Insufficient permissions" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Token(s) revoked successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "Insufficient permissions" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -228,22 +231,24 @@ public static class AuthEndpoints
         authGroup.MapGet("/me", GetCurrentUserAsync)
             .WithName("GetCurrentUser")
             .WithSummary("Get current user profile")
-            .WithDescription("Gets the current authenticated user's profile information including roles, claims, and preferences")
+            .WithDescription(
+                "Gets the current authenticated user's profile information including roles, claims, and preferences")
             .RequireAuthorization()
             .Produces<CurrentUserResponse>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get current user profile",
-                Description = "Gets the current authenticated user's profile information including roles, claims, and preferences",
-                Responses = new()
+                Description =
+                    "Gets the current authenticated user's profile information including roles, claims, and preferences",
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User profile retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["404"] = new() { Description = "User not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User profile retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["404"] = new OpenApiResponse { Description = "User not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
     }
@@ -284,10 +289,7 @@ public static class AuthEndpoints
         CancellationToken cancellationToken = default)
     {
         var token = ApiHelpers.ExtractTokenFromHeader(context);
-        if (string.IsNullOrEmpty(token))
-        {
-            return Results.BadRequest("No token provided");
-        }
+        if (string.IsNullOrEmpty(token)) return Results.BadRequest("No token provided");
 
         var command = new LogoutCommand
         {
@@ -430,10 +432,7 @@ public static class AuthEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var query = new GetCurrentUserQuery { UserId = userId.Value };
         var result = await mediator.Send(query, cancellationToken);

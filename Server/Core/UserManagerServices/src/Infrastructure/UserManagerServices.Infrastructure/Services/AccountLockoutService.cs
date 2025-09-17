@@ -27,22 +27,24 @@ public class AccountLockoutService : IAccountLockoutService
     /// <summary>
     /// Records a login attempt and evaluates lockout conditions
     /// </summary>
-    public async Task<(UserLoginAttempt attempt, bool shouldLockout, UserLockoutHistory? lockout)> RecordLoginAttemptAsync(
-        Guid? userId,
-        string emailOrUsername,
-        bool isSuccessful,
-        LoginFailureReasonEnum? failureReason,
-        string ipAddress,
-        string? userAgent = null,
-        string? locationInfo = null,
-        string? deviceFingerprint = null,
-        Guid? sessionId = null,
-        CancellationToken cancellationToken = default)
+    public async Task<(UserLoginAttempt attempt, bool shouldLockout, UserLockoutHistory? lockout)>
+        RecordLoginAttemptAsync(
+            Guid? userId,
+            string emailOrUsername,
+            bool isSuccessful,
+            LoginFailureReasonEnum? failureReason,
+            string ipAddress,
+            string? userAgent = null,
+            string? locationInfo = null,
+            string? deviceFingerprint = null,
+            Guid? sessionId = null,
+            CancellationToken cancellationToken = default)
     {
         try
         {
             // Calculate risk score
-            var riskScore = await CalculateRiskScoreAsync(userId, ipAddress, userAgent, locationInfo, deviceFingerprint, cancellationToken);
+            var riskScore = await CalculateRiskScoreAsync(userId, ipAddress, userAgent, locationInfo, deviceFingerprint,
+                cancellationToken);
 
             // Create login attempt record
             var attempt = new UserLoginAttempt
@@ -64,7 +66,7 @@ public class AccountLockoutService : IAccountLockoutService
             await _unitOfWork.UserLoginAttempts.AddAsync(attempt, cancellationToken);
 
             UserLockoutHistory? lockout = null;
-            bool shouldLockout = false;
+            var shouldLockout = false;
 
             // Only evaluate lockout for failed attempts with valid user IDs
             if (!isSuccessful && userId.HasValue)
@@ -86,10 +88,15 @@ public class AccountLockoutService : IAccountLockoutService
                     lockout = new UserLockoutHistory
                     {
                         UserId = userId.Value,
-                        LockoutType = securitySettings.EnableProgressiveLockout ? LockoutTypeEnum.Progressive : LockoutTypeEnum.Automatic,
-                        LockoutReason = attempt.IsSuspicious ? LockoutReasonEnum.SuspiciousLoginPattern : LockoutReasonEnum.FailedLoginAttempts,
+                        LockoutType = securitySettings.EnableProgressiveLockout
+                            ? LockoutTypeEnum.Progressive
+                            : LockoutTypeEnum.Automatic,
+                        LockoutReason = attempt.IsSuspicious
+                            ? LockoutReasonEnum.SuspiciousLoginPattern
+                            : LockoutReasonEnum.FailedLoginAttempts,
                         LockoutStart = DateTime.UtcNow,
-                        LockoutEnd = lockoutDuration.HasValue ? DateTime.UtcNow.AddMinutes(lockoutDuration.Value) : null,
+                        LockoutEnd =
+                            lockoutDuration.HasValue ? DateTime.UtcNow.AddMinutes(lockoutDuration.Value) : null,
                         DurationMinutes = lockoutDuration,
                         FailedAttemptCount = recentFailedAttempts.Count + 1,
                         LockoutLevel = lockoutLevel,
@@ -107,14 +114,16 @@ public class AccountLockoutService : IAccountLockoutService
 
                     await _unitOfWork.UserLockoutHistory.AddAsync(lockout, cancellationToken);
 
-                    _logger.LogWarning("User {UserId} locked out due to {FailedAttempts} failed attempts. Lockout level: {LockoutLevel}, Duration: {Duration} minutes",
+                    _logger.LogWarning(
+                        "User {UserId} locked out due to {FailedAttempts} failed attempts. Lockout level: {LockoutLevel}, Duration: {Duration} minutes",
                         userId.Value, recentFailedAttempts.Count + 1, lockoutLevel, lockoutDuration);
                 }
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Login attempt recorded for {EmailOrUsername}. Success: {IsSuccessful}, Risk Score: {RiskScore}, Suspicious: {IsSuspicious}",
+            _logger.LogInformation(
+                "Login attempt recorded for {EmailOrUsername}. Success: {IsSuccessful}, Risk Score: {RiskScore}, Suspicious: {IsSuspicious}",
                 emailOrUsername, isSuccessful, riskScore, attempt.IsSuspicious);
 
             return (attempt, shouldLockout, lockout);
@@ -129,7 +138,8 @@ public class AccountLockoutService : IAccountLockoutService
     /// <summary>
     /// Checks if a user is currently locked out
     /// </summary>
-    public async Task<UserLockoutHistory?> GetActiveLockoutAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserLockoutHistory?> GetActiveLockoutAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _unitOfWork.UserLockoutHistory.GetActiveLockoutAsync(userId, cancellationToken);
     }
@@ -150,10 +160,9 @@ public class AccountLockoutService : IAccountLockoutService
             // Check if user is already locked out
             var existingLockout = await GetActiveLockoutAsync(userId, cancellationToken);
             if (existingLockout != null)
-            {
                 // Release existing lockout first
-                await ReleaseLockoutAsync(userId, LockoutReleaseReasonEnum.ManualRelease, lockedByUserId, cancellationToken);
-            }
+                await ReleaseLockoutAsync(userId, LockoutReleaseReasonEnum.ManualRelease, lockedByUserId,
+                    cancellationToken);
 
             var lockout = new UserLockoutHistory
             {
@@ -174,7 +183,8 @@ public class AccountLockoutService : IAccountLockoutService
             await _unitOfWork.UserLockoutHistory.AddAsync(lockout, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            _logger.LogWarning("User {UserId} manually locked out by {LockedByUserId}. Reason: {LockoutReason}, Duration: {Duration} minutes",
+            _logger.LogWarning(
+                "User {UserId} manually locked out by {LockedByUserId}. Reason: {LockoutReason}, Duration: {Duration} minutes",
                 userId, lockedByUserId, lockoutReason, durationMinutes);
 
             return lockout;
@@ -205,10 +215,8 @@ public class AccountLockoutService : IAccountLockoutService
                 activeLockout.Id, releaseReason, releasedByUserId, cancellationToken);
 
             if (success)
-            {
                 _logger.LogInformation("User {UserId} lockout released by {ReleasedByUserId}. Reason: {ReleaseReason}",
                     userId, releasedByUserId, releaseReason);
-            }
 
             return success;
         }
@@ -232,7 +240,7 @@ public class AccountLockoutService : IAccountLockoutService
     {
         try
         {
-            decimal riskScore = 0.0m;
+            var riskScore = 0.0m;
 
             if (!userId.HasValue)
             {
@@ -251,10 +259,7 @@ public class AccountLockoutService : IAccountLockoutService
                     .Distinct()
                     .ToList();
 
-                if (!knownIpAddresses.Contains(ipAddress))
-                {
-                    riskScore += 0.4m; // New IP address
-                }
+                if (!knownIpAddresses.Contains(ipAddress)) riskScore += 0.4m; // New IP address
 
                 // Check for unusual user agent
                 if (!string.IsNullOrEmpty(userAgent))
@@ -266,34 +271,27 @@ public class AccountLockoutService : IAccountLockoutService
                         .ToList();
 
                     if (!knownUserAgents.Any(ua => ua!.Contains(userAgent.Split(' ')[0]))) // Check browser family
-                    {
                         riskScore += 0.2m; // New user agent
-                    }
                 }
 
                 // Check for rapid successive attempts
                 var recentFailedAttempts = await GetRecentFailedAttemptsAsync(userId.Value, cancellationToken);
-                if (recentFailedAttempts.Count >= 3)
-                {
-                    riskScore += 0.3m; // Multiple recent failures
-                }
+                if (recentFailedAttempts.Count >= 3) riskScore += 0.3m; // Multiple recent failures
             }
 
             // Check IP reputation (simplified - in real implementation, use external service)
             var ipAttempts = await _unitOfWork.UserLoginAttempts.GetIpAttemptsAsync(
                 ipAddress, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow, cancellationToken);
 
-            if (ipAttempts.Count > 10)
-            {
-                riskScore += 0.4m; // High activity from IP
-            }
+            if (ipAttempts.Count > 10) riskScore += 0.4m; // High activity from IP
 
             // Ensure risk score is between 0 and 1
             return Math.Min(1.0m, Math.Max(0.0m, riskScore));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error calculating risk score for user {UserId} from IP {IpAddress}", userId, ipAddress);
+            _logger.LogError(ex, "Error calculating risk score for user {UserId} from IP {IpAddress}", userId,
+                ipAddress);
             return 0.5m; // Default moderate risk on error
         }
     }
@@ -301,18 +299,21 @@ public class AccountLockoutService : IAccountLockoutService
     /// <summary>
     /// Gets failed login attempts for a user within the configured time window
     /// </summary>
-    public async Task<List<UserLoginAttempt>> GetRecentFailedAttemptsAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<List<UserLoginAttempt>> GetRecentFailedAttemptsAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         var securitySettings = await GetSecuritySettingsAsync(userId, cancellationToken);
         var fromDate = DateTime.UtcNow.AddMinutes(-securitySettings.FailedAttemptWindowMinutes);
-        
-        return await _unitOfWork.UserLoginAttempts.GetFailedAttemptsAsync(userId, fromDate, DateTime.UtcNow, cancellationToken);
+
+        return await _unitOfWork.UserLoginAttempts.GetFailedAttemptsAsync(userId, fromDate, DateTime.UtcNow,
+            cancellationToken);
     }
 
     /// <summary>
     /// Gets security settings for a user
     /// </summary>
-    public async Task<UserSecuritySettings> GetSecuritySettingsAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserSecuritySettings> GetSecuritySettingsAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _unitOfWork.UserSecuritySettings.GetUserSecuritySettingsAsync(userId, cancellationToken);
     }
@@ -320,10 +321,11 @@ public class AccountLockoutService : IAccountLockoutService
     /// <summary>
     /// Updates security settings for a user
     /// </summary>
-    public async Task<UserSecuritySettings> UpdateSecuritySettingsAsync(Guid userId, UserSecuritySettings settings, 
+    public async Task<UserSecuritySettings> UpdateSecuritySettingsAsync(Guid userId, UserSecuritySettings settings,
         CancellationToken cancellationToken = default)
     {
-        return await _unitOfWork.UserSecuritySettings.CreateOrUpdateUserSettingsAsync(userId, settings, cancellationToken);
+        return await _unitOfWork.UserSecuritySettings.CreateOrUpdateUserSettingsAsync(userId, settings,
+            cancellationToken);
     }
 
     /// <summary>
@@ -336,7 +338,7 @@ public class AccountLockoutService : IAccountLockoutService
             ipAddress, DateTime.UtcNow.AddHours(-1), DateTime.UtcNow, cancellationToken);
 
         var failedAttempts = recentAttempts.Count(a => !a.IsSuccessful);
-        
+
         // Block if more than 20 failed attempts in the last hour
         return failedAttempts > 20;
     }
@@ -344,7 +346,7 @@ public class AccountLockoutService : IAccountLockoutService
     /// <summary>
     /// Gets lockout statistics for a date range
     /// </summary>
-    public async Task<Dictionary<string, int>> GetLockoutStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    public async Task<Dictionary<string, int>> GetLockoutStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         return await _unitOfWork.UserLockoutHistory.GetLockoutStatisticsAsync(fromDate, toDate, cancellationToken);
@@ -353,7 +355,7 @@ public class AccountLockoutService : IAccountLockoutService
     /// <summary>
     /// Gets login attempt statistics for a date range
     /// </summary>
-    public async Task<Dictionary<string, int>> GetLoginStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    public async Task<Dictionary<string, int>> GetLoginStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         return await _unitOfWork.UserLoginAttempts.GetLoginStatisticsAsync(fromDate, toDate, cancellationToken);
@@ -366,17 +368,19 @@ public class AccountLockoutService : IAccountLockoutService
     {
         try
         {
-            var globalSettings = await _unitOfWork.UserSecuritySettings.GetGlobalDefaultSettingsAsync(cancellationToken);
-            
+            var globalSettings =
+                await _unitOfWork.UserSecuritySettings.GetGlobalDefaultSettingsAsync(cancellationToken);
+
             var attemptsCleanedUp = await _unitOfWork.UserLoginAttempts.CleanupOldAttemptsAsync(
                 globalSettings.SecurityLogRetentionDays, cancellationToken);
-            
+
             var historyCleanedUp = await _unitOfWork.UserLockoutHistory.CleanupOldHistoryAsync(
                 globalSettings.SecurityLogRetentionDays * 4, cancellationToken); // Keep lockout history longer
 
             var totalCleanedUp = attemptsCleanedUp + historyCleanedUp;
 
-            _logger.LogInformation("Cleaned up {TotalRecords} old security records ({Attempts} login attempts, {History} lockout history)",
+            _logger.LogInformation(
+                "Cleaned up {TotalRecords} old security records ({Attempts} login attempts, {History} lockout history)",
                 totalCleanedUp, attemptsCleanedUp, historyCleanedUp);
 
             return totalCleanedUp;
@@ -394,7 +398,7 @@ public class AccountLockoutService : IAccountLockoutService
     private async Task<int> CalculateLockoutLevelAsync(Guid userId, CancellationToken cancellationToken)
     {
         var securitySettings = await GetSecuritySettingsAsync(userId, cancellationToken);
-        
+
         if (!securitySettings.EnableProgressiveLockout)
             return 1;
 
@@ -413,8 +417,9 @@ public class AccountLockoutService : IAccountLockoutService
         if (!settings.EnableProgressiveLockout)
             return settings.InitialLockoutDurationMinutes;
 
-        var duration = (int)(settings.InitialLockoutDurationMinutes * Math.Pow((double)settings.LockoutDurationMultiplier, lockoutLevel - 1));
-        
+        var duration = (int)(settings.InitialLockoutDurationMinutes *
+                             Math.Pow((double)settings.LockoutDurationMultiplier, lockoutLevel - 1));
+
         return Math.Min(duration, settings.MaxLockoutDurationMinutes);
     }
 }

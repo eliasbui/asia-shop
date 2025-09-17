@@ -26,7 +26,7 @@ public class UnlockUserCommandHandler(
     {
         try
         {
-            logger.LogInformation("Unlocking user: {UserId} (unlocked by: {UnlockedBy})", 
+            logger.LogInformation("Unlocking user: {UserId} (unlocked by: {UnlockedBy})",
                 request.UserId, request.UnlockedBy);
 
             // Get user to unlock
@@ -55,7 +55,7 @@ public class UnlockUserCommandHandler(
             var result = await userManager.SetLockoutEndDateAsync(user, null);
             if (!result.Succeeded)
             {
-                logger.LogWarning("Failed to unlock user {UserId}: {Errors}", 
+                logger.LogWarning("Failed to unlock user {UserId}: {Errors}",
                     request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
                 return BaseResponse<bool>.Failure("Failed to unlock user account", new Dictionary<string, object>
                 {

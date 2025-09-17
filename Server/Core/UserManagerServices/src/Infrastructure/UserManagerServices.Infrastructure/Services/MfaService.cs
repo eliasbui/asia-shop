@@ -43,17 +43,12 @@ public class MfaService(
         try
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                throw new InvalidOperationException("User not found");
-            }
+            if (user == null) throw new InvalidOperationException("User not found");
 
             // Get or create MFA settings
             var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
             if (mfaSettings == null)
-            {
                 throw new InvalidOperationException("MFA setup not initiated. Please setup TOTP first.");
-            }
 
             // Verify TOTP code
             var decryptedSecret = _totpService.DecryptSecretKey(mfaSettings.TotpSecretKey!);
@@ -96,16 +91,10 @@ public class MfaService(
         try
         {
             var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (mfaSettings == null || !mfaSettings.IsEnabled)
-            {
-                return true; // Already disabled
-            }
+            if (mfaSettings == null || !mfaSettings.IsEnabled) return true; // Already disabled
 
             // Check if MFA is enforced
-            if (mfaSettings.IsEnforced)
-            {
-                throw new InvalidOperationException("MFA is enforced and cannot be disabled");
-            }
+            if (mfaSettings.IsEnforced) throw new InvalidOperationException("MFA is enforced and cannot be disabled");
 
             // Disable MFA
             mfaSettings.IsEnabled = false;
@@ -146,10 +135,7 @@ public class MfaService(
         try
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-            {
-                throw new InvalidOperationException("User not found");
-            }
+            if (user == null) throw new InvalidOperationException("User not found");
 
             // Generate secret key
             var secretKey = _totpService.GenerateSecretKey();
@@ -195,10 +181,7 @@ public class MfaService(
         try
         {
             var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (mfaSettings?.TotpSecretKey == null)
-            {
-                return false;
-            }
+            if (mfaSettings?.TotpSecretKey == null) return false;
 
             var decryptedSecret = _totpService.DecryptSecretKey(mfaSettings.TotpSecretKey);
             var isValid = _totpService.ValidateTotpCode(decryptedSecret, totpCode);
@@ -226,10 +209,7 @@ public class MfaService(
         try
         {
             var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (mfaSettings?.TotpSecretKey == null || !mfaSettings.IsTotpEnabled)
-            {
-                return false;
-            }
+            if (mfaSettings?.TotpSecretKey == null || !mfaSettings.IsTotpEnabled) return false;
 
             var decryptedSecret = _totpService.DecryptSecretKey(mfaSettings.TotpSecretKey);
             var isValid = _totpService.ValidateTotpCode(decryptedSecret, totpCode);
@@ -259,15 +239,11 @@ public class MfaService(
         try
         {
             var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (mfaSettings == null || !mfaSettings.IsBackupCodesEnabled)
-            {
-                return false;
-            }
+            if (mfaSettings == null || !mfaSettings.IsBackupCodesEnabled) return false;
 
             var backupCodes = await _unitOfWork.UserMfaBackupCodes.GetActiveByUserIdAsync(userId, cancellationToken);
 
             foreach (var code in backupCodes)
-            {
                 if (_passwordHashingService.VerifyPassword(backupCode, code.CodeHash))
                 {
                     // Mark code as used
@@ -288,7 +264,6 @@ public class MfaService(
 
                     return true;
                 }
-            }
 
             await LogMfaActivityAsync(userId, MfaActionEnum.BackupCodeFailed, "BackupCode", false,
                 "Invalid backup code", ipAddress, userAgent, cancellationToken: cancellationToken);
@@ -310,10 +285,7 @@ public class MfaService(
             var activeOtps = await _unitOfWork.UserEmailOtps.GetActiveByUserIdAsync(userId, "MFA", cancellationToken);
             var otp = activeOtps.FirstOrDefault(o => !o.IsUsed && !o.IsBlocked && o.ExpiresAt > DateTime.UtcNow);
 
-            if (otp == null)
-            {
-                return false;
-            }
+            if (otp == null) return false;
 
             // Check attempt count
             otp.AttemptCount++;
@@ -335,10 +307,7 @@ public class MfaService(
                 otp.UsedFromUserAgent = userAgent;
 
                 var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-                if (mfaSettings != null)
-                {
-                    mfaSettings.LastUsedAt = DateTime.UtcNow;
-                }
+                if (mfaSettings != null) mfaSettings.LastUsedAt = DateTime.UtcNow;
             }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -366,23 +335,17 @@ public class MfaService(
         try
         {
             var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (mfaSettings == null)
-            {
-                throw new InvalidOperationException("MFA not set up for user");
-            }
+            if (mfaSettings == null) throw new InvalidOperationException("MFA not set up for user");
 
             // Invalidate existing backup codes
             var existingCodes = await _unitOfWork.UserMfaBackupCodes.GetByUserIdAsync(userId, cancellationToken);
-            foreach (var code in existingCodes)
-            {
-                code.IsDeleted = true;
-            }
+            foreach (var code in existingCodes) code.IsDeleted = true;
 
             // Generate new backup codes
             var backupCodes = new List<string>();
             var batchId = Guid.NewGuid();
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
                 var code = GenerateBackupCode();
                 var hashedCode = _passwordHashingService.HashPassword(code);
@@ -441,10 +404,7 @@ public class MfaService(
         try
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user?.Email == null)
-            {
-                return false;
-            }
+            if (user?.Email == null) return false;
 
             // Generate OTP
             var otp = GenerateEmailOtp();
@@ -465,16 +425,16 @@ public class MfaService(
 
             // Send email
             var emailSent = await _emailService.SendTemplatedEmailAsync(
-                to: user.Email,
-                templateName: "mfa-otp",
-                templateData: new Dictionary<string, object>
+                user.Email,
+                "mfa-otp",
+                new Dictionary<string, object>
                 {
                     { "FirstName", user.FirstName ?? "User" },
                     { "OtpCode", otp },
                     { "ExpiryMinutes", "10" },
                     { "Purpose", purpose }
                 },
-                cancellationToken: cancellationToken);
+                cancellationToken);
 
             await LogMfaActivityAsync(userId, MfaActionEnum.EmailOtpSent, "EmailOTP", emailSent,
                 emailSent ? null : "Failed to send email", cancellationToken: cancellationToken);
@@ -493,7 +453,8 @@ public class MfaService(
     {
         try
         {
-            return await _unitOfWork.UserEmailOtps.GetRecentOtpAttemptsAsync(userId, purpose, withinMinutes, cancellationToken);
+            return await _unitOfWork.UserEmailOtps.GetRecentOtpAttemptsAsync(userId, purpose, withinMinutes,
+                cancellationToken);
         }
         catch (Exception ex)
         {
@@ -619,10 +580,7 @@ public class MfaService(
             // In a real implementation, you'd validate the recovery token
 
             var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (mfaSettings == null)
-            {
-                throw new InvalidOperationException("MFA settings not found");
-            }
+            if (mfaSettings == null) throw new InvalidOperationException("MFA settings not found");
 
             // Update secret key
             var encryptedSecret = _totpService.EncryptSecretKey(newSecretKey);

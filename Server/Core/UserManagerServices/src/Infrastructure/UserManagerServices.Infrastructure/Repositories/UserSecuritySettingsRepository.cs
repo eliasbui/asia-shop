@@ -17,7 +17,8 @@ public class UserSecuritySettingsRepository : GenericRepository<UserSecuritySett
     /// <summary>
     /// Gets security settings for a user (or global default if user-specific doesn't exist)
     /// </summary>
-    public async Task<UserSecuritySettings> GetUserSecuritySettingsAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserSecuritySettings> GetUserSecuritySettingsAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         // First try to get user-specific settings
         var userSettings = await _context.UserSecuritySettings
@@ -73,7 +74,7 @@ public class UserSecuritySettingsRepository : GenericRepository<UserSecuritySett
     /// <summary>
     /// Creates or updates user-specific security settings
     /// </summary>
-    public async Task<UserSecuritySettings> CreateOrUpdateUserSettingsAsync(Guid userId, UserSecuritySettings settings, 
+    public async Task<UserSecuritySettings> CreateOrUpdateUserSettingsAsync(Guid userId, UserSecuritySettings settings,
         CancellationToken cancellationToken = default)
     {
         var existingSettings = await _context.UserSecuritySettings
@@ -120,7 +121,7 @@ public class UserSecuritySettingsRepository : GenericRepository<UserSecuritySett
     /// <summary>
     /// Updates global default security settings
     /// </summary>
-    public async Task<UserSecuritySettings> UpdateGlobalDefaultSettingsAsync(UserSecuritySettings settings, 
+    public async Task<UserSecuritySettings> UpdateGlobalDefaultSettingsAsync(UserSecuritySettings settings,
         CancellationToken cancellationToken = default)
     {
         var globalSettings = await _context.UserSecuritySettings

@@ -19,13 +19,13 @@ public class UserLoginAttemptRepository : GenericRepository<UserLoginAttempt>, I
     /// <summary>
     /// Gets login attempts for a user within a time window
     /// </summary>
-    public async Task<List<UserLoginAttempt>> GetUserAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    public async Task<List<UserLoginAttempt>> GetUserAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         return await _context.UserLoginAttempts
-            .Where(la => la.UserId == userId && 
-                        la.AttemptedAt >= fromDate && 
-                        la.AttemptedAt <= toDate)
+            .Where(la => la.UserId == userId &&
+                         la.AttemptedAt >= fromDate &&
+                         la.AttemptedAt <= toDate)
             .OrderByDescending(la => la.AttemptedAt)
             .ToListAsync(cancellationToken);
     }
@@ -33,14 +33,14 @@ public class UserLoginAttemptRepository : GenericRepository<UserLoginAttempt>, I
     /// <summary>
     /// Gets failed login attempts for a user within a time window
     /// </summary>
-    public async Task<List<UserLoginAttempt>> GetFailedAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    public async Task<List<UserLoginAttempt>> GetFailedAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         return await _context.UserLoginAttempts
-            .Where(la => la.UserId == userId && 
-                        !la.IsSuccessful &&
-                        la.AttemptedAt >= fromDate && 
-                        la.AttemptedAt <= toDate)
+            .Where(la => la.UserId == userId &&
+                         !la.IsSuccessful &&
+                         la.AttemptedAt >= fromDate &&
+                         la.AttemptedAt <= toDate)
             .OrderByDescending(la => la.AttemptedAt)
             .ToListAsync(cancellationToken);
     }
@@ -48,13 +48,13 @@ public class UserLoginAttemptRepository : GenericRepository<UserLoginAttempt>, I
     /// <summary>
     /// Gets login attempts from a specific IP address within a time window
     /// </summary>
-    public async Task<List<UserLoginAttempt>> GetIpAttemptsAsync(string ipAddress, DateTime fromDate, DateTime toDate, 
+    public async Task<List<UserLoginAttempt>> GetIpAttemptsAsync(string ipAddress, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         return await _context.UserLoginAttempts
-            .Where(la => la.IpAddress == ipAddress && 
-                        la.AttemptedAt >= fromDate && 
-                        la.AttemptedAt <= toDate)
+            .Where(la => la.IpAddress == ipAddress &&
+                         la.AttemptedAt >= fromDate &&
+                         la.AttemptedAt <= toDate)
             .OrderByDescending(la => la.AttemptedAt)
             .ToListAsync(cancellationToken);
     }
@@ -81,7 +81,7 @@ public class UserLoginAttemptRepository : GenericRepository<UserLoginAttempt>, I
     /// <summary>
     /// Gets recent login attempts for a user
     /// </summary>
-    public async Task<List<UserLoginAttempt>> GetRecentAttemptsAsync(Guid userId, int count = 10, 
+    public async Task<List<UserLoginAttempt>> GetRecentAttemptsAsync(Guid userId, int count = 10,
         CancellationToken cancellationToken = default)
     {
         return await _context.UserLoginAttempts
@@ -94,13 +94,13 @@ public class UserLoginAttemptRepository : GenericRepository<UserLoginAttempt>, I
     /// <summary>
     /// Gets login attempts by email or username
     /// </summary>
-    public async Task<List<UserLoginAttempt>> GetAttemptsByEmailOrUsernameAsync(string emailOrUsername, 
+    public async Task<List<UserLoginAttempt>> GetAttemptsByEmailOrUsernameAsync(string emailOrUsername,
         DateTime fromDate, DateTime toDate, CancellationToken cancellationToken = default)
     {
         return await _context.UserLoginAttempts
-            .Where(la => la.EmailOrUsername.ToLower() == emailOrUsername.ToLower() && 
-                        la.AttemptedAt >= fromDate && 
-                        la.AttemptedAt <= toDate)
+            .Where(la => la.EmailOrUsername.ToLower() == emailOrUsername.ToLower() &&
+                         la.AttemptedAt >= fromDate &&
+                         la.AttemptedAt <= toDate)
             .OrderByDescending(la => la.AttemptedAt)
             .ToListAsync(cancellationToken);
     }
@@ -108,7 +108,7 @@ public class UserLoginAttemptRepository : GenericRepository<UserLoginAttempt>, I
     /// <summary>
     /// Gets login statistics for a date range
     /// </summary>
-    public async Task<Dictionary<string, int>> GetLoginStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    public async Task<Dictionary<string, int>> GetLoginStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         var sql = @"
@@ -142,10 +142,11 @@ public class UserLoginAttemptRepository : GenericRepository<UserLoginAttempt>, I
     /// <summary>
     /// Cleans up old login attempts
     /// </summary>
-    public async Task<int> CleanupOldAttemptsAsync(int olderThanDays = 90, CancellationToken cancellationToken = default)
+    public async Task<int> CleanupOldAttemptsAsync(int olderThanDays = 90,
+        CancellationToken cancellationToken = default)
     {
         var cutoffDate = DateTime.UtcNow.AddDays(-olderThanDays);
-        
+
         var sql = @"
             DELETE FROM ""UserLoginAttempts""
             WHERE ""AttemptedAt"" < @CutoffDate";

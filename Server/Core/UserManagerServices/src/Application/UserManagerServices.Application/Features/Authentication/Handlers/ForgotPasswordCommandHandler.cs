@@ -69,13 +69,13 @@ public class ForgotPasswordCommandHandler(
                 user.Id, resetToken);
 
             var resetUrl = $"https://yourdomain.com/reset-password?token={resetToken}";
-            
+
             // Send email
             if (user.FirstName != null)
                 await emailService.SendTemplatedEmailAsync(
-                    to: request.Email,
-                    templateName: "password-reset",
-                    templateData: new Dictionary<string, object>
+                    request.Email,
+                    "password-reset",
+                    new Dictionary<string, object>
                     {
                         { "FirstName", user.FirstName },
                         { "Email", request.Email },
@@ -83,7 +83,7 @@ public class ForgotPasswordCommandHandler(
                         { "ResetUrl", $"{resetUrl}" },
                         { "ExpiryHours", "24" },
                         { "SupportEmail", "support@yourdomain.com" }
-                    }, cancellationToken: cancellationToken);
+                    }, cancellationToken);
 
             logger.LogInformation("Password reset email would be sent to: {Email}", request.Email);
 

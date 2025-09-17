@@ -83,7 +83,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="roleName">Role name</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Users in the specified role</returns>
-    public async Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName,
+        CancellationToken cancellationToken = default)
     {
         return await _context.UserRoles
             .Where(ur => !ur.IsDeleted)
@@ -115,7 +116,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="endDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Users created within the date range</returns>
-    public async Task<IEnumerable<User>> GetUsersByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<User>> GetUsersByDateRangeAsync(DateTime startDate, DateTime endDate,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(u => u.CreatedAt >= startDate && u.CreatedAt <= endDate)
@@ -147,7 +149,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
         var today = DateTime.UtcNow.Date;
         var tomorrow = today.AddDays(1);
 
-        return await _dbSet.CountAsync(u => u.CreatedAt >= today && u.CreatedAt < tomorrow && !u.IsDeleted, cancellationToken);
+        return await _dbSet.CountAsync(u => u.CreatedAt >= today && u.CreatedAt < tomorrow && !u.IsDeleted,
+            cancellationToken);
     }
 
     /// <summary>
@@ -156,7 +159,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="days">Number of days to look back</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Registration statistics</returns>
-    public async Task<Dictionary<DateTime, int>> GetRegistrationStatisticsAsync(int days, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<DateTime, int>> GetRegistrationStatisticsAsync(int days,
+        CancellationToken cancellationToken = default)
     {
         var startDate = DateTime.UtcNow.Date.AddDays(-days);
 
@@ -181,14 +185,12 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="excludeUserId">User ID to exclude from check (for updates)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if email is taken, false otherwise</returns>
-    public async Task<bool> IsEmailTakenAsync(string email, Guid? excludeUserId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> IsEmailTakenAsync(string email, Guid? excludeUserId = null,
+        CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(u => u.Email == email);
 
-        if (excludeUserId.HasValue)
-        {
-            query = query.Where(u => u.Id != excludeUserId.Value);
-        }
+        if (excludeUserId.HasValue) query = query.Where(u => u.Id != excludeUserId.Value);
 
         return await query.AnyAsync(cancellationToken);
     }
@@ -200,14 +202,12 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="excludeUserId">User ID to exclude from check (for updates)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if username is taken, false otherwise</returns>
-    public async Task<bool> IsUsernameTakenAsync(string username, Guid? excludeUserId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> IsUsernameTakenAsync(string username, Guid? excludeUserId = null,
+        CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(u => u.UserName == username);
 
-        if (excludeUserId.HasValue)
-        {
-            query = query.Where(u => u.Id != excludeUserId.Value);
-        }
+        if (excludeUserId.HasValue) query = query.Where(u => u.Id != excludeUserId.Value);
 
         return await query.AnyAsync(cancellationToken);
     }
@@ -219,14 +219,12 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="excludeUserId">User ID to exclude from check (for updates)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if phone number is taken, false otherwise</returns>
-    public async Task<bool> IsPhoneNumberTakenAsync(string phoneNumber, Guid? excludeUserId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> IsPhoneNumberTakenAsync(string phoneNumber, Guid? excludeUserId = null,
+        CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(u => u.PhoneNumber == phoneNumber);
 
-        if (excludeUserId.HasValue)
-        {
-            query = query.Where(u => u.Id != excludeUserId.Value);
-        }
+        if (excludeUserId.HasValue) query = query.Where(u => u.Id != excludeUserId.Value);
 
         return await query.AnyAsync(cancellationToken);
     }
@@ -265,10 +263,7 @@ public class UserRepository : GenericRepository<User>, IUserRepository
                 (u.UserName != null && u.UserName.ToLower().Contains(lowerSearchTerm)));
         }
 
-        if (isActive.HasValue)
-        {
-            query = query.Where(u => u.IsActive == isActive.Value);
-        }
+        if (isActive.HasValue) query = query.Where(u => u.IsActive == isActive.Value);
 
         if (roles != null && roles.Any())
         {
@@ -326,7 +321,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User preferences</returns>
-    public async Task<IEnumerable<UserPreference>> GetUserPreferencesAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserPreference>> GetUserPreferencesAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _context.UserPreferences
             .Where(up => up.UserId == userId && !up.IsDeleted)
@@ -341,10 +337,12 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="key">Preference key</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User preference if found, null otherwise</returns>
-    public async Task<UserPreference?> GetUserPreferenceAsync(Guid userId, string category, string key, CancellationToken cancellationToken = default)
+    public async Task<UserPreference?> GetUserPreferenceAsync(Guid userId, string category, string key,
+        CancellationToken cancellationToken = default)
     {
         return await _context.UserPreferences
-            .FirstOrDefaultAsync(up => up.UserId == userId && up.Category == category && up.Key == key && !up.IsDeleted, cancellationToken);
+            .FirstOrDefaultAsync(up => up.UserId == userId && up.Category == category && up.Key == key && !up.IsDeleted,
+                cancellationToken);
     }
 
     /// <summary>
@@ -353,9 +351,11 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="userPreference">User preference to add or update</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the operation</returns>
-    public async Task AddOrUpdateUserPreferenceAsync(UserPreference userPreference, CancellationToken cancellationToken = default)
+    public async Task AddOrUpdateUserPreferenceAsync(UserPreference userPreference,
+        CancellationToken cancellationToken = default)
     {
-        var existing = await GetUserPreferenceAsync(userPreference.UserId, userPreference.Category, userPreference.Key, cancellationToken);
+        var existing = await GetUserPreferenceAsync(userPreference.UserId, userPreference.Category, userPreference.Key,
+            cancellationToken);
 
         if (existing != null)
         {
@@ -379,7 +379,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User notification settings if found, null otherwise</returns>
-    public async Task<UserNotificationSettings?> GetUserNotificationSettingsAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserNotificationSettings?> GetUserNotificationSettingsAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _context.UserNotificationSettings
             .FirstOrDefaultAsync(uns => uns.UserId == userId && !uns.IsDeleted, cancellationToken);
@@ -391,7 +392,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="notificationSettings">Notification settings to add or update</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the operation</returns>
-    public async Task AddOrUpdateNotificationSettingsAsync(UserNotificationSettings notificationSettings, CancellationToken cancellationToken = default)
+    public async Task AddOrUpdateNotificationSettingsAsync(UserNotificationSettings notificationSettings,
+        CancellationToken cancellationToken = default)
     {
         var existing = await GetUserNotificationSettingsAsync(notificationSettings.UserId, cancellationToken);
 
@@ -442,7 +444,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User API keys</returns>
-    public async Task<IEnumerable<UserApiKey>> GetUserApiKeysAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserApiKey>> GetUserApiKeysAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _context.UserApiKeys
             .Where(uak => uak.UserId == userId && !uak.IsDeleted)
@@ -457,7 +460,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User API key if found, null otherwise</returns>
-    public async Task<UserApiKey?> GetUserApiKeyAsync(Guid keyId, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserApiKey?> GetUserApiKeyAsync(Guid keyId, Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _context.UserApiKeys
             .FirstOrDefaultAsync(uak => uak.Id == keyId && uak.UserId == userId && !uak.IsDeleted, cancellationToken);
@@ -481,7 +485,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if deleted, false if not found</returns>
-    public async Task<bool> DeleteUserApiKeyAsync(Guid keyId, Guid userId, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteUserApiKeyAsync(Guid keyId, Guid userId,
+        CancellationToken cancellationToken = default)
     {
         var apiKey = await GetUserApiKeyAsync(keyId, userId, cancellationToken);
         if (apiKey == null)

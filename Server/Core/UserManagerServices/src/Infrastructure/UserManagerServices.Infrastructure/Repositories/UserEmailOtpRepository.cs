@@ -20,7 +20,8 @@ public class UserEmailOtpRepository : GenericRepository<UserEmailOtp>, IUserEmai
     public UserEmailOtpRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
-        _dapperConnectionFactory = dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
+        _dapperConnectionFactory =
+            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     /// <summary>
@@ -30,15 +31,15 @@ public class UserEmailOtpRepository : GenericRepository<UserEmailOtp>, IUserEmai
     /// <param name="purpose">OTP purpose</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of active email OTPs</returns>
-    public async Task<List<UserEmailOtp>> GetActiveByUserIdAsync(Guid userId, string purpose, 
+    public async Task<List<UserEmailOtp>> GetActiveByUserIdAsync(Guid userId, string purpose,
         CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Where(otp => otp.UserId == userId && 
-                         otp.Purpose == purpose &&
-                         !otp.IsUsed && 
-                         !otp.IsBlocked && 
-                         otp.ExpiresAt > DateTime.UtcNow)
+            .Where(otp => otp.UserId == userId &&
+                          otp.Purpose == purpose &&
+                          !otp.IsUsed &&
+                          !otp.IsBlocked &&
+                          otp.ExpiresAt > DateTime.UtcNow)
             .OrderByDescending(otp => otp.CreatedAt)
             .ToListAsync(cancellationToken);
     }
@@ -49,7 +50,7 @@ public class UserEmailOtpRepository : GenericRepository<UserEmailOtp>, IUserEmai
     /// <param name="emailAddress">Email address</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of email OTPs</returns>
-    public async Task<List<UserEmailOtp>> GetByEmailAddressAsync(string emailAddress, 
+    public async Task<List<UserEmailOtp>> GetByEmailAddressAsync(string emailAddress,
         CancellationToken cancellationToken = default)
     {
         return await _dbSet
@@ -79,10 +80,10 @@ public class UserEmailOtpRepository : GenericRepository<UserEmailOtp>, IUserEmai
     public async Task<int> CleanupExpiredOtpsAsync(int olderThanDays = 7, CancellationToken cancellationToken = default)
     {
         var cutoffDate = DateTime.UtcNow.AddDays(-olderThanDays);
-        
+
         var otpsToDelete = await _dbSet
-            .Where(otp => (otp.IsUsed || otp.ExpiresAt <= DateTime.UtcNow) && 
-                         otp.CreatedAt <= cutoffDate)
+            .Where(otp => (otp.IsUsed || otp.ExpiresAt <= DateTime.UtcNow) &&
+                          otp.CreatedAt <= cutoffDate)
             .ToListAsync(cancellationToken);
 
         foreach (var otp in otpsToDelete)
@@ -102,15 +103,15 @@ public class UserEmailOtpRepository : GenericRepository<UserEmailOtp>, IUserEmai
     /// <param name="withinMinutes">Time window in minutes</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Count of recent OTP attempts</returns>
-    public async Task<int> GetRecentOtpAttemptsAsync(Guid userId, string purpose, int withinMinutes = 5, 
+    public async Task<int> GetRecentOtpAttemptsAsync(Guid userId, string purpose, int withinMinutes = 5,
         CancellationToken cancellationToken = default)
     {
         var cutoffTime = DateTime.UtcNow.AddMinutes(-withinMinutes);
-        
+
         return await _dbSet
-            .CountAsync(otp => otp.UserId == userId && 
-                              otp.Purpose == purpose && 
-                              otp.CreatedAt >= cutoffTime, 
-                       cancellationToken);
+            .CountAsync(otp => otp.UserId == userId &&
+                               otp.Purpose == purpose &&
+                               otp.CreatedAt >= cutoffTime,
+                cancellationToken);
     }
 }

@@ -20,7 +20,8 @@ public class UserMfaSettingsRepository : GenericRepository<UserMfaSettings>, IUs
     public UserMfaSettingsRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
-        _dapperConnectionFactory = dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
+        _dapperConnectionFactory =
+            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     /// <summary>
@@ -69,16 +70,16 @@ public class UserMfaSettingsRepository : GenericRepository<UserMfaSettings>, IUs
     /// <param name="daysBeforeExpiry">Days before expiry to check</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of users with expiring grace period</returns>
-    public async Task<List<UserMfaSettings>> GetExpiringGracePeriodUsersAsync(int daysBeforeExpiry = 7, 
+    public async Task<List<UserMfaSettings>> GetExpiringGracePeriodUsersAsync(int daysBeforeExpiry = 7,
         CancellationToken cancellationToken = default)
     {
         var expiryDate = DateTime.UtcNow.AddDays(daysBeforeExpiry);
-        
+
         return await _dbSet
-            .Where(ms => ms.IsEnforced && 
-                        ms.EnforcementGracePeriodEnd.HasValue && 
-                        ms.EnforcementGracePeriodEnd <= expiryDate &&
-                        !ms.IsEnabled)
+            .Where(ms => ms.IsEnforced &&
+                         ms.EnforcementGracePeriodEnd.HasValue &&
+                         ms.EnforcementGracePeriodEnd <= expiryDate &&
+                         !ms.IsEnabled)
             .Include(ms => ms.User)
             .ToListAsync(cancellationToken);
     }

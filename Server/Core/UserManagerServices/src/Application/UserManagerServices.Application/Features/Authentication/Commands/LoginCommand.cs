@@ -34,4 +34,3 @@ public class LoginCommand : IRequest<BaseResponse<LoginResponse>>
     /// </summary>
     public string? UserAgent { get; set; }
 }
-

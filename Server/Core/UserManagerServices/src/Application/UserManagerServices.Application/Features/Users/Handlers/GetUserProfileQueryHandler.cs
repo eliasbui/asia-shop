@@ -16,7 +16,8 @@ namespace UserManagerServices.Application.Features.Users.Handlers;
 public class GetUserProfileQueryHandler(
     UserManager<User> userManager,
     IUnitOfWork unitOfWork,
-    ILogger<GetUserProfileQueryHandler> logger) : IRequestHandler<GetUserProfileQuery, BaseResponse<UserProfileResponse>>
+    ILogger<GetUserProfileQueryHandler> logger)
+    : IRequestHandler<GetUserProfileQuery, BaseResponse<UserProfileResponse>>
 {
     /// <summary>
     /// Handles the get user profile query
@@ -24,7 +25,8 @@ public class GetUserProfileQueryHandler(
     /// <param name="request">Get user profile query</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User profile information</returns>
-    public async Task<BaseResponse<UserProfileResponse>> Handle(GetUserProfileQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<UserProfileResponse>> Handle(GetUserProfileQuery request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -47,9 +49,8 @@ public class GetUserProfileQueryHandler(
             // Get user preferences
             var preferences = new Dictionary<string, object>();
             var userPreferences = await unitOfWork.Users.GetUserPreferencesAsync(request.UserId, cancellationToken);
-            
+
             foreach (var pref in userPreferences.Where(p => p.IsActive && !p.IsDeleted))
-            {
                 try
                 {
                     var value = pref.DataType.ToLower() switch
@@ -64,10 +65,10 @@ public class GetUserProfileQueryHandler(
                 }
                 catch (Exception ex)
                 {
-                    logger.LogWarning(ex, "Failed to parse preference value for {Category}.{Key}", pref.Category, pref.Key);
+                    logger.LogWarning(ex, "Failed to parse preference value for {Category}.{Key}", pref.Category,
+                        pref.Key);
                     preferences[$"{pref.Category}.{pref.Key}"] = pref.Value;
                 }
-            }
 
             var response = new UserProfileResponse
             {
@@ -103,7 +104,8 @@ public class GetUserProfileQueryHandler(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting user profile for user: {UserId}", request.UserId);
-            return BaseResponse<UserProfileResponse>.Failure("An error occurred while retrieving user profile. Please try again.",
+            return BaseResponse<UserProfileResponse>.Failure(
+                "An error occurred while retrieving user profile. Please try again.",
                 new Dictionary<string, object>
                 {
                     ["errorCode"] = "SERVER_ERROR"

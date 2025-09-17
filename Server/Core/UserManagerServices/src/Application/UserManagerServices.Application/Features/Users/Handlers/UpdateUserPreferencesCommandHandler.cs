@@ -14,7 +14,8 @@ namespace UserManagerServices.Application.Features.Users.Handlers;
 /// </summary>
 public class UpdateUserPreferencesCommandHandler(
     IUnitOfWork unitOfWork,
-    ILogger<UpdateUserPreferencesCommandHandler> logger) : IRequestHandler<UpdateUserPreferencesCommand, BaseResponse<UserPreferencesResponse>>
+    ILogger<UpdateUserPreferencesCommandHandler> logger)
+    : IRequestHandler<UpdateUserPreferencesCommand, BaseResponse<UserPreferencesResponse>>
 {
     /// <summary>
     /// Handles the update user preferences command
@@ -22,7 +23,8 @@ public class UpdateUserPreferencesCommandHandler(
     /// <param name="request">Update user preferences command</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated user preferences</returns>
-    public async Task<BaseResponse<UserPreferencesResponse>> Handle(UpdateUserPreferencesCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<UserPreferencesResponse>> Handle(UpdateUserPreferencesCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -41,63 +43,59 @@ public class UpdateUserPreferencesCommandHandler(
 
             // Process each category and preference
             foreach (var category in request.Preferences)
-            {
-                foreach (var preference in category.Value)
+            foreach (var preference in category.Value)
+                try
                 {
-                    try
-                    {
-                        // Serialize the value based on data type
-                        string serializedValue;
-                        var dataType = preference.Value.DataType.ToLower();
-                        
-                        switch (dataType)
-                        {
-                            case "json":
-                                serializedValue = JsonSerializer.Serialize(preference.Value.Value);
-                                break;
-                            case "bool":
-                                if (preference.Value.Value is bool boolValue)
-                                    serializedValue = boolValue.ToString().ToLower();
-                                else
-                                    serializedValue = bool.Parse(preference.Value.Value.ToString()!).ToString().ToLower();
-                                break;
-                            case "int":
-                                if (preference.Value.Value is int intValue)
-                                    serializedValue = intValue.ToString();
-                                else
-                                    serializedValue = int.Parse(preference.Value.Value.ToString()!).ToString();
-                                break;
-                            case "double":
-                                if (preference.Value.Value is double doubleValue)
-                                    serializedValue = doubleValue.ToString();
-                                else
-                                    serializedValue = double.Parse(preference.Value.Value.ToString()!).ToString();
-                                break;
-                            default:
-                                serializedValue = preference.Value.Value.ToString() ?? string.Empty;
-                                break;
-                        }
+                    // Serialize the value based on data type
+                    string serializedValue;
+                    var dataType = preference.Value.DataType.ToLower();
 
-                        var userPreference = new UserPreference
-                        {
-                            UserId = request.UserId,
-                            Category = category.Key,
-                            Key = preference.Key,
-                            Value = serializedValue,
-                            DataType = dataType,
-                            IsActive = true
-                        };
-
-                        await unitOfWork.Users.AddOrUpdateUserPreferenceAsync(userPreference, cancellationToken);
-                    }
-                    catch (Exception ex)
+                    switch (dataType)
                     {
-                        logger.LogWarning(ex, "Failed to process preference {Category}.{Key} for user {UserId}", 
-                            category.Key, preference.Key, request.UserId);
-                        // Continue processing other preferences
+                        case "json":
+                            serializedValue = JsonSerializer.Serialize(preference.Value.Value);
+                            break;
+                        case "bool":
+                            if (preference.Value.Value is bool boolValue)
+                                serializedValue = boolValue.ToString().ToLower();
+                            else
+                                serializedValue = bool.Parse(preference.Value.Value.ToString()!).ToString().ToLower();
+                            break;
+                        case "int":
+                            if (preference.Value.Value is int intValue)
+                                serializedValue = intValue.ToString();
+                            else
+                                serializedValue = int.Parse(preference.Value.Value.ToString()!).ToString();
+                            break;
+                        case "double":
+                            if (preference.Value.Value is double doubleValue)
+                                serializedValue = doubleValue.ToString();
+                            else
+                                serializedValue = double.Parse(preference.Value.Value.ToString()!).ToString();
+                            break;
+                        default:
+                            serializedValue = preference.Value.Value.ToString() ?? string.Empty;
+                            break;
                     }
+
+                    var userPreference = new UserPreference
+                    {
+                        UserId = request.UserId,
+                        Category = category.Key,
+                        Key = preference.Key,
+                        Value = serializedValue,
+                        DataType = dataType,
+                        IsActive = true
+                    };
+
+                    await unitOfWork.Users.AddOrUpdateUserPreferenceAsync(userPreference, cancellationToken);
                 }
-            }
+                catch (Exception ex)
+                {
+                    logger.LogWarning(ex, "Failed to process preference {Category}.{Key} for user {UserId}",
+                        category.Key, preference.Key, request.UserId);
+                    // Continue processing other preferences
+                }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -111,9 +109,7 @@ public class UpdateUserPreferencesCommandHandler(
             foreach (var pref in updatedPreferences.Where(p => p.IsActive && !p.IsDeleted))
             {
                 if (!groupedPreferences.ContainsKey(pref.Category))
-                {
                     groupedPreferences[pref.Category] = new Dictionary<string, PreferenceItem>();
-                }
 
                 // Parse the value based on data type
                 object parsedValue;
@@ -130,7 +126,8 @@ public class UpdateUserPreferencesCommandHandler(
                 }
                 catch (Exception ex)
                 {
-                    logger.LogWarning(ex, "Failed to parse preference value for {Category}.{Key}, using raw value", pref.Category, pref.Key);
+                    logger.LogWarning(ex, "Failed to parse preference value for {Category}.{Key}, using raw value",
+                        pref.Category, pref.Key);
                     parsedValue = pref.Value;
                 }
 
@@ -146,10 +143,7 @@ public class UpdateUserPreferencesCommandHandler(
 
                 // Track the latest update time
                 var prefUpdateTime = pref.UpdatedAt ?? pref.CreatedAt;
-                if (lastUpdated == null || prefUpdateTime > lastUpdated)
-                {
-                    lastUpdated = prefUpdateTime;
-                }
+                if (lastUpdated == null || prefUpdateTime > lastUpdated) lastUpdated = prefUpdateTime;
             }
 
             var response = new UserPreferencesResponse
@@ -165,7 +159,8 @@ public class UpdateUserPreferencesCommandHandler(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error updating user preferences for user: {UserId}", request.UserId);
-            return BaseResponse<UserPreferencesResponse>.Failure("An error occurred while updating user preferences. Please try again.",
+            return BaseResponse<UserPreferencesResponse>.Failure(
+                "An error occurred while updating user preferences. Please try again.",
                 new Dictionary<string, object>
                 {
                     ["errorCode"] = "SERVER_ERROR"

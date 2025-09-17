@@ -109,11 +109,11 @@ public static class MfaEndpoints
         {
             var userId = ApiHelpers.GetCurrentUserId(context);
             var command = new SetupMfaCommand { UserId = userId };
-            
+
             var result = await mediator.Send(command);
-            
-            return result.IsSuccess 
-                ? Results.Ok(result) 
+
+            return result.IsSuccess
+                ? Results.Ok(result)
                 : Results.BadRequest(result);
         }
         catch (UnauthorizedAccessException)
@@ -139,16 +139,16 @@ public static class MfaEndpoints
         try
         {
             var userId = ApiHelpers.GetCurrentUserId(context);
-            var command = new EnableMfaCommand 
-            { 
+            var command = new EnableMfaCommand
+            {
                 UserId = userId,
                 TotpCode = request.TotpCode
             };
-            
+
             var result = await mediator.Send(command);
-            
-            return result.IsSuccess 
-                ? Results.Ok(result) 
+
+            return result.IsSuccess
+                ? Results.Ok(result)
                 : Results.BadRequest(result);
         }
         catch (UnauthorizedAccessException)
@@ -181,11 +181,11 @@ public static class MfaEndpoints
                 IpAddress = ApiHelpers.GetClientIpAddress(context),
                 UserAgent = context.Request.Headers["User-Agent"].ToString()
             };
-            
+
             var result = await mediator.Send(command);
-            
-            return result.IsSuccess 
-                ? Results.Ok(result) 
+
+            return result.IsSuccess
+                ? Results.Ok(result)
                 : Results.BadRequest(result);
         }
         catch (Exception ex)
@@ -216,11 +216,11 @@ public static class MfaEndpoints
                 IpAddress = ApiHelpers.GetClientIpAddress(context),
                 UserAgent = context.Request.Headers["User-Agent"].ToString()
             };
-            
+
             var result = await mediator.Send(command);
-            
-            return result.IsSuccess 
-                ? Results.Ok(result) 
+
+            return result.IsSuccess
+                ? Results.Ok(result)
                 : Results.BadRequest(result);
         }
         catch (UnauthorizedAccessException)
@@ -245,17 +245,17 @@ public static class MfaEndpoints
         try
         {
             var userId = ApiHelpers.GetCurrentUserId(context);
-            var command = new GenerateBackupCodesCommand 
-            { 
+            var command = new GenerateBackupCodesCommand
+            {
                 UserId = userId,
                 GeneratedBy = userId,
                 Reason = "User requested new backup codes"
             };
-            
+
             var result = await mediator.Send(command);
-            
-            return result.IsSuccess 
-                ? Results.Ok(result) 
+
+            return result.IsSuccess
+                ? Results.Ok(result)
                 : Results.BadRequest(result);
         }
         catch (UnauthorizedAccessException)
@@ -281,11 +281,11 @@ public static class MfaEndpoints
         {
             var userId = ApiHelpers.GetCurrentUserId(context);
             var query = new GetMfaStatusQuery { UserId = userId };
-            
+
             var result = await mediator.Send(query);
-            
-            return result.IsSuccess 
-                ? Results.Ok(result) 
+
+            return result.IsSuccess
+                ? Results.Ok(result)
                 : Results.BadRequest(result);
         }
         catch (UnauthorizedAccessException)

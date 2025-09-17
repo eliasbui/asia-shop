@@ -35,6 +35,6 @@ public interface IUserMfaSettingsRepository : IGenericRepository<UserMfaSettings
     /// <param name="daysBeforeExpiry">Days before expiry to check</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of users with expiring grace period</returns>
-    Task<List<UserMfaSettings>> GetExpiringGracePeriodUsersAsync(int daysBeforeExpiry = 7, 
+    Task<List<UserMfaSettings>> GetExpiringGracePeriodUsersAsync(int daysBeforeExpiry = 7,
         CancellationToken cancellationToken = default);
 }

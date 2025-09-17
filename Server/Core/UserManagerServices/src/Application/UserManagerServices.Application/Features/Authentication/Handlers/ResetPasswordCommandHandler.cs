@@ -72,12 +72,10 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
 
                 // Check if the error is related to invalid token
                 if (result.Errors.Any(e => e.Code.Contains("InvalidToken")))
-                {
                     return BaseResponse.Failure("Invalid or expired reset token", new Dictionary<string, object>
                     {
                         ["errorCode"] = "INVALID_RESET_TOKEN"
                     });
-                }
 
                 return BaseResponse.Failure("Password reset failed", new Dictionary<string, object>
                 {

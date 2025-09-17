@@ -101,11 +101,8 @@ public class RegisterCommandHandler(
             // Assign role to user
             var roleResult = await userManager.AddToRoleAsync(user, roleName);
             if (!roleResult.Succeeded)
-            {
                 logger.LogWarning("Failed to assign role {Role} to user {UserId}", roleName, user.Id);
-                // Continue with registration even if role assignment fails
-            }
-
+            // Continue with registration even if role assignment fails
             logger.LogInformation("User registered successfully: {UserId} with email: {Email}", user.Id, request.Email);
 
             // Send email confirmation if not auto-confirmed
@@ -115,16 +112,16 @@ public class RegisterCommandHandler(
                 var confirmationUrl = $"https://yourdomain.com/confirm-email?userId={user.Id}&token={emailToken}";
 
                 await emailService.SendTemplatedEmailAsync(
-                    to: request.Email,
-                    templateName: "welcome",
-                    templateData: new Dictionary<string, object>
+                    request.Email,
+                    "welcome",
+                    new Dictionary<string, object>
                     {
                         { "FirstName", request.FirstName },
                         { "Email", request.Email },
                         { "CompanyName", "Asia Shop" },
                         { "ConfirmationUrl", confirmationUrl },
                         { "SupportEmail", "support@yourdomain.com" }
-                    }, cancellationToken: cancellationToken);
+                    }, cancellationToken);
 
                 logger.LogInformation("Email confirmation sent to: {Email}", request.Email);
             }

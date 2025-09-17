@@ -15,7 +15,8 @@ public interface ITokenService
     /// <param name="roles">User roles</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>JWT token string</returns>
-    Task<string> GenerateAccessTokenAsync(User user, IList<string> roles, CancellationToken cancellationToken = default);
+    Task<string> GenerateAccessTokenAsync(User user, IList<string> roles,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Generates a refresh token
@@ -149,5 +150,6 @@ public interface ICacheService
     /// <param name="slidingExpiration">Sliding expiration time</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the operation</returns>
-    Task SetSlidingAsync<T>(string key, T value, TimeSpan slidingExpiration, CancellationToken cancellationToken = default);
+    Task SetSlidingAsync<T>(string key, T value, TimeSpan slidingExpiration,
+        CancellationToken cancellationToken = default);
 }

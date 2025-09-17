@@ -13,7 +13,8 @@ namespace UserManagerServices.Application.Features.Users.Handlers;
 /// </summary>
 public class GetUserPreferencesQueryHandler(
     IUnitOfWork unitOfWork,
-    ILogger<GetUserPreferencesQueryHandler> logger) : IRequestHandler<GetUserPreferencesQuery, BaseResponse<UserPreferencesResponse>>
+    ILogger<GetUserPreferencesQueryHandler> logger)
+    : IRequestHandler<GetUserPreferencesQuery, BaseResponse<UserPreferencesResponse>>
 {
     /// <summary>
     /// Handles the get user preferences query
@@ -21,7 +22,8 @@ public class GetUserPreferencesQueryHandler(
     /// <param name="request">Get user preferences query</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User preferences</returns>
-    public async Task<BaseResponse<UserPreferencesResponse>> Handle(GetUserPreferencesQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<UserPreferencesResponse>> Handle(GetUserPreferencesQuery request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -37,9 +39,7 @@ public class GetUserPreferencesQueryHandler(
             foreach (var pref in userPreferences.Where(p => p.IsActive && !p.IsDeleted))
             {
                 if (!groupedPreferences.ContainsKey(pref.Category))
-                {
                     groupedPreferences[pref.Category] = new Dictionary<string, PreferenceItem>();
-                }
 
                 // Parse the value based on data type
                 object parsedValue;
@@ -56,7 +56,8 @@ public class GetUserPreferencesQueryHandler(
                 }
                 catch (Exception ex)
                 {
-                    logger.LogWarning(ex, "Failed to parse preference value for {Category}.{Key}, using raw value", pref.Category, pref.Key);
+                    logger.LogWarning(ex, "Failed to parse preference value for {Category}.{Key}, using raw value",
+                        pref.Category, pref.Key);
                     parsedValue = pref.Value;
                 }
 
@@ -72,10 +73,7 @@ public class GetUserPreferencesQueryHandler(
 
                 // Track the latest update time
                 var prefUpdateTime = pref.UpdatedAt ?? pref.CreatedAt;
-                if (lastUpdated == null || prefUpdateTime > lastUpdated)
-                {
-                    lastUpdated = prefUpdateTime;
-                }
+                if (lastUpdated == null || prefUpdateTime > lastUpdated) lastUpdated = prefUpdateTime;
             }
 
             var response = new UserPreferencesResponse
@@ -85,15 +83,16 @@ public class GetUserPreferencesQueryHandler(
                 LastUpdated = lastUpdated
             };
 
-            logger.LogInformation("Successfully retrieved {Count} preferences for user: {UserId}", 
+            logger.LogInformation("Successfully retrieved {Count} preferences for user: {UserId}",
                 userPreferences.Count(), request.UserId);
-            
+
             return BaseResponse<UserPreferencesResponse>.Success(response);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting user preferences for user: {UserId}", request.UserId);
-            return BaseResponse<UserPreferencesResponse>.Failure("An error occurred while retrieving user preferences. Please try again.",
+            return BaseResponse<UserPreferencesResponse>.Failure(
+                "An error occurred while retrieving user preferences. Please try again.",
                 new Dictionary<string, object>
                 {
                     ["errorCode"] = "SERVER_ERROR"

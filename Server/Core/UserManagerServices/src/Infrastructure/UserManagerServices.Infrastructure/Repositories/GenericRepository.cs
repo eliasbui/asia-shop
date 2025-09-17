@@ -55,7 +55,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class, IBase
     /// <param name="predicate">Filter predicate</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Collection of matching entities</returns>
-    public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
     }
@@ -66,7 +67,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class, IBase
     /// <param name="predicate">Filter predicate</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>First matching entity or null</returns>
-    public virtual async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
     }
@@ -77,7 +79,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class, IBase
     /// <param name="predicate">Filter predicate</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if any entity matches, false otherwise</returns>
-    public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet.AnyAsync(predicate, cancellationToken);
     }
@@ -88,7 +91,8 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class, IBase
     /// <param name="predicate">Filter predicate</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Count of matching entities</returns>
-    public virtual async Task<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+    public virtual async Task<int> CountAsync(Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet.CountAsync(predicate, cancellationToken);
     }
@@ -115,22 +119,15 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class, IBase
     {
         var query = _dbSet.AsQueryable();
 
-        if (predicate != null)
-        {
-            query = query.Where(predicate);
-        }
+        if (predicate != null) query = query.Where(predicate);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
         if (orderBy != null)
-        {
             query = orderBy(query);
-        }
         else
-        {
             // Default ordering by CreatedAt descending
             query = query.OrderByDescending(e => e.CreatedAt);
-        }
 
         var items = await query
             .Skip((pageNumber - 1) * pageSize)
@@ -205,10 +202,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class, IBase
     /// <param name="entities">Entities to soft delete</param>
     public virtual void SoftDeleteRange(IEnumerable<T> entities)
     {
-        foreach (var entity in entities)
-        {
-            SoftDelete(entity);
-        }
+        foreach (var entity in entities) SoftDelete(entity);
     }
 
     /// <summary>
@@ -245,10 +239,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class, IBase
     {
         var query = _dbSet.AsQueryable();
 
-        foreach (var includeProperty in includeProperties)
-        {
-            query = query.Include(includeProperty);
-        }
+        foreach (var includeProperty in includeProperties) query = query.Include(includeProperty);
 
         return await query.ToListAsync(cancellationToken);
     }
@@ -267,10 +258,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class, IBase
     {
         var query = _dbSet.AsQueryable();
 
-        foreach (var includeProperty in includeProperties)
-        {
-            query = query.Include(includeProperty);
-        }
+        foreach (var includeProperty in includeProperties) query = query.Include(includeProperty);
 
         return await query.Where(predicate).ToListAsync(cancellationToken);
     }

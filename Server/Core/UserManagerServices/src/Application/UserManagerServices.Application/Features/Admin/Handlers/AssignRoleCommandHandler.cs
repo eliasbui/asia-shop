@@ -27,7 +27,7 @@ public class AssignRoleCommandHandler(
     {
         try
         {
-            logger.LogInformation("Assigning role '{RoleName}' to user: {UserId} (assigned by: {AssignedBy})", 
+            logger.LogInformation("Assigning role '{RoleName}' to user: {UserId} (assigned by: {AssignedBy})",
                 request.RoleName, request.UserId, request.AssignedBy);
 
             // Get user
@@ -67,7 +67,7 @@ public class AssignRoleCommandHandler(
             var result = await userManager.AddToRoleAsync(user, request.RoleName);
             if (!result.Succeeded)
             {
-                logger.LogWarning("Failed to assign role '{RoleName}' to user {UserId}: {Errors}", 
+                logger.LogWarning("Failed to assign role '{RoleName}' to user {UserId}: {Errors}",
                     request.RoleName, request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
                 return BaseResponse<bool>.Failure("Failed to assign role to user", new Dictionary<string, object>
                 {
@@ -76,14 +76,14 @@ public class AssignRoleCommandHandler(
                 });
             }
 
-            logger.LogInformation("Successfully assigned role '{RoleName}' to user: {UserId}", 
+            logger.LogInformation("Successfully assigned role '{RoleName}' to user: {UserId}",
                 request.RoleName, request.UserId);
-            
+
             return BaseResponse<bool>.Success(true, "Role assigned successfully");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error assigning role '{RoleName}' to user: {UserId}", 
+            logger.LogError(ex, "Error assigning role '{RoleName}' to user: {UserId}",
                 request.RoleName, request.UserId);
             return BaseResponse<bool>.Failure("An error occurred while assigning the role. Please try again.",
                 new Dictionary<string, object>

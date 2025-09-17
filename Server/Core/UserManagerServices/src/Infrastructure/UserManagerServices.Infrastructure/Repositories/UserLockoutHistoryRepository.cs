@@ -16,12 +16,13 @@ public class UserLockoutHistoryRepository(ApplicationDbContext context)
     /// <summary>
     /// Gets active lockout for a user
     /// </summary>
-    public async Task<UserLockoutHistory?> GetActiveLockoutAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserLockoutHistory?> GetActiveLockoutAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _context.UserLockoutHistory
-            .Where(lh => lh.UserId == userId && 
-                        lh.IsActive && 
-                        (lh.LockoutEnd == null || lh.LockoutEnd > DateTime.UtcNow))
+            .Where(lh => lh.UserId == userId &&
+                         lh.IsActive &&
+                         (lh.LockoutEnd == null || lh.LockoutEnd > DateTime.UtcNow))
             .OrderByDescending(lh => lh.LockoutStart)
             .FirstOrDefaultAsync(cancellationToken);
     }
@@ -29,7 +30,7 @@ public class UserLockoutHistoryRepository(ApplicationDbContext context)
     /// <summary>
     /// Gets lockout history for a user
     /// </summary>
-    public async Task<(List<UserLockoutHistory> history, int totalCount)> GetUserLockoutHistoryAsync(Guid userId, 
+    public async Task<(List<UserLockoutHistory> history, int totalCount)> GetUserLockoutHistoryAsync(Guid userId,
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default)
     {
         var query = _context.UserLockoutHistory
@@ -48,26 +49,26 @@ public class UserLockoutHistoryRepository(ApplicationDbContext context)
     /// <summary>
     /// Gets lockout count for a user within a time period
     /// </summary>
-    public async Task<int> GetLockoutCountAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    public async Task<int> GetLockoutCountAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         return await _context.UserLockoutHistory
-            .Where(lh => lh.UserId == userId && 
-                        lh.LockoutStart >= fromDate && 
-                        lh.LockoutStart <= toDate)
+            .Where(lh => lh.UserId == userId &&
+                         lh.LockoutStart >= fromDate &&
+                         lh.LockoutStart <= toDate)
             .CountAsync(cancellationToken);
     }
 
     /// <summary>
     /// Gets the highest lockout level for a user within a time period
     /// </summary>
-    public async Task<int> GetHighestLockoutLevelAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    public async Task<int> GetHighestLockoutLevelAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         var maxLevel = await _context.UserLockoutHistory
-            .Where(lh => lh.UserId == userId && 
-                        lh.LockoutStart >= fromDate && 
-                        lh.LockoutStart <= toDate)
+            .Where(lh => lh.UserId == userId &&
+                         lh.LockoutStart >= fromDate &&
+                         lh.LockoutStart <= toDate)
             .MaxAsync(lh => (int?)lh.LockoutLevel, cancellationToken);
 
         return maxLevel ?? 0;
@@ -95,7 +96,8 @@ public class UserLockoutHistoryRepository(ApplicationDbContext context)
     /// <summary>
     /// Gets lockouts by type
     /// </summary>
-    public async Task<(List<UserLockoutHistory> lockouts, int totalCount)> GetLockoutsByTypeAsync(LockoutTypeEnum lockoutType, 
+    public async Task<(List<UserLockoutHistory> lockouts, int totalCount)> GetLockoutsByTypeAsync(
+        LockoutTypeEnum lockoutType,
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default)
     {
         var query = _context.UserLockoutHistory
@@ -115,7 +117,7 @@ public class UserLockoutHistoryRepository(ApplicationDbContext context)
     /// <summary>
     /// Gets lockout statistics for a date range
     /// </summary>
-    public async Task<Dictionary<string, int>> GetLockoutStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    public async Task<Dictionary<string, int>> GetLockoutStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default)
     {
         var sql = @"
@@ -149,7 +151,7 @@ public class UserLockoutHistoryRepository(ApplicationDbContext context)
     /// <summary>
     /// Releases an active lockout
     /// </summary>
-    public async Task<bool> ReleaseLockoutAsync(Guid lockoutId, LockoutReleaseReasonEnum releaseReason, 
+    public async Task<bool> ReleaseLockoutAsync(Guid lockoutId, LockoutReleaseReasonEnum releaseReason,
         Guid? releasedByUserId = null, CancellationToken cancellationToken = default)
     {
         var lockout = await _context.UserLockoutHistory
@@ -171,10 +173,11 @@ public class UserLockoutHistoryRepository(ApplicationDbContext context)
     /// <summary>
     /// Cleans up old lockout history
     /// </summary>
-    public async Task<int> CleanupOldHistoryAsync(int olderThanDays = 365, CancellationToken cancellationToken = default)
+    public async Task<int> CleanupOldHistoryAsync(int olderThanDays = 365,
+        CancellationToken cancellationToken = default)
     {
         var cutoffDate = DateTime.UtcNow.AddDays(-olderThanDays);
-        
+
         var sql = @"
             DELETE FROM ""UserLockoutHistory""
             WHERE ""LockoutStart"" < @CutoffDate AND ""IsActive"" = false";

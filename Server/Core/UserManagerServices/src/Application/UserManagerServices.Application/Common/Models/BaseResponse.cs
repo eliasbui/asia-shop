@@ -25,12 +25,12 @@ public class BaseResponse<T>
     /// <summary>
     /// Collection of validation errors
     /// </summary>
-    public Dictionary<string, object> ValidationErrors { get; init; } = new Dictionary<string, object>();
+    public Dictionary<string, object> ValidationErrors { get; init; } = new();
 
     /// <summary>
     /// Additional metadata about the response
     /// </summary>
-    public Dictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> Metadata { get; set; } = new();
 
     /// <summary>
     /// HTTP status code for the response

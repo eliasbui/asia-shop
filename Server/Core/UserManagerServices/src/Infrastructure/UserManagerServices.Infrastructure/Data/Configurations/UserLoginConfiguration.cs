@@ -32,11 +32,11 @@ public class UserLoginConfiguration : IEntityTypeConfiguration<UserLogin>
         builder.Property(ul => ul.LoginProvider)
             .HasMaxLength(128)
             .IsRequired();
-            
+
         builder.Property(ul => ul.ProviderKey)
             .HasMaxLength(128)
             .IsRequired();
-            
+
         builder.Property(ul => ul.ProviderDisplayName)
             .HasMaxLength(256);
 
@@ -44,13 +44,13 @@ public class UserLoginConfiguration : IEntityTypeConfiguration<UserLogin>
         builder.Property(ul => ul.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(ul => ul.UpdatedAt);
-        
+
         builder.Property(ul => ul.CreatedBy);
-        
+
         builder.Property(ul => ul.UpdatedBy);
-        
+
         builder.Property(ul => ul.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -68,7 +68,7 @@ public class UserLoginConfiguration : IEntityTypeConfiguration<UserLogin>
             .HasForeignKey(ul => ul.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_UserLogins_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(ul => ul.UpdatedBy)
@@ -78,13 +78,13 @@ public class UserLoginConfiguration : IEntityTypeConfiguration<UserLogin>
         // Indexes
         builder.HasIndex(ul => ul.UserId)
             .HasDatabaseName("idx_user_logins_user_id");
-            
+
         builder.HasIndex(ul => ul.LoginProvider)
             .HasDatabaseName("idx_user_logins_provider");
-            
+
         builder.HasIndex(ul => ul.CreatedAt)
             .HasDatabaseName("idx_user_logins_created_at");
-            
+
         builder.HasIndex(ul => ul.IsDeleted)
             .HasDatabaseName("idx_user_logins_is_deleted");
 

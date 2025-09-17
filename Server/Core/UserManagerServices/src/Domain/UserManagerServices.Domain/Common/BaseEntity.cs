@@ -10,6 +10,4 @@ public interface IBaseEntity
     public Guid? UpdatedBy { get; }
 
     public bool IsDeleted { get; }
-    
 }
-

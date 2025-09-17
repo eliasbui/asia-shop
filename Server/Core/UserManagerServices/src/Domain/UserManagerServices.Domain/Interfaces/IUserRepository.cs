@@ -9,7 +9,7 @@ namespace UserManagerServices.Domain.Interfaces;
 public interface IUserRepository : IGenericRepository<User>
 {
     #region User-Specific Queries
-    
+
     /// <summary>
     /// Gets a user by email address
     /// </summary>
@@ -17,7 +17,7 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User if found, null otherwise</returns>
     Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets a user by username
     /// </summary>
@@ -25,7 +25,7 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User if found, null otherwise</returns>
     Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets a user by phone number
     /// </summary>
@@ -33,7 +33,7 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User if found, null otherwise</returns>
     Task<User?> GetByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets a user with all related data (profiles, sessions, etc.)
     /// </summary>
@@ -41,7 +41,7 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User with related data if found, null otherwise</returns>
     Task<User?> GetWithAllRelatedDataAsync(Guid userId, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets users by role
     /// </summary>
@@ -49,14 +49,14 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Users in the specified role</returns>
     Task<IEnumerable<User>> GetUsersByRoleAsync(string roleName, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets active users (IsActive = true and not deleted)
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Active users</returns>
     Task<IEnumerable<User>> GetActiveUsersAsync(CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets users created within a date range
     /// </summary>
@@ -64,38 +64,40 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="endDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Users created within the date range</returns>
-    Task<IEnumerable<User>> GetUsersByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default);
-    
+    Task<IEnumerable<User>> GetUsersByDateRangeAsync(DateTime startDate, DateTime endDate,
+        CancellationToken cancellationToken = default);
+
     #endregion
-    
+
     #region User Statistics
-    
+
     /// <summary>
     /// Gets total count of active users
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Count of active users</returns>
     Task<int> GetActiveUserCountAsync(CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets count of users registered today
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Count of users registered today</returns>
     Task<int> GetTodayRegistrationCountAsync(CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets user registration statistics by date
     /// </summary>
     /// <param name="days">Number of days to look back</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Registration statistics</returns>
-    Task<Dictionary<DateTime, int>> GetRegistrationStatisticsAsync(int days, CancellationToken cancellationToken = default);
-    
+    Task<Dictionary<DateTime, int>> GetRegistrationStatisticsAsync(int days,
+        CancellationToken cancellationToken = default);
+
     #endregion
-    
+
     #region User Validation
-    
+
     /// <summary>
     /// Checks if email is already taken by another user
     /// </summary>
@@ -103,8 +105,9 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="excludeUserId">User ID to exclude from check (for updates)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if email is taken, false otherwise</returns>
-    Task<bool> IsEmailTakenAsync(string email, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
-    
+    Task<bool> IsEmailTakenAsync(string email, Guid? excludeUserId = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Checks if username is already taken by another user
     /// </summary>
@@ -112,8 +115,9 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="excludeUserId">User ID to exclude from check (for updates)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if username is taken, false otherwise</returns>
-    Task<bool> IsUsernameTakenAsync(string username, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
-    
+    Task<bool> IsUsernameTakenAsync(string username, Guid? excludeUserId = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Checks if phone number is already taken by another user
     /// </summary>
@@ -121,12 +125,13 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="excludeUserId">User ID to exclude from check (for updates)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if phone number is taken, false otherwise</returns>
-    Task<bool> IsPhoneNumberTakenAsync(string phoneNumber, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
-    
+    Task<bool> IsPhoneNumberTakenAsync(string phoneNumber, Guid? excludeUserId = null,
+        CancellationToken cancellationToken = default);
+
     #endregion
-    
+
     #region Search and Filtering
-    
+
     /// <summary>
     /// Searches users by multiple criteria
     /// </summary>
@@ -144,7 +149,7 @@ public interface IUserRepository : IGenericRepository<User>
         int pageNumber = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default);
-    
+
     #endregion
 
     #region Profile and Preferences
@@ -171,7 +176,8 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User preferences</returns>
-    Task<IEnumerable<UserPreference>> GetUserPreferencesAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<UserPreference>> GetUserPreferencesAsync(Guid userId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets a specific user preference by category and key
@@ -181,7 +187,8 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="key">Preference key</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User preference if found, null otherwise</returns>
-    Task<UserPreference?> GetUserPreferenceAsync(Guid userId, string category, string key, CancellationToken cancellationToken = default);
+    Task<UserPreference?> GetUserPreferenceAsync(Guid userId, string category, string key,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Adds or updates a user preference
@@ -197,7 +204,8 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User notification settings if found, null otherwise</returns>
-    Task<UserNotificationSettings?> GetUserNotificationSettingsAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<UserNotificationSettings?> GetUserNotificationSettingsAsync(Guid userId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Adds or updates user notification settings
@@ -205,7 +213,8 @@ public interface IUserRepository : IGenericRepository<User>
     /// <param name="notificationSetting">Notification settings to add or update</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the operation</returns>
-    Task AddOrUpdateNotificationSettingsAsync(UserNotificationSettings notificationSetting, CancellationToken cancellationToken = default);
+    Task AddOrUpdateNotificationSettingsAsync(UserNotificationSettings notificationSetting,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets user API keys by user ID

@@ -44,10 +44,7 @@ public class GetUsersQueryHandler(
             }
 
             // Apply active status filter
-            if (request.IsActive.HasValue)
-            {
-                query = query.Where(u => u.IsActive == request.IsActive.Value);
-            }
+            if (request.IsActive.HasValue) query = query.Where(u => u.IsActive == request.IsActive.Value);
 
             // Get total count before pagination
             var totalCount = await query.CountAsync(cancellationToken);

@@ -22,7 +22,8 @@ public class GetMfaStatusQueryHandler : IRequestHandler<GetMfaStatusQuery, BaseR
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<BaseResponse<MfaStatusResponse>> Handle(GetMfaStatusQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<MfaStatusResponse>> Handle(GetMfaStatusQuery request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -30,7 +31,7 @@ public class GetMfaStatusQueryHandler : IRequestHandler<GetMfaStatusQuery, BaseR
 
             // Get MFA settings
             var mfaSettings = await _mfaService.GetMfaSettingsAsync(request.UserId, cancellationToken);
-            
+
             var response = new MfaStatusResponse();
 
             if (mfaSettings != null)
@@ -65,7 +66,7 @@ public class GetMfaStatusQueryHandler : IRequestHandler<GetMfaStatusQuery, BaseR
                 response.AvailableMethods = new List<string>();
             }
 
-            _logger.LogInformation("Retrieved MFA status for user {UserId}: Enabled={IsEnabled}, Enforced={IsEnforced}", 
+            _logger.LogInformation("Retrieved MFA status for user {UserId}: Enabled={IsEnabled}, Enforced={IsEnforced}",
                 request.UserId, response.IsEnabled, response.IsEnforced);
 
             return BaseResponse<MfaStatusResponse>.Success(response, "MFA status retrieved successfully");

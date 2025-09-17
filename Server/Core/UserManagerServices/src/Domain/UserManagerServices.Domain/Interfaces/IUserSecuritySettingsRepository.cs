@@ -29,7 +29,7 @@ public interface IUserSecuritySettingsRepository : IGenericRepository<UserSecuri
     /// <param name="settings">Security settings</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated security settings</returns>
-    Task<UserSecuritySettings> CreateOrUpdateUserSettingsAsync(Guid userId, UserSecuritySettings settings, 
+    Task<UserSecuritySettings> CreateOrUpdateUserSettingsAsync(Guid userId, UserSecuritySettings settings,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -38,7 +38,7 @@ public interface IUserSecuritySettingsRepository : IGenericRepository<UserSecuri
     /// <param name="settings">Security settings</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated global settings</returns>
-    Task<UserSecuritySettings> UpdateGlobalDefaultSettingsAsync(UserSecuritySettings settings, 
+    Task<UserSecuritySettings> UpdateGlobalDefaultSettingsAsync(UserSecuritySettings settings,
         CancellationToken cancellationToken = default);
 
     /// <summary>

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.OpenApi.Models;
 using UserManagerServices.API.Common;
 using UserManagerServices.Application.Features.Admin.Commands;
 using UserManagerServices.Application.Features.Admin.Queries;
@@ -35,17 +36,17 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get user activity logs (Admin)",
                 Description = "Gets a specific user's activity logs with pagination (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User activity logs retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "User not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User activity logs retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "User not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -58,16 +59,16 @@ public static class AdminEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get users (Admin)",
                 Description = "Gets users with filtering and pagination (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Users retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Users retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -82,17 +83,17 @@ public static class AdminEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Create user (Admin)",
                 Description = "Creates a new user (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["201"] = new() { Description = "User created successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["201"] = new OpenApiResponse { Description = "User created successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -108,18 +109,18 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Update user (Admin)",
                 Description = "Updates a user (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User updated successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "User not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User updated successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "User not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -133,17 +134,17 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Delete user (Admin)",
                 Description = "Deletes a user (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["204"] = new() { Description = "User deleted successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "User not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["204"] = new OpenApiResponse { Description = "User deleted successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "User not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -159,18 +160,18 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Lock user account (Admin)",
                 Description = "Locks a user account (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["204"] = new() { Description = "User account locked successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "User not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["204"] = new OpenApiResponse { Description = "User account locked successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "User not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -184,17 +185,17 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Unlock user account (Admin)",
                 Description = "Unlocks a user account (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["204"] = new() { Description = "User account unlocked successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "User not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["204"] = new OpenApiResponse { Description = "User account unlocked successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "User not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -210,18 +211,18 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Assign role to user (Admin)",
                 Description = "Assigns a role to a user (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["204"] = new() { Description = "Role assigned successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "User or role not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["204"] = new OpenApiResponse { Description = "Role assigned successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "User or role not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -235,17 +236,17 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Remove role from user (Admin)",
                 Description = "Removes a role from a user (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["204"] = new() { Description = "Role removed successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "User or role not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["204"] = new OpenApiResponse { Description = "Role removed successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "User or role not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -258,16 +259,16 @@ public static class AdminEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get roles (Admin)",
                 Description = "Gets all roles with pagination (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Roles retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Roles retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -282,17 +283,17 @@ public static class AdminEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Create role (Admin)",
                 Description = "Creates a new role (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["201"] = new() { Description = "Role created successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["201"] = new OpenApiResponse { Description = "Role created successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -308,18 +309,18 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Update role (Admin)",
                 Description = "Updates a role (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Role updated successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "Role not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Role updated successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "Role not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -333,17 +334,17 @@ public static class AdminEndpoints
             .Produces(403, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Delete role (Admin)",
                 Description = "Deletes a role (Admin only)",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["204"] = new() { Description = "Role deleted successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["403"] = new() { Description = "User not authorized (Admin required)" },
-                    ["404"] = new() { Description = "Role not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["204"] = new OpenApiResponse { Description = "Role deleted successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["403"] = new OpenApiResponse { Description = "User not authorized (Admin required)" },
+                    ["404"] = new OpenApiResponse { Description = "Role not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
     }
@@ -373,10 +374,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         var query = new GetUserActivityQuery
         {
@@ -417,10 +415,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         var query = new GetUsersQuery
         {
@@ -451,10 +446,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         command.CreatedBy = adminUserId.Value;
         var result = await mediator.Send(command, cancellationToken);
@@ -478,10 +470,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         command.UserId = userId;
         command.UpdatedBy = adminUserId.Value;
@@ -504,10 +493,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         var command = new DeleteUserCommand
         {
@@ -535,10 +521,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         command.UserId = userId;
         command.LockedBy = adminUserId.Value;
@@ -561,10 +544,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         var command = new UnlockUserCommand
         {
@@ -592,10 +572,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         command.UserId = userId;
         command.AssignedBy = adminUserId.Value;
@@ -620,10 +597,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         var command = new RemoveRoleCommand
         {
@@ -645,10 +619,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         var query = new GetRolesQuery
         {
@@ -677,10 +648,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         command.CreatedBy = adminUserId.Value;
         var result = await mediator.Send(command, cancellationToken);
@@ -695,10 +663,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         command.RoleId = roleId;
         command.UpdatedBy = adminUserId.Value;
@@ -713,10 +678,7 @@ public static class AdminEndpoints
         CancellationToken cancellationToken = default)
     {
         var adminUserId = ApiHelpers.GetCurrentUserId(user);
-        if (adminUserId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (adminUserId == null) return Results.Unauthorized();
 
         var command = new DeleteRoleCommand
         {

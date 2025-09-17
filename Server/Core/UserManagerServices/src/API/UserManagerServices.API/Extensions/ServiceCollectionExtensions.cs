@@ -44,8 +44,8 @@ public static class ServiceCollectionExtensions
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
-                    factory: partition => new FixedWindowRateLimiterOptions
+                    httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
+                    partition => new FixedWindowRateLimiterOptions
                     {
                         AutoReplenishment = true,
                         PermitLimit = 100,
@@ -63,10 +63,7 @@ public static class ServiceCollectionExtensions
         var issuer = jwtSettings["Issuer"];
         var audience = jwtSettings["Audience"];
 
-        if (string.IsNullOrEmpty(secretKey))
-        {
-            throw new InvalidOperationException("JWT SecretKey is not configured");
-        }
+        if (string.IsNullOrEmpty(secretKey)) throw new InvalidOperationException("JWT SecretKey is not configured");
 
         services.AddAuthentication(options =>
             {
@@ -95,9 +92,7 @@ public static class ServiceCollectionExtensions
                     OnAuthenticationFailed = context =>
                     {
                         if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                        {
                             context.Response.Headers.Append("Token-Expired", "true");
-                        }
 
                         return Task.CompletedTask;
                     },
@@ -147,7 +142,8 @@ public static class WebApplicationExtensions
             {
                 options.Title = "User Manager Services API";
                 options.Theme = ScalarTheme.BluePlanet;
-                options.DefaultHttpClient = new(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                options.DefaultHttpClient =
+                    new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
             });
         }
     }
@@ -162,7 +158,7 @@ public static class WebApplicationExtensions
                 document.Info.Description =
                     "This is the API documentation for the User Manager Services API.";
                 document.Info.Version = "v1";
-                document.Info.Contact = new()
+                document.Info.Contact = new OpenApiContact
                 {
                     Name = "Asia Shop user manager services",
                     Email = "support@example.com"

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.OpenApi.Models;
 using UserManagerServices.API.Common;
 
 namespace UserManagerServices.API.Endpoints;
@@ -28,14 +29,14 @@ public static class HealthEndpoints
             .WithDescription("Returns the overall health status of the API and its dependencies")
             .Produces<HealthCheckResponse>(200, "application/json")
             .Produces<HealthCheckResponse>(503, "application/json")
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get API health status",
                 Description = "Returns the overall health status of the API and its dependencies",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "API is healthy" },
-                    ["503"] = new() { Description = "API is unhealthy" }
+                    ["200"] = new OpenApiResponse { Description = "API is healthy" },
+                    ["503"] = new OpenApiResponse { Description = "API is unhealthy" }
                 }
             });
 
@@ -45,13 +46,13 @@ public static class HealthEndpoints
             .WithSummary("Simple health ping")
             .WithDescription("Returns a simple response to verify the API is responding")
             .Produces<object>(200, "application/json")
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Simple health ping",
                 Description = "Returns a simple response to verify the API is responding",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "API is responding" }
+                    ["200"] = new OpenApiResponse { Description = "API is responding" }
                 }
             });
 

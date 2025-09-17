@@ -25,7 +25,7 @@ public class ZohoEmailService : IEmailService
         _httpClient = httpClient;
         _logger = logger;
         _configuration = configuration.GetSection("Zoho:Email").Get<ZohoEmailConfiguration>()
-            ?? throw new InvalidOperationException("Zoho email configuration is missing");
+                         ?? throw new InvalidOperationException("Zoho email configuration is missing");
 
         ConfigureHttpClient();
     }
@@ -33,7 +33,8 @@ public class ZohoEmailService : IEmailService
     /// <summary>
     /// Sends a simple email asynchronously
     /// </summary>
-    public async Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true, CancellationToken cancellationToken = default)
+    public async Task<bool> SendEmailAsync(string to, string subject, string body, bool isHtml = true,
+        CancellationToken cancellationToken = default)
     {
         return await SendEmailAsync(to, null, null, subject, body, isHtml, cancellationToken);
     }
@@ -41,7 +42,8 @@ public class ZohoEmailService : IEmailService
     /// <summary>
     /// Sends an email with CC and BCC recipients asynchronously
     /// </summary>
-    public async Task<bool> SendEmailAsync(string to, string? cc, string? bcc, string subject, string body, bool isHtml = true, CancellationToken cancellationToken = default)
+    public async Task<bool> SendEmailAsync(string to, string? cc, string? bcc, string subject, string body,
+        bool isHtml = true, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -71,11 +73,13 @@ public class ZohoEmailService : IEmailService
     /// Sends an email with attachments asynchronously
     /// Note: This is a basic implementation. Zoho API might require different approach for attachments
     /// </summary>
-    public async Task<bool> SendEmailWithAttachmentsAsync(string to, string subject, string body, Dictionary<string, byte[]> attachments, bool isHtml = true, CancellationToken cancellationToken = default)
+    public async Task<bool> SendEmailWithAttachmentsAsync(string to, string subject, string body,
+        Dictionary<string, byte[]> attachments, bool isHtml = true, CancellationToken cancellationToken = default)
     {
         try
         {
-            _logger.LogWarning("Attachment support is not fully implemented for Zoho API. Sending email without attachments.");
+            _logger.LogWarning(
+                "Attachment support is not fully implemented for Zoho API. Sending email without attachments.");
 
             return await SendEmailAsync(to, subject, body, isHtml, cancellationToken);
         }
@@ -89,7 +93,8 @@ public class ZohoEmailService : IEmailService
     /// <summary>
     /// Sends a templated email asynchronously
     /// </summary>
-    public async Task<bool> SendTemplatedEmailAsync(string to, string templateName, Dictionary<string, object> templateData, CancellationToken cancellationToken = default)
+    public async Task<bool> SendTemplatedEmailAsync(string to, string templateName,
+        Dictionary<string, object> templateData, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -109,7 +114,8 @@ public class ZohoEmailService : IEmailService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send templated email to {To} using template {TemplateName}", to, templateName);
+            _logger.LogError(ex, "Failed to send templated email to {To} using template {TemplateName}", to,
+                templateName);
             return false;
         }
     }
@@ -190,10 +196,7 @@ public class ZohoEmailService : IEmailService
 
         var templatePath = Path.Combine(_configuration.TemplatesPath ?? "Templates", $"{templateName}.html");
 
-        if (File.Exists(templatePath))
-        {
-            return await File.ReadAllTextAsync(templatePath, cancellationToken);
-        }
+        if (File.Exists(templatePath)) return await File.ReadAllTextAsync(templatePath, cancellationToken);
 
         _logger.LogWarning("Template file not found: {TemplatePath}", templatePath);
         return string.Empty;
@@ -222,9 +225,7 @@ public class ZohoEmailService : IEmailService
     {
         // Look for subject in template data first
         if (templateData.TryGetValue("Subject", out var subjectObj) && subjectObj != null)
-        {
             return subjectObj.ToString() ?? "No Subject";
-        }
 
         // Try to extract from template (look for <!-- SUBJECT: ... --> comment)
         var subjectMatch = System.Text.RegularExpressions.Regex.Match(

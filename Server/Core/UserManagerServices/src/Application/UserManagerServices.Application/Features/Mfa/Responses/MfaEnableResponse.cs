@@ -39,6 +39,6 @@ public class MfaEnableResponse
     /// <summary>
     /// Warning message about backup codes
     /// </summary>
-    public string Warning { get; set; } = 
+    public string Warning { get; set; } =
         "These backup codes will not be shown again. Please save them securely.";
 }

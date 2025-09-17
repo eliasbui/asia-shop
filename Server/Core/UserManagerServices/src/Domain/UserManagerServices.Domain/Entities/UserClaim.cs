@@ -5,7 +5,7 @@ using UserManagerServices.Domain.Common;
 namespace UserManagerServices.Domain.Entities;
 
 [Table("UserClaims")]
-public class UserClaim : IdentityUserClaim<Guid> ,IBaseEntity
+public class UserClaim : IdentityUserClaim<Guid>, IBaseEntity
 {
     public new Guid Id { get; } = Guid.CreateVersion7();
     public DateTime CreatedAt { get; } = DateTime.UtcNow;

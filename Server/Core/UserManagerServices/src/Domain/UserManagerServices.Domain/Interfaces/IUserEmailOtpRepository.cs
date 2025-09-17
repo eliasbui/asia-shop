@@ -14,7 +14,7 @@ public interface IUserEmailOtpRepository : IGenericRepository<UserEmailOtp>
     /// <param name="purpose">OTP purpose</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of active email OTPs</returns>
-    Task<List<UserEmailOtp>> GetActiveByUserIdAsync(Guid userId, string purpose, 
+    Task<List<UserEmailOtp>> GetActiveByUserIdAsync(Guid userId, string purpose,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -23,7 +23,7 @@ public interface IUserEmailOtpRepository : IGenericRepository<UserEmailOtp>
     /// <param name="emailAddress">Email address</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of email OTPs</returns>
-    Task<List<UserEmailOtp>> GetByEmailAddressAsync(string emailAddress, 
+    Task<List<UserEmailOtp>> GetByEmailAddressAsync(string emailAddress,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -49,6 +49,6 @@ public interface IUserEmailOtpRepository : IGenericRepository<UserEmailOtp>
     /// <param name="withinMinutes">Time window in minutes</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Count of recent OTP attempts</returns>
-    Task<int> GetRecentOtpAttemptsAsync(Guid userId, string purpose, int withinMinutes = 5, 
+    Task<int> GetRecentOtpAttemptsAsync(Guid userId, string purpose, int withinMinutes = 5,
         CancellationToken cancellationToken = default);
 }

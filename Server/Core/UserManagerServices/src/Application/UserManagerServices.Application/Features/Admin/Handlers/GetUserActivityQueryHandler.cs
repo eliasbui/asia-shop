@@ -76,15 +76,15 @@ public class GetUserActivityQueryHandler(
 
             // Get activity logs with pagination
             var (activityLogs, totalCount) = await unitOfWork.UserActivityLogs.SearchActivityLogsAsync(
-                userId: request.UserId,
-                action: actionEnum,
-                entity: null,
-                ipAddress: null,
-                startDate: request.StartDate,
-                endDate: request.EndDate,
-                pageNumber: request.PageNumber,
-                pageSize: request.PageSize,
-                cancellationToken: cancellationToken);
+                request.UserId,
+                actionEnum,
+                null,
+                null,
+                request.StartDate,
+                request.EndDate,
+                request.PageNumber,
+                request.PageSize,
+                cancellationToken);
 
             // Map to response model
             var activityInfos = activityLogs.Select(log => new ActivityLogInfo
@@ -196,15 +196,9 @@ public class GetUserActivityQueryHandler(
         try
         {
             var metadata = ParseMetadata(log.Details);
-            if (metadata.TryGetValue("success", out var successValue))
-            {
-                return successValue is bool success && success;
-            }
+            if (metadata.TryGetValue("success", out var successValue)) return successValue is bool success && success;
 
-            if (metadata.TryGetValue("error", out var errorValue))
-            {
-                return errorValue == null;
-            }
+            if (metadata.TryGetValue("error", out var errorValue)) return errorValue == null;
 
             // Default to true if no explicit success/error indicators
             return true;
@@ -225,15 +219,9 @@ public class GetUserActivityQueryHandler(
         try
         {
             var metadata = ParseMetadata(log.Details);
-            if (metadata.TryGetValue("error", out var errorValue))
-            {
-                return errorValue?.ToString();
-            }
+            if (metadata.TryGetValue("error", out var errorValue)) return errorValue?.ToString();
 
-            if (metadata.TryGetValue("errorMessage", out var errorMessageValue))
-            {
-                return errorMessageValue?.ToString();
-            }
+            if (metadata.TryGetValue("errorMessage", out var errorMessageValue)) return errorMessageValue?.ToString();
 
             return null;
         }

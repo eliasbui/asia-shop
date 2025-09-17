@@ -31,7 +31,7 @@ public class MappingProfile : Profile
         // Example:
         // CreateMap<User, UserDto>()
         //     .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"));
-        
+
         // CreateMap<CreateUserCommand, User>()
         //     .ForMember(dest => dest.Id, opt => opt.Ignore())
         //     .ForMember(dest => dest.CreatedAt, opt => opt.Ignore());
@@ -88,7 +88,10 @@ public interface IMapFrom<T>
     /// Configures mapping from the specified type
     /// </summary>
     /// <param name="profile">AutoMapper profile</param>
-    void Mapping(Profile profile) => profile.CreateMap(typeof(T), GetType());
+    void Mapping(Profile profile)
+    {
+        profile.CreateMap(typeof(T), GetType());
+    }
 }
 
 /// <summary>
@@ -101,5 +104,8 @@ public interface IMapTo<T>
     /// Configures mapping to the specified type
     /// </summary>
     /// <param name="profile">AutoMapper profile</param>
-    void Mapping(Profile profile) => profile.CreateMap(GetType(), typeof(T));
+    void Mapping(Profile profile)
+    {
+        profile.CreateMap(GetType(), typeof(T));
+    }
 }

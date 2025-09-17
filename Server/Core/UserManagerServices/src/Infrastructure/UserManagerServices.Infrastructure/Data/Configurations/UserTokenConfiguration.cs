@@ -32,11 +32,11 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
         builder.Property(ut => ut.LoginProvider)
             .HasMaxLength(128)
             .IsRequired();
-            
+
         builder.Property(ut => ut.Name)
             .HasMaxLength(128)
             .IsRequired();
-            
+
         builder.Property(ut => ut.Value)
             .HasMaxLength(2048);
 
@@ -44,13 +44,13 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
         builder.Property(ut => ut.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(ut => ut.UpdatedAt);
-        
+
         builder.Property(ut => ut.CreatedBy);
-        
+
         builder.Property(ut => ut.UpdatedBy);
-        
+
         builder.Property(ut => ut.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -68,7 +68,7 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
             .HasForeignKey(ut => ut.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_UserTokens_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(ut => ut.UpdatedBy)
@@ -78,16 +78,16 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
         // Indexes
         builder.HasIndex(ut => ut.UserId)
             .HasDatabaseName("idx_user_tokens_user_id");
-            
+
         builder.HasIndex(ut => ut.LoginProvider)
             .HasDatabaseName("idx_user_tokens_provider");
-            
+
         builder.HasIndex(ut => ut.Name)
             .HasDatabaseName("idx_user_tokens_name");
-            
+
         builder.HasIndex(ut => ut.CreatedAt)
             .HasDatabaseName("idx_user_tokens_created_at");
-            
+
         builder.HasIndex(ut => ut.IsDeleted)
             .HasDatabaseName("idx_user_tokens_is_deleted");
 

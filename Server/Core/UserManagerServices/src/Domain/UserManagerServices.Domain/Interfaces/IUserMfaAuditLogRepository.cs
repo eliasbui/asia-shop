@@ -16,7 +16,7 @@ public interface IUserMfaAuditLogRepository : IGenericRepository<UserMfaAuditLog
     /// <param name="pageSize">Page size</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Paginated audit logs and total count</returns>
-    Task<(List<UserMfaAuditLog> logs, int totalCount)> GetPagedByUserIdAsync(Guid userId, 
+    Task<(List<UserMfaAuditLog> logs, int totalCount)> GetPagedByUserIdAsync(Guid userId,
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -27,7 +27,7 @@ public interface IUserMfaAuditLogRepository : IGenericRepository<UserMfaAuditLog
     /// <param name="pageSize">Page size</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Paginated audit logs and total count</returns>
-    Task<(List<UserMfaAuditLog> logs, int totalCount)> GetPagedByActionAsync(MfaActionEnum action, 
+    Task<(List<UserMfaAuditLog> logs, int totalCount)> GetPagedByActionAsync(MfaActionEnum action,
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -38,7 +38,7 @@ public interface IUserMfaAuditLogRepository : IGenericRepository<UserMfaAuditLog
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of failed MFA attempts</returns>
-    Task<List<UserMfaAuditLog>> GetFailedAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    Task<List<UserMfaAuditLog>> GetFailedAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -68,6 +68,6 @@ public interface IUserMfaAuditLogRepository : IGenericRepository<UserMfaAuditLog
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>MFA statistics</returns>
-    Task<Dictionary<string, int>> GetMfaStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    Task<Dictionary<string, int>> GetMfaStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 }

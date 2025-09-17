@@ -25,7 +25,7 @@ public class CreateUserCommandHandler(
     {
         try
         {
-            logger.LogInformation("Creating user with email: {Email} (created by: {CreatedBy})", 
+            logger.LogInformation("Creating user with email: {Email} (created by: {CreatedBy})",
                 request.Email, request.CreatedBy);
 
             // Check if user already exists
@@ -33,10 +33,11 @@ public class CreateUserCommandHandler(
             if (existingUser != null)
             {
                 logger.LogWarning("User with email {Email} already exists", request.Email);
-                return BaseResponse<UserResponse>.Failure("A user with this email already exists", new Dictionary<string, object>
-                {
-                    ["errorCode"] = "USER_ALREADY_EXISTS"
-                });
+                return BaseResponse<UserResponse>.Failure("A user with this email already exists",
+                    new Dictionary<string, object>
+                    {
+                        ["errorCode"] = "USER_ALREADY_EXISTS"
+                    });
             }
 
             // Create new user
@@ -56,7 +57,7 @@ public class CreateUserCommandHandler(
             var result = await userManager.CreateAsync(user, request.Password);
             if (!result.Succeeded)
             {
-                logger.LogWarning("Failed to create user {Email}: {Errors}", 
+                logger.LogWarning("Failed to create user {Email}: {Errors}",
                     request.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
                 return BaseResponse<UserResponse>.Failure("Failed to create user", new Dictionary<string, object>
                 {
@@ -70,11 +71,9 @@ public class CreateUserCommandHandler(
             {
                 var roleResult = await userManager.AddToRolesAsync(user, request.Roles);
                 if (!roleResult.Succeeded)
-                {
-                    logger.LogWarning("Failed to assign roles to user {Email}: {Errors}", 
+                    logger.LogWarning("Failed to assign roles to user {Email}: {Errors}",
                         request.Email, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
-                    // Don't fail the entire operation, just log the warning
-                }
+                // Don't fail the entire operation, just log the warning
             }
 
             // Get updated user with roles
@@ -95,10 +94,10 @@ public class CreateUserCommandHandler(
                 PhoneNumberConfirmed = createdUser.PhoneNumberConfirmed,
                 TwoFactorEnabled = createdUser.TwoFactorEnabled,
                 Roles = userRoles.ToList(),
-                Claims = userClaims.Select(c => new UserClaimInfo 
-                { 
-                    Type = c.Type, 
-                    Value = c.Value 
+                Claims = userClaims.Select(c => new UserClaimInfo
+                {
+                    Type = c.Type,
+                    Value = c.Value
                 }).ToList(),
                 CreatedAt = createdUser.CreatedAt,
                 UpdatedAt = createdUser.UpdatedAt,
@@ -107,9 +106,9 @@ public class CreateUserCommandHandler(
                 LockoutEnd = createdUser.LockoutEnd
             };
 
-            logger.LogInformation("Successfully created user {Email} with ID: {UserId}", 
+            logger.LogInformation("Successfully created user {Email} with ID: {UserId}",
                 request.Email, createdUser.Id);
-            
+
             return BaseResponse<UserResponse>.Success(response, "User created successfully");
         }
         catch (Exception ex)

@@ -31,7 +31,8 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
     /// <param name="next">The next handler in the pipeline</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The response</returns>
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;
         var requestId = Guid.NewGuid();
@@ -46,9 +47,9 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         try
         {
             var response = await next();
-            
+
             stopwatch.Stop();
-            
+
             _logger.LogInformation(
                 "Completed request {RequestName} with ID {RequestId} in {ElapsedMilliseconds}ms at {Timestamp}",
                 requestName,
@@ -61,7 +62,7 @@ public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, 
         catch (Exception ex)
         {
             stopwatch.Stop();
-            
+
             _logger.LogError(ex,
                 "Request {RequestName} with ID {RequestId} failed after {ElapsedMilliseconds}ms at {Timestamp}. Error: {ErrorMessage}",
                 requestName,

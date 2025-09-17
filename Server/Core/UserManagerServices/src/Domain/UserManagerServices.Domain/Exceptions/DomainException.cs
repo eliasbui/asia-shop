@@ -73,7 +73,8 @@ public class BusinessRuleViolationException : DomainException
     /// <param name="message">Error message</param>
     /// <param name="innerException">Inner exception</param>
     /// <param name="errorCode">Error code</param>
-    public BusinessRuleViolationException(string message, Exception innerException, string errorCode = "BUSINESS_RULE_VIOLATION")
+    public BusinessRuleViolationException(string message, Exception innerException,
+        string errorCode = "BUSINESS_RULE_VIOLATION")
         : base(message, errorCode, innerException)
     {
     }

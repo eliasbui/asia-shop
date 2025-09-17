@@ -17,8 +17,8 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     var configuration = new ConfigurationBuilder()
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+        .AddJsonFile("appsettings.json", false, true)
+        .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true)
         .AddEnvironmentVariables()
         .Build();
 
@@ -38,10 +38,7 @@ try
     app.UseGlobalExceptionHandling();
     app.UseSecurityHeaders();
 
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseScalar();
-    }
+    if (app.Environment.IsDevelopment()) app.UseScalar();
 
     app.UseHttpsRedirection();
     app.UseResponseCompression();

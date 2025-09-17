@@ -32,9 +32,7 @@ public class PasswordHashingService : IPasswordHashingService
     public string HashPassword(string password)
     {
         if (string.IsNullOrEmpty(password))
-        {
             throw new ArgumentException("Password cannot be null or empty", nameof(password));
-        }
 
         try
         {
@@ -59,14 +57,10 @@ public class PasswordHashingService : IPasswordHashingService
     public bool VerifyPassword(string password, string hashedPassword)
     {
         if (string.IsNullOrEmpty(password))
-        {
             throw new ArgumentException("Password cannot be null or empty", nameof(password));
-        }
 
         if (string.IsNullOrEmpty(hashedPassword))
-        {
             throw new ArgumentException("Hashed password cannot be null or empty", nameof(hashedPassword));
-        }
 
         try
         {
@@ -89,22 +83,18 @@ public class PasswordHashingService : IPasswordHashingService
     /// <returns>True if rehashing is needed, false otherwise</returns>
     public bool NeedsRehash(string hashedPassword)
     {
-        if (string.IsNullOrEmpty(hashedPassword))
-        {
-            return true; // Invalid hash needs rehashing
-        }
+        if (string.IsNullOrEmpty(hashedPassword)) return true; // Invalid hash needs rehashing
 
         try
         {
             // Check if the hash was created with the current work factor
             var currentWorkFactor = ExtractWorkFactor(hashedPassword);
             var needsRehash = currentWorkFactor < DefaultWorkFactor;
-            
+
             if (needsRehash)
-            {
-                _logger.LogInformation("Password hash needs rehashing. Current work factor: {CurrentWorkFactor}, Target work factor: {TargetWorkFactor}", 
+                _logger.LogInformation(
+                    "Password hash needs rehashing. Current work factor: {CurrentWorkFactor}, Target work factor: {TargetWorkFactor}",
                     currentWorkFactor, DefaultWorkFactor);
-            }
 
             return needsRehash;
         }
@@ -124,27 +114,20 @@ public class PasswordHashingService : IPasswordHashingService
     {
         // BCrypt hash format: $2a$[cost]$[salt][hash]
         // Example: $2a$12$R9h/cIPz0gi.URNNX3kh2OPST9/PgBkqquzi.Ss7KIUgO2t0jWMUW
-        
+
         if (string.IsNullOrEmpty(hashedPassword) || hashedPassword.Length < 7)
-        {
             throw new ArgumentException("Invalid BCrypt hash format", nameof(hashedPassword));
-        }
 
         var parts = hashedPassword.Split('$');
-        if (parts.Length < 4)
-        {
-            throw new ArgumentException("Invalid BCrypt hash format", nameof(hashedPassword));
-        }
+        if (parts.Length < 4) throw new ArgumentException("Invalid BCrypt hash format", nameof(hashedPassword));
 
         if (!int.TryParse(parts[2], out var workFactor))
-        {
             throw new ArgumentException("Invalid work factor in BCrypt hash", nameof(hashedPassword));
-        }
 
         if (workFactor < MinWorkFactor || workFactor > MaxWorkFactor)
-        {
-            throw new ArgumentException($"Work factor {workFactor} is outside valid range ({MinWorkFactor}-{MaxWorkFactor})", nameof(hashedPassword));
-        }
+            throw new ArgumentException(
+                $"Work factor {workFactor} is outside valid range ({MinWorkFactor}-{MaxWorkFactor})",
+                nameof(hashedPassword));
 
         return workFactor;
     }

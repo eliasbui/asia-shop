@@ -16,9 +16,9 @@ public class UserSession : IBaseEntity
     public string RefreshToken { get; set; } = null!;
 
     public string? OperatingSystem { get; set; } = null!;
-    
+
     public string? Browser { get; set; } = null!;
-    
+
     public string? Location { get; set; } = null!;
 
     [Column(TypeName = "jsonb")] public string DeviceInfo { get; set; } = null!;

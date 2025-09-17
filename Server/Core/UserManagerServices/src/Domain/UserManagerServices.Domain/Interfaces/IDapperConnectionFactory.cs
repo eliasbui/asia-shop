@@ -13,14 +13,14 @@ public interface IDapperConnectionFactory
     /// </summary>
     /// <returns>Database connection instance</returns>
     IDbConnection CreateConnection();
-    
+
     /// <summary>
     /// Creates a new database connection asynchronously
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Database connection instance</returns>
     Task<IDbConnection> CreateConnectionAsync(CancellationToken cancellationToken = default);
-    
+
     /// <summary>
     /// Gets the connection string
     /// </summary>

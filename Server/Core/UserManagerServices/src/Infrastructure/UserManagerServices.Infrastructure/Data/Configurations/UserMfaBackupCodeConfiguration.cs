@@ -27,22 +27,22 @@ public class UserMfaBackupCodeConfiguration : IEntityTypeConfiguration<UserMfaBa
         builder.Property(bc => bc.CodeHash)
             .HasMaxLength(512)
             .IsRequired();
-            
+
         builder.Property(bc => bc.IsUsed)
             .IsRequired()
             .HasDefaultValue(false);
-            
+
         builder.Property(bc => bc.UsedAt);
-        
+
         builder.Property(bc => bc.UsedFromIp)
             .HasMaxLength(45);
-            
+
         builder.Property(bc => bc.UsedFromUserAgent)
             .HasMaxLength(1024);
-            
+
         builder.Property(bc => bc.ExpiresAt)
             .IsRequired();
-            
+
         builder.Property(bc => bc.GenerationBatchId)
             .IsRequired();
 
@@ -50,13 +50,13 @@ public class UserMfaBackupCodeConfiguration : IEntityTypeConfiguration<UserMfaBa
         builder.Property(bc => bc.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(bc => bc.UpdatedAt);
-        
+
         builder.Property(bc => bc.CreatedBy);
-        
+
         builder.Property(bc => bc.UpdatedBy);
-        
+
         builder.Property(bc => bc.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -80,7 +80,7 @@ public class UserMfaBackupCodeConfiguration : IEntityTypeConfiguration<UserMfaBa
             .HasForeignKey(bc => bc.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_UserMfaBackupCodes_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(bc => bc.UpdatedBy)
@@ -90,16 +90,16 @@ public class UserMfaBackupCodeConfiguration : IEntityTypeConfiguration<UserMfaBa
         // Indexes for performance
         builder.HasIndex(bc => bc.UserId)
             .HasDatabaseName("idx_user_mfa_backup_codes_user_id");
-            
+
         builder.HasIndex(bc => bc.MfaSettingsId)
             .HasDatabaseName("idx_user_mfa_backup_codes_mfa_settings_id");
-            
+
         builder.HasIndex(bc => bc.IsUsed)
             .HasDatabaseName("idx_user_mfa_backup_codes_is_used");
-            
+
         builder.HasIndex(bc => bc.ExpiresAt)
             .HasDatabaseName("idx_user_mfa_backup_codes_expires_at");
-            
+
         builder.HasIndex(bc => bc.GenerationBatchId)
             .HasDatabaseName("idx_user_mfa_backup_codes_generation_batch_id");
 

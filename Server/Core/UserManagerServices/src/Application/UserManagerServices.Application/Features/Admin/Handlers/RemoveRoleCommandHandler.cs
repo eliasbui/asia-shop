@@ -27,7 +27,7 @@ public class RemoveRoleCommandHandler(
     {
         try
         {
-            logger.LogInformation("Removing role '{RoleName}' from user: {UserId} (removed by: {RemovedBy})", 
+            logger.LogInformation("Removing role '{RoleName}' from user: {UserId} (removed by: {RemovedBy})",
                 request.RoleName, request.UserId, request.RemovedBy);
 
             // Get user
@@ -67,7 +67,7 @@ public class RemoveRoleCommandHandler(
             var result = await userManager.RemoveFromRoleAsync(user, request.RoleName);
             if (!result.Succeeded)
             {
-                logger.LogWarning("Failed to remove role '{RoleName}' from user {UserId}: {Errors}", 
+                logger.LogWarning("Failed to remove role '{RoleName}' from user {UserId}: {Errors}",
                     request.RoleName, request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
                 return BaseResponse<bool>.Failure("Failed to remove role from user", new Dictionary<string, object>
                 {
@@ -76,14 +76,14 @@ public class RemoveRoleCommandHandler(
                 });
             }
 
-            logger.LogInformation("Successfully removed role '{RoleName}' from user: {UserId}", 
+            logger.LogInformation("Successfully removed role '{RoleName}' from user: {UserId}",
                 request.RoleName, request.UserId);
-            
+
             return BaseResponse<bool>.Success(true, "Role removed successfully");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error removing role '{RoleName}' from user: {UserId}", 
+            logger.LogError(ex, "Error removing role '{RoleName}' from user: {UserId}",
                 request.RoleName, request.UserId);
             return BaseResponse<bool>.Failure("An error occurred while removing the role. Please try again.",
                 new Dictionary<string, object>

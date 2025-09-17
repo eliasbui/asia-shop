@@ -16,7 +16,7 @@ public interface IUserLoginAttemptRepository : IGenericRepository<UserLoginAttem
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of login attempts</returns>
-    Task<List<UserLoginAttempt>> GetUserAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    Task<List<UserLoginAttempt>> GetUserAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -27,7 +27,7 @@ public interface IUserLoginAttemptRepository : IGenericRepository<UserLoginAttem
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of failed login attempts</returns>
-    Task<List<UserLoginAttempt>> GetFailedAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    Task<List<UserLoginAttempt>> GetFailedAttemptsAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -38,7 +38,7 @@ public interface IUserLoginAttemptRepository : IGenericRepository<UserLoginAttem
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of login attempts</returns>
-    Task<List<UserLoginAttempt>> GetIpAttemptsAsync(string ipAddress, DateTime fromDate, DateTime toDate, 
+    Task<List<UserLoginAttempt>> GetIpAttemptsAsync(string ipAddress, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -58,7 +58,7 @@ public interface IUserLoginAttemptRepository : IGenericRepository<UserLoginAttem
     /// <param name="count">Number of attempts to retrieve</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of recent login attempts</returns>
-    Task<List<UserLoginAttempt>> GetRecentAttemptsAsync(Guid userId, int count = 10, 
+    Task<List<UserLoginAttempt>> GetRecentAttemptsAsync(Guid userId, int count = 10,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -69,7 +69,7 @@ public interface IUserLoginAttemptRepository : IGenericRepository<UserLoginAttem
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of login attempts</returns>
-    Task<List<UserLoginAttempt>> GetAttemptsByEmailOrUsernameAsync(string emailOrUsername, 
+    Task<List<UserLoginAttempt>> GetAttemptsByEmailOrUsernameAsync(string emailOrUsername,
         DateTime fromDate, DateTime toDate, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -79,7 +79,7 @@ public interface IUserLoginAttemptRepository : IGenericRepository<UserLoginAttem
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Login statistics</returns>
-    Task<Dictionary<string, int>> GetLoginStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    Task<Dictionary<string, int>> GetLoginStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>

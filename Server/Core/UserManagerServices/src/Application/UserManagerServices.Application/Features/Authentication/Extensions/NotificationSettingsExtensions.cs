@@ -67,7 +67,8 @@ public static class NotificationSettingsExtensions
     /// <param name="info">NotificationSettingInfo DTO</param>
     /// <param name="existingSettings">Existing settings entity (optional)</param>
     /// <returns>UserNotificationSettings entity</returns>
-    public static UserNotificationSettings ToUserNotificationSettings(this NotificationSettingInfo info, UserNotificationSettings? existingSettings = null)
+    public static UserNotificationSettings ToUserNotificationSettings(this NotificationSettingInfo info,
+        UserNotificationSettings? existingSettings = null)
     {
         var settings = existingSettings ?? new UserNotificationSettings();
 

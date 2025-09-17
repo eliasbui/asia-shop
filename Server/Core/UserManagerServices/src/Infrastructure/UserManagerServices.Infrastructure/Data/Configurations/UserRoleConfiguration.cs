@@ -35,13 +35,13 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
         builder.Property(ur => ur.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(ur => ur.UpdatedAt);
-        
+
         builder.Property(ur => ur.CreatedBy);
-        
+
         builder.Property(ur => ur.UpdatedBy);
-        
+
         builder.Property(ur => ur.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -65,7 +65,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
             .HasForeignKey(ur => ur.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_UserRoles_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(ur => ur.UpdatedBy)
@@ -75,16 +75,16 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
         // Indexes
         builder.HasIndex(ur => ur.UserId)
             .HasDatabaseName("idx_user_roles_user_id");
-            
+
         builder.HasIndex(ur => ur.RoleId)
             .HasDatabaseName("idx_user_roles_role_id");
-            
+
         builder.HasIndex(ur => ur.ExpiresAt)
             .HasDatabaseName("idx_user_roles_expires_at");
-            
+
         builder.HasIndex(ur => ur.CreatedAt)
             .HasDatabaseName("idx_user_roles_created_at");
-            
+
         builder.HasIndex(ur => ur.IsDeleted)
             .HasDatabaseName("idx_user_roles_is_deleted");
 

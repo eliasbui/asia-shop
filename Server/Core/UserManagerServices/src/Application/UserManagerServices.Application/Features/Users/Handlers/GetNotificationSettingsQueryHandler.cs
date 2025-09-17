@@ -13,7 +13,8 @@ namespace UserManagerServices.Application.Features.Users.Handlers;
 /// </summary>
 public class GetNotificationSettingsQueryHandler(
     IUnitOfWork unitOfWork,
-    ILogger<GetNotificationSettingsQueryHandler> logger) : IRequestHandler<GetNotificationSettingsQuery, BaseResponse<NotificationSettingsResponse>>
+    ILogger<GetNotificationSettingsQueryHandler> logger)
+    : IRequestHandler<GetNotificationSettingsQuery, BaseResponse<NotificationSettingsResponse>>
 {
     /// <summary>
     /// Handles the get notification settings query
@@ -21,7 +22,8 @@ public class GetNotificationSettingsQueryHandler(
     /// <param name="request">Get notification settings query</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User notification settings</returns>
-    public async Task<BaseResponse<NotificationSettingsResponse>> Handle(GetNotificationSettingsQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<NotificationSettingsResponse>> Handle(GetNotificationSettingsQuery request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -75,7 +77,8 @@ public class GetNotificationSettingsQueryHandler(
                     LastUpdated = null
                 };
 
-                logger.LogInformation("No notification settings found for user {UserId}, returning defaults", request.UserId);
+                logger.LogInformation("No notification settings found for user {UserId}, returning defaults",
+                    request.UserId);
                 return BaseResponse<NotificationSettingsResponse>.Success(defaultResponse);
             }
 
@@ -130,7 +133,8 @@ public class GetNotificationSettingsQueryHandler(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting notification settings for user: {UserId}", request.UserId);
-            return BaseResponse<NotificationSettingsResponse>.Failure("An error occurred while retrieving notification settings. Please try again.",
+            return BaseResponse<NotificationSettingsResponse>.Failure(
+                "An error occurred while retrieving notification settings. Please try again.",
                 new Dictionary<string, object>
                 {
                     ["errorCode"] = "SERVER_ERROR"

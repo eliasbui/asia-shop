@@ -91,7 +91,8 @@ public class UnitOfWork : IUnitOfWork
         ILogger<UnitOfWork> logger)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
-        _dapperConnectionFactory = dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
+        _dapperConnectionFactory =
+            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _repositories = new Dictionary<Type, object>();
 
@@ -130,12 +131,14 @@ public class UnitOfWork : IUnitOfWork
     {
         if (_currentTransaction != null)
         {
-            _logger.LogWarning("Transaction already active. Transaction ID: {TransactionId}", _currentTransaction.TransactionId);
+            _logger.LogWarning("Transaction already active. Transaction ID: {TransactionId}",
+                _currentTransaction.TransactionId);
             return;
         }
 
         _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-        _logger.LogInformation("Transaction started. Transaction ID: {TransactionId}", _currentTransaction.TransactionId);
+        _logger.LogInformation("Transaction started. Transaction ID: {TransactionId}",
+            _currentTransaction.TransactionId);
     }
 
     /// <summary>
@@ -154,11 +157,13 @@ public class UnitOfWork : IUnitOfWork
         try
         {
             await _currentTransaction.CommitAsync(cancellationToken);
-            _logger.LogInformation("Transaction committed successfully. Transaction ID: {TransactionId}", _currentTransaction.TransactionId);
+            _logger.LogInformation("Transaction committed successfully. Transaction ID: {TransactionId}",
+                _currentTransaction.TransactionId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to commit transaction. Transaction ID: {TransactionId}", _currentTransaction.TransactionId);
+            _logger.LogError(ex, "Failed to commit transaction. Transaction ID: {TransactionId}",
+                _currentTransaction.TransactionId);
             await RollbackTransactionAsync(cancellationToken);
             throw;
         }
@@ -185,11 +190,13 @@ public class UnitOfWork : IUnitOfWork
         try
         {
             await _currentTransaction.RollbackAsync(cancellationToken);
-            _logger.LogInformation("Transaction rolled back successfully. Transaction ID: {TransactionId}", _currentTransaction.TransactionId);
+            _logger.LogInformation("Transaction rolled back successfully. Transaction ID: {TransactionId}",
+                _currentTransaction.TransactionId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to rollback transaction. Transaction ID: {TransactionId}", _currentTransaction.TransactionId);
+            _logger.LogError(ex, "Failed to rollback transaction. Transaction ID: {TransactionId}",
+                _currentTransaction.TransactionId);
             throw;
         }
         finally
@@ -260,10 +267,7 @@ public class UnitOfWork : IUnitOfWork
     {
         var type = typeof(T);
 
-        if (_repositories.ContainsKey(type))
-        {
-            return (IGenericRepository<T>)_repositories[type];
-        }
+        if (_repositories.ContainsKey(type)) return (IGenericRepository<T>)_repositories[type];
 
         var repository = new GenericRepository<T>(_context);
         _repositories.Add(type, repository);
@@ -285,16 +289,10 @@ public class UnitOfWork : IUnitOfWork
             .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
         foreach (var entry in entries)
-        {
             if (entry.State == EntityState.Added)
-            {
                 entry.Property(nameof(IBaseEntity.CreatedBy)).CurrentValue = userId;
-            }
             else if (entry.State == EntityState.Modified)
-            {
                 entry.Property(nameof(IBaseEntity.UpdatedBy)).CurrentValue = userId;
-            }
-        }
     }
 
     #endregion

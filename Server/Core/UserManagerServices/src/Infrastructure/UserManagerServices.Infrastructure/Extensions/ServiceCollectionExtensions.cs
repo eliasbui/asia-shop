@@ -36,50 +36,46 @@ public static class ServiceCollectionExtensions
             {
                 npgsqlOptions.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName);
                 npgsqlOptions.EnableRetryOnFailure(
-                    maxRetryCount: 3,
-                    maxRetryDelay: TimeSpan.FromSeconds(30),
-                    errorCodesToAdd: null);
+                    3,
+                    TimeSpan.FromSeconds(30),
+                    null);
             });
 
             // Enable sensitive data logging in development
             if (configuration.GetValue<bool>("Logging:EnableSensitiveDataLogging"))
-            {
                 options.EnableSensitiveDataLogging();
-            }
 
             // Enable detailed errors in development
-            if (configuration.GetValue<bool>("Logging:EnableDetailedErrors"))
-            {
-                options.EnableDetailedErrors();
-            }
+            if (configuration.GetValue<bool>("Logging:EnableDetailedErrors")) options.EnableDetailedErrors();
         });
 
         // Add Identity services
         services.AddIdentity<User, Role>(options =>
-        {
-            // Password settings
-            options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = true;
-            options.Password.RequireNonAlphanumeric = true;
-            options.Password.RequireUppercase = true;
-            options.Password.RequiredLength = 8;
-            options.Password.RequiredUniqueChars = 1;
+            {
+                // Password settings
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequiredUniqueChars = 1;
 
-            // Lockout settings
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            options.Lockout.MaxFailedAccessAttempts = 5;
-            options.Lockout.AllowedForNewUsers = true;
+                // Lockout settings
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
 
-            // User settings
-            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            options.User.RequireUniqueEmail = true;
+                // User settings
+                options.User.AllowedUserNameCharacters =
+                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                options.User.RequireUniqueEmail = true;
 
-            // Sign-in settings
-            options.SignIn.RequireConfirmedEmail = true;
-            options.SignIn.RequireConfirmedPhoneNumber = false;
-        })
-        .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddDefaultTokenProviders();
+                // Sign-in settings
+                options.SignIn.RequireConfirmedEmail = true;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
         // Add Redis for caching and token blacklisting
         var redisConnectionString = configuration.GetConnectionString("Redis");
@@ -103,7 +99,8 @@ public static class ServiceCollectionExtensions
             // Configure Data Protection with Redis
             services.AddDataProtection()
                 .SetApplicationName("UserManagerServices")
-                .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(redisConnectionString), "DataProtection-Keys");
+                .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect(redisConnectionString),
+                    "DataProtection-Keys");
         }
         else
         {
@@ -140,15 +137,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITotpService, TotpService>();
         services.AddScoped<IMfaService, MfaService>();
         services.AddScoped<IAccountLockoutService, AccountLockoutService>();
+        services.AddScoped<ISessionManagementService, SessionManagementService>();
 
         // Register HTTP client and email service
         services.AddHttpClient<ZohoEmailService>(client =>
         {
-            var zohoConfig = configuration.GetSection("Zoho:Email").Get<Services.ZohoEmailConfiguration>();
-            if (zohoConfig != null)
-            {
-                client.Timeout = TimeSpan.FromSeconds(zohoConfig.TimeoutSeconds);
-            }
+            var zohoConfig = configuration.GetSection("Zoho:Email").Get<ZohoEmailConfiguration>();
+            if (zohoConfig != null) client.Timeout = TimeSpan.FromSeconds(zohoConfig.TimeoutSeconds);
         });
         services.AddScoped<IEmailService, ZohoEmailService>();
 
@@ -162,7 +157,8 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The service collection</param>
     /// <param name="configuration">Application configuration</param>
     /// <returns>The service collection for chaining</returns>
-    public static IServiceCollection ConfigureEntityFramework(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection ConfigureEntityFramework(this IServiceCollection services,
+        IConfiguration configuration)
     {
         // Configure connection pool settings
         services.Configure<DbContextOptions>(options =>

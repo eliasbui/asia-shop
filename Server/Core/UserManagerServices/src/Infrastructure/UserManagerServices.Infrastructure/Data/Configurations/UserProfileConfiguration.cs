@@ -26,29 +26,29 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         // Business properties
         builder.Property(up => up.Address)
             .HasMaxLength(500);
-            
+
         builder.Property(up => up.PostalCode)
             .HasMaxLength(20);
-            
+
         builder.Property(up => up.City)
             .HasMaxLength(100);
-            
+
         builder.Property(up => up.Country)
             .HasMaxLength(100);
-            
+
         builder.Property(up => up.Province)
             .HasMaxLength(100);
-            
+
         builder.Property(up => up.State)
             .HasMaxLength(100);
-            
+
         builder.Property(up => up.District)
             .HasMaxLength(100);
-            
+
         builder.Property(up => up.TimeZone)
             .HasMaxLength(50)
             .HasDefaultValue("UTC");
-            
+
         builder.Property(up => up.Language)
             .HasMaxLength(10)
             .HasDefaultValue("en");
@@ -61,13 +61,13 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         builder.Property(up => up.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(up => up.UpdatedAt);
-        
+
         builder.Property(up => up.CreatedBy);
-        
+
         builder.Property(up => up.UpdatedBy);
-        
+
         builder.Property(up => up.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -85,7 +85,7 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
             .HasForeignKey(up => up.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_UserProfiles_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(up => up.UpdatedBy)
@@ -95,25 +95,25 @@ public class UserProfileConfiguration : IEntityTypeConfiguration<UserProfile>
         // Indexes
         builder.HasIndex(up => up.UserId)
             .HasDatabaseName("idx_user_profiles_user_id");
-            
+
         builder.HasIndex(up => up.Country)
             .HasDatabaseName("idx_user_profiles_country");
-            
+
         builder.HasIndex(up => up.City)
             .HasDatabaseName("idx_user_profiles_city");
-            
+
         builder.HasIndex(up => up.PostalCode)
             .HasDatabaseName("idx_user_profiles_postal_code");
-            
+
         builder.HasIndex(up => up.TimeZone)
             .HasDatabaseName("idx_user_profiles_timezone");
-            
+
         builder.HasIndex(up => up.Language)
             .HasDatabaseName("idx_user_profiles_language");
-            
+
         builder.HasIndex(up => up.CreatedAt)
             .HasDatabaseName("idx_user_profiles_created_at");
-            
+
         builder.HasIndex(up => up.IsDeleted)
             .HasDatabaseName("idx_user_profiles_is_deleted");
 

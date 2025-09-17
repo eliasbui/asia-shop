@@ -27,7 +27,7 @@ public class UpdateUserCommandHandler(
     {
         try
         {
-            logger.LogInformation("Updating user: {UserId} (updated by: {UpdatedBy})", 
+            logger.LogInformation("Updating user: {UserId} (updated by: {UpdatedBy})",
                 request.UserId, request.UpdatedBy);
 
             // Get user to update
@@ -49,12 +49,11 @@ public class UpdateUserCommandHandler(
                 // Check if email is already taken
                 var existingUser = await userManager.FindByEmailAsync(request.Email);
                 if (existingUser != null && existingUser.Id != user.Id)
-                {
-                    return BaseResponse<UserResponse>.Failure("Email is already taken by another user", new Dictionary<string, object>
-                    {
-                        ["errorCode"] = "EMAIL_ALREADY_EXISTS"
-                    });
-                }
+                    return BaseResponse<UserResponse>.Failure("Email is already taken by another user",
+                        new Dictionary<string, object>
+                        {
+                            ["errorCode"] = "EMAIL_ALREADY_EXISTS"
+                        });
                 user.Email = request.Email;
                 user.UserName = request.Email;
                 hasChanges = true;
@@ -90,7 +89,8 @@ public class UpdateUserCommandHandler(
                 hasChanges = true;
             }
 
-            if (request.PhoneNumberConfirmed.HasValue && request.PhoneNumberConfirmed.Value != user.PhoneNumberConfirmed)
+            if (request.PhoneNumberConfirmed.HasValue &&
+                request.PhoneNumberConfirmed.Value != user.PhoneNumberConfirmed)
             {
                 user.PhoneNumberConfirmed = request.PhoneNumberConfirmed.Value;
                 hasChanges = true;
@@ -110,7 +110,7 @@ public class UpdateUserCommandHandler(
                 var result = await userManager.UpdateAsync(user);
                 if (!result.Succeeded)
                 {
-                    logger.LogWarning("Failed to update user {UserId}: {Errors}", 
+                    logger.LogWarning("Failed to update user {UserId}: {Errors}",
                         request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
                     return BaseResponse<UserResponse>.Failure("Failed to update user", new Dictionary<string, object>
                     {
@@ -138,10 +138,10 @@ public class UpdateUserCommandHandler(
                 PhoneNumberConfirmed = updatedUser.PhoneNumberConfirmed,
                 TwoFactorEnabled = updatedUser.TwoFactorEnabled,
                 Roles = userRoles.ToList(),
-                Claims = userClaims.Select(c => new UserClaimInfo 
-                { 
-                    Type = c.Type, 
-                    Value = c.Value 
+                Claims = userClaims.Select(c => new UserClaimInfo
+                {
+                    Type = c.Type,
+                    Value = c.Value
                 }).ToList(),
                 CreatedAt = updatedUser.CreatedAt,
                 UpdatedAt = updatedUser.UpdatedAt,

@@ -29,15 +29,9 @@ public static class ApiHelpers
     /// <returns>HTTP result</returns>
     public static IResult CreateResponse<T>(BaseResponse<T> result)
     {
-        if (result.IsSuccess)
-        {
-            return Results.Ok(result);
-        }
+        if (result.IsSuccess) return Results.Ok(result);
 
-        if (result.ValidationErrors.Any())
-        {
-            return Results.BadRequest(result);
-        }
+        if (result.ValidationErrors.Any()) return Results.BadRequest(result);
 
         return Results.BadRequest(result);
     }
@@ -49,15 +43,9 @@ public static class ApiHelpers
     /// <returns>HTTP result</returns>
     public static IResult CreateResponse(BaseResponse result)
     {
-        if (result.IsSuccess)
-        {
-            return Results.Ok(result);
-        }
+        if (result.IsSuccess) return Results.Ok(result);
 
-        if (result.ValidationErrors.Any())
-        {
-            return Results.BadRequest(result);
-        }
+        if (result.ValidationErrors.Any()) return Results.BadRequest(result);
 
         return Results.BadRequest(result);
     }
@@ -82,10 +70,7 @@ public static class ApiHelpers
     public static Guid GetCurrentUserId(HttpContext context)
     {
         var userId = GetCurrentUserId(context.User);
-        if (!userId.HasValue)
-        {
-            throw new UnauthorizedAccessException("User ID not found in token");
-        }
+        if (!userId.HasValue) throw new UnauthorizedAccessException("User ID not found in token");
         return userId.Value;
     }
 
@@ -117,10 +102,7 @@ public static class ApiHelpers
     public static string? ExtractTokenFromHeader(HttpContext context)
     {
         var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
-        if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
-        {
-            return null;
-        }
+        if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer ")) return null;
 
         return authHeader.Substring("Bearer ".Length).Trim();
     }

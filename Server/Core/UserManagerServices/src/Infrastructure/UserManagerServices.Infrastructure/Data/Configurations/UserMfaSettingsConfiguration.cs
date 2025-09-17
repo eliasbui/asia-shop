@@ -27,52 +27,52 @@ public class UserMfaSettingsConfiguration : IEntityTypeConfiguration<UserMfaSett
         builder.Property(ums => ums.IsEnabled)
             .IsRequired()
             .HasDefaultValue(false);
-            
+
         builder.Property(ums => ums.IsTotpEnabled)
             .IsRequired()
             .HasDefaultValue(false);
-            
+
         builder.Property(ums => ums.IsEmailOtpEnabled)
             .IsRequired()
             .HasDefaultValue(false);
-            
+
         builder.Property(ums => ums.IsBackupCodesEnabled)
             .IsRequired()
             .HasDefaultValue(false);
-            
+
         builder.Property(ums => ums.TotpSecretKey)
             .HasMaxLength(512);
-            
+
         builder.Property(ums => ums.BackupCodesRemaining)
             .IsRequired()
             .HasDefaultValue(0);
-            
+
         builder.Property(ums => ums.LastUsedAt);
-        
+
         builder.Property(ums => ums.EnabledAt);
-        
+
         builder.Property(ums => ums.DisabledAt);
-        
+
         builder.Property(ums => ums.DisabledReason)
             .HasMaxLength(500);
-            
+
         builder.Property(ums => ums.IsEnforced)
             .IsRequired()
             .HasDefaultValue(false);
-            
+
         builder.Property(ums => ums.EnforcementGracePeriodEnd);
 
         // Base entity properties
         builder.Property(ums => ums.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(ums => ums.UpdatedAt);
-        
+
         builder.Property(ums => ums.CreatedBy);
-        
+
         builder.Property(ums => ums.UpdatedBy);
-        
+
         builder.Property(ums => ums.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -100,7 +100,7 @@ public class UserMfaSettingsConfiguration : IEntityTypeConfiguration<UserMfaSett
             .HasForeignKey(ums => ums.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_UserMfaSettings_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(ums => ums.UpdatedBy)
@@ -110,10 +110,10 @@ public class UserMfaSettingsConfiguration : IEntityTypeConfiguration<UserMfaSett
         // Indexes for performance
         builder.HasIndex(ums => ums.UserId)
             .HasDatabaseName("idx_user_mfa_settings_user_id");
-            
+
         builder.HasIndex(ums => ums.IsEnabled)
             .HasDatabaseName("idx_user_mfa_settings_is_enabled");
-            
+
         builder.HasIndex(ums => ums.IsEnforced)
             .HasDatabaseName("idx_user_mfa_settings_is_enforced");
 

@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            
+
             // Add pipeline behaviors in order of execution
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
@@ -38,13 +38,13 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         // Add AutoMapper
-        var autoMapperLicenseKey = Environment.GetEnvironmentVariable("AutoMapperLicenseKey") ?? configuration.GetSection("AutoMapperLicenseKey").Value;
-       
+        var autoMapperLicenseKey = Environment.GetEnvironmentVariable("AutoMapperLicenseKey") ??
+                                   configuration.GetSection("AutoMapperLicenseKey").Value;
+
         services.AddAutoMapper(cfg =>
         {
             cfg.LicenseKey = autoMapperLicenseKey;
             cfg.AddProfile<MappingProfile>();
-
         });
 
         return services;
@@ -60,7 +60,8 @@ public static class ServiceCollectionExtensions
         // Configure MediatR settings
         services.Configure<MediatRServiceConfiguration>(options =>
         {
-            options.RequestExceptionActionProcessorStrategy = RequestExceptionActionProcessorStrategy.ApplyForUnhandledExceptions;
+            options.RequestExceptionActionProcessorStrategy =
+                RequestExceptionActionProcessorStrategy.ApplyForUnhandledExceptions;
         });
 
         return services;

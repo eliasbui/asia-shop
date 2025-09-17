@@ -24,7 +24,8 @@ public class CreateApiKeyCommandHandler(
     /// <param name="request">Create API key command</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created API key</returns>
-    public async Task<BaseResponse<ApiKeyResponse>> Handle(CreateApiKeyCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<ApiKeyResponse>> Handle(CreateApiKeyCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -45,11 +46,13 @@ public class CreateApiKeyCommandHandler(
             var existingKeys = await unitOfWork.Users.GetUserApiKeysAsync(request.UserId, cancellationToken);
             if (existingKeys.Any(k => k.KeyName.Equals(request.Name, StringComparison.OrdinalIgnoreCase)))
             {
-                logger.LogWarning("API key with name '{Name}' already exists for user: {UserId}", request.Name, request.UserId);
-                return BaseResponse<ApiKeyResponse>.Failure("An API key with this name already exists", new Dictionary<string, object>
-                {
-                    ["errorCode"] = "DUPLICATE_API_KEY_NAME"
-                });
+                logger.LogWarning("API key with name '{Name}' already exists for user: {UserId}", request.Name,
+                    request.UserId);
+                return BaseResponse<ApiKeyResponse>.Failure("An API key with this name already exists",
+                    new Dictionary<string, object>
+                    {
+                        ["errorCode"] = "DUPLICATE_API_KEY_NAME"
+                    });
             }
 
             // Generate a secure API key
@@ -89,13 +92,15 @@ public class CreateApiKeyCommandHandler(
                 ExpiresAt = apiKey.ExpiresAt
             };
 
-            logger.LogInformation("Successfully created API key '{Name}' for user: {UserId}", request.Name, request.UserId);
+            logger.LogInformation("Successfully created API key '{Name}' for user: {UserId}", request.Name,
+                request.UserId);
             return BaseResponse<ApiKeyResponse>.Success(response, "API key created successfully");
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error creating API key '{Name}' for user: {UserId}", request.Name, request.UserId);
-            return BaseResponse<ApiKeyResponse>.Failure("An error occurred while creating the API key. Please try again.",
+            return BaseResponse<ApiKeyResponse>.Failure(
+                "An error occurred while creating the API key. Please try again.",
                 new Dictionary<string, object>
                 {
                     ["errorCode"] = "SERVER_ERROR"

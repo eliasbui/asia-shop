@@ -26,7 +26,7 @@ public class RoleClaimConfiguration : IEntityTypeConfiguration<RoleClaim>
         // Identity properties
         builder.Property(rc => rc.ClaimType)
             .HasMaxLength(256);
-            
+
         builder.Property(rc => rc.ClaimValue)
             .HasMaxLength(1024);
 
@@ -34,13 +34,13 @@ public class RoleClaimConfiguration : IEntityTypeConfiguration<RoleClaim>
         builder.Property(rc => rc.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(rc => rc.UpdatedAt);
-        
+
         builder.Property(rc => rc.CreatedBy);
-        
+
         builder.Property(rc => rc.UpdatedBy);
-        
+
         builder.Property(rc => rc.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -58,7 +58,7 @@ public class RoleClaimConfiguration : IEntityTypeConfiguration<RoleClaim>
             .HasForeignKey(rc => rc.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_RoleClaims_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(rc => rc.UpdatedBy)
@@ -68,16 +68,16 @@ public class RoleClaimConfiguration : IEntityTypeConfiguration<RoleClaim>
         // Indexes
         builder.HasIndex(rc => rc.RoleId)
             .HasDatabaseName("idx_role_claims_role_id");
-            
+
         builder.HasIndex(rc => rc.ClaimType)
             .HasDatabaseName("idx_role_claims_claim_type");
-            
+
         builder.HasIndex(rc => new { rc.RoleId, rc.ClaimType })
             .HasDatabaseName("idx_role_claims_role_claim_type");
-            
+
         builder.HasIndex(rc => rc.CreatedAt)
             .HasDatabaseName("idx_role_claims_created_at");
-            
+
         builder.HasIndex(rc => rc.IsDeleted)
             .HasDatabaseName("idx_role_claims_is_deleted");
 

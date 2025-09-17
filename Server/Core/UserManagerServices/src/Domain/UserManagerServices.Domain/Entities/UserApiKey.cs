@@ -15,19 +15,16 @@ public class UserApiKey : IBaseEntity
 
     public bool IsActive { get; set; } = true;
 
-    [Column(TypeName = "jsonb")] 
-    public string Permissions { get; set; } = null!;
+    [Column(TypeName = "jsonb")] public string Permissions { get; set; } = null!;
 
     public DateTime ExpiresAt { get; set; } = DateTime.UtcNow.AddYears(1);
     public DateTime LastUsedAt { get; set; } = DateTime.UtcNow;
     public int RequestLimit { get; set; } = 1000;
     public int RequestCount { get; set; } = 0;
-    
-    [Column(TypeName = "jsonb")]
-    public string? IpWhitelist { get; set; } = null!;
-    [Column(TypeName = "jsonb")]
-    public string[]? IpBlacklist { get; set; } = null!;
-    
+
+    [Column(TypeName = "jsonb")] public string? IpWhitelist { get; set; } = null!;
+    [Column(TypeName = "jsonb")] public string[]? IpBlacklist { get; set; } = null!;
+
     public DateTime CreatedAt { get; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; } = null;
     public Guid? CreatedBy { get; } = null;

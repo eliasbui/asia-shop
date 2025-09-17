@@ -35,46 +35,32 @@ public class DisableMfaCommandHandler : IRequestHandler<DisableMfaCommand, BaseR
 
             // Verify user exists
             var user = await _userManager.FindByIdAsync(request.UserId.ToString());
-            if (user == null)
-            {
-                return BaseResponse<bool>.Failure("User not found");
-            }
+            if (user == null) return BaseResponse<bool>.Failure("User not found");
 
             // Check if MFA is enforced
             var isEnforced = await _mfaService.IsMfaEnforcedAsync(request.UserId, cancellationToken);
-            if (isEnforced)
-            {
-                return BaseResponse<bool>.Failure("MFA is enforced by policy and cannot be disabled");
-            }
+            if (isEnforced) return BaseResponse<bool>.Failure("MFA is enforced by policy and cannot be disabled");
 
             // Verify current password
             var passwordValid = await _userManager.CheckPasswordAsync(user, request.CurrentPassword);
-            if (!passwordValid)
-            {
-                return BaseResponse<bool>.Failure("Invalid current password");
-            }
+            if (!passwordValid) return BaseResponse<bool>.Failure("Invalid current password");
 
             // Verify MFA code (either TOTP or backup code)
-            bool mfaValid = false;
-            
+            var mfaValid = false;
+
             // Try TOTP first
-            mfaValid = await _mfaService.VerifyTotpAsync(request.UserId, request.MfaCode, 
+            mfaValid = await _mfaService.VerifyTotpAsync(request.UserId, request.MfaCode,
                 request.IpAddress, request.UserAgent, cancellationToken);
 
             // If TOTP fails, try backup code
             if (!mfaValid)
-            {
-                mfaValid = await _mfaService.VerifyBackupCodeAsync(request.UserId, request.MfaCode, 
+                mfaValid = await _mfaService.VerifyBackupCodeAsync(request.UserId, request.MfaCode,
                     request.IpAddress, request.UserAgent, cancellationToken);
-            }
 
-            if (!mfaValid)
-            {
-                return BaseResponse<bool>.Failure("Invalid MFA code");
-            }
+            if (!mfaValid) return BaseResponse<bool>.Failure("Invalid MFA code");
 
             // Disable MFA
-            var success = await _mfaService.DisableMfaAsync(request.UserId, request.Reason, 
+            var success = await _mfaService.DisableMfaAsync(request.UserId, request.Reason,
                 request.DisabledBy, cancellationToken);
 
             if (success)

@@ -38,9 +38,7 @@ public class TotpService : ITotpService
                          "your-totp-encryption-key-32-chars!!";
 
         if (_encryptionKey.Length < 32)
-        {
             throw new InvalidOperationException("TOTP encryption key must be at least 32 characters long");
-        }
     }
 
     /// <summary>
@@ -119,7 +117,7 @@ public class TotpService : ITotpService
             var currentTimeStep = GetCurrentTimeStep();
 
             // Check current time step and adjacent time steps within the window
-            for (int i = -windowSize; i <= windowSize; i++)
+            for (var i = -windowSize; i <= windowSize; i++)
             {
                 var timeStep = currentTimeStep + i;
                 var expectedCode = GenerateTotpCode(secretBytes, timeStep);
@@ -238,7 +236,7 @@ public class TotpService : ITotpService
             return string.Empty;
 
         var formatted = new StringBuilder();
-        for (int i = 0; i < secretKey.Length; i += 4)
+        for (var i = 0; i < secretKey.Length; i += 4)
         {
             if (i > 0)
                 formatted.Append(' ');
@@ -317,8 +315,8 @@ public class TotpService : ITotpService
     private static string ToBase32(byte[] bytes)
     {
         var result = new StringBuilder();
-        int buffer = 0;
-        int bitsLeft = 0;
+        var buffer = 0;
+        var bitsLeft = 0;
 
         foreach (var b in bytes)
         {
@@ -332,10 +330,7 @@ public class TotpService : ITotpService
             }
         }
 
-        if (bitsLeft > 0)
-        {
-            result.Append(Base32Chars[(buffer << (5 - bitsLeft)) & 31]);
-        }
+        if (bitsLeft > 0) result.Append(Base32Chars[(buffer << (5 - bitsLeft)) & 31]);
 
         return result.ToString();
     }
@@ -348,8 +343,8 @@ public class TotpService : ITotpService
     private static byte[] FromBase32(string base32)
     {
         var result = new List<byte>();
-        int buffer = 0;
-        int bitsLeft = 0;
+        var buffer = 0;
+        var bitsLeft = 0;
 
         foreach (var c in base32.ToUpper())
         {

@@ -26,26 +26,26 @@ public class VerifyMfaCommandHandler : IRequestHandler<VerifyMfaCommand, BaseRes
     {
         try
         {
-            _logger.LogInformation("Verifying MFA for user {UserId} using method {MfaType}", 
+            _logger.LogInformation("Verifying MFA for user {UserId} using method {MfaType}",
                 request.UserId, request.MfaType);
 
-            bool isValid = false;
-            string method = request.MfaType.ToUpper();
+            var isValid = false;
+            var method = request.MfaType.ToUpper();
 
             switch (method)
             {
                 case "TOTP":
-                    isValid = await _mfaService.VerifyTotpAsync(request.UserId, request.MfaCode, 
+                    isValid = await _mfaService.VerifyTotpAsync(request.UserId, request.MfaCode,
                         request.IpAddress, request.UserAgent, cancellationToken);
                     break;
 
                 case "BACKUPCODE":
-                    isValid = await _mfaService.VerifyBackupCodeAsync(request.UserId, request.MfaCode, 
+                    isValid = await _mfaService.VerifyBackupCodeAsync(request.UserId, request.MfaCode,
                         request.IpAddress, request.UserAgent, cancellationToken);
                     break;
 
                 case "EMAILOTP":
-                    isValid = await _mfaService.VerifyEmailOtpAsync(request.UserId, request.MfaCode, 
+                    isValid = await _mfaService.VerifyEmailOtpAsync(request.UserId, request.MfaCode,
                         request.IpAddress, request.UserAgent, cancellationToken);
                     break;
 
@@ -56,13 +56,13 @@ public class VerifyMfaCommandHandler : IRequestHandler<VerifyMfaCommand, BaseRes
 
             if (isValid)
             {
-                _logger.LogInformation("MFA verification successful for user {UserId} using {MfaType}", 
+                _logger.LogInformation("MFA verification successful for user {UserId} using {MfaType}",
                     request.UserId, request.MfaType);
                 return BaseResponse<bool>.Success(true, "MFA verification successful");
             }
             else
             {
-                _logger.LogWarning("MFA verification failed for user {UserId} using {MfaType}", 
+                _logger.LogWarning("MFA verification failed for user {UserId} using {MfaType}",
                     request.UserId, request.MfaType);
                 return BaseResponse<bool>.Failure("Invalid MFA code");
             }

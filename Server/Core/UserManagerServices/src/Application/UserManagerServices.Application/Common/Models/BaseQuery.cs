@@ -62,7 +62,7 @@ public abstract class GetFilteredListQuery<TResponse> : GetListQuery<TResponse>
     /// <summary>
     /// Additional filter parameters as key-value pairs
     /// </summary>
-    public Dictionary<string, object> Filters { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> Filters { get; set; } = new();
 }
 
 /// <summary>
@@ -93,7 +93,7 @@ public abstract class GetCountQuery : IQuery<int>
     /// <summary>
     /// Filter parameters for counting
     /// </summary>
-    public Dictionary<string, object> Filters { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> Filters { get; set; } = new();
 }
 
 /// <summary>
@@ -109,7 +109,7 @@ public abstract class ExistsQuery : IQuery<bool>
     /// <summary>
     /// Additional criteria for existence check
     /// </summary>
-    public Dictionary<string, object> Criteria { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> Criteria { get; set; } = new();
 }
 
 /// <summary>
@@ -136,5 +136,5 @@ public abstract class GetStatisticsQuery<TResponse> : IQuery<TResponse>
     /// <summary>
     /// Additional parameters for statistics calculation
     /// </summary>
-    public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
+    public Dictionary<string, object> Parameters { get; set; } = new();
 }

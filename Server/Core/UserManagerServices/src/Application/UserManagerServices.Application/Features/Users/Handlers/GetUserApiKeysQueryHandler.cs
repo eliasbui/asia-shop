@@ -13,7 +13,8 @@ namespace UserManagerServices.Application.Features.Users.Handlers;
 /// </summary>
 public class GetUserApiKeysQueryHandler(
     IUnitOfWork unitOfWork,
-    ILogger<GetUserApiKeysQueryHandler> logger) : IRequestHandler<GetUserApiKeysQuery, BaseResponse<UserApiKeysResponse>>
+    ILogger<GetUserApiKeysQueryHandler> logger)
+    : IRequestHandler<GetUserApiKeysQuery, BaseResponse<UserApiKeysResponse>>
 {
     /// <summary>
     /// Handles the get user API keys query
@@ -21,7 +22,8 @@ public class GetUserApiKeysQueryHandler(
     /// <param name="request">Get user API keys query</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User API keys</returns>
-    public async Task<BaseResponse<UserApiKeysResponse>> Handle(GetUserApiKeysQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<UserApiKeysResponse>> Handle(GetUserApiKeysQuery request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -50,15 +52,16 @@ public class GetUserApiKeysQueryHandler(
                 ActiveKeys = apiKeyInfos.Count(k => k.IsActive && !k.IsExpired)
             };
 
-            logger.LogInformation("Successfully retrieved {Count} API keys for user: {UserId}", 
+            logger.LogInformation("Successfully retrieved {Count} API keys for user: {UserId}",
                 apiKeyInfos.Count, request.UserId);
-            
+
             return BaseResponse<UserApiKeysResponse>.Success(response);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting API keys for user: {UserId}", request.UserId);
-            return BaseResponse<UserApiKeysResponse>.Failure("An error occurred while retrieving API keys. Please try again.",
+            return BaseResponse<UserApiKeysResponse>.Failure(
+                "An error occurred while retrieving API keys. Please try again.",
                 new Dictionary<string, object>
                 {
                     ["errorCode"] = "SERVER_ERROR"

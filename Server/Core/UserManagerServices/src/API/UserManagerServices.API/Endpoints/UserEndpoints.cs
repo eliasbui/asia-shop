@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 using UserManagerServices.API.Common;
 using UserManagerServices.Application.Features.Admin.Queries;
 using UserManagerServices.Application.Features.Users.Commands;
@@ -37,16 +38,16 @@ public static class UserEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get user profile",
                 Description = "Gets the current user's profile information",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User profile retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["404"] = new() { Description = "User profile not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User profile retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["404"] = new OpenApiResponse { Description = "User profile not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -61,17 +62,17 @@ public static class UserEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Update user profile",
                 Description = "Updates the current user's profile information",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User profile updated successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["404"] = new() { Description = "User not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User profile updated successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["404"] = new OpenApiResponse { Description = "User not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -83,15 +84,15 @@ public static class UserEndpoints
             .Produces<UserPreferencesResponse>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get user preferences",
                 Description = "Gets the current user's preferences and settings",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User preferences retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User preferences retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -105,16 +106,16 @@ public static class UserEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ValidationProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Update user preferences",
                 Description = "Updates the current user's preferences and settings",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User preferences updated successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User preferences updated successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -126,15 +127,15 @@ public static class UserEndpoints
             .Produces<NotificationSettingsResponse>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get notification settings",
                 Description = "Gets the current user's notification preferences and settings",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Notification settings retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Notification settings retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -148,16 +149,16 @@ public static class UserEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ValidationProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Update notification settings",
                 Description = "Updates the current user's notification preferences and settings",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Notification settings updated successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Notification settings updated successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -169,15 +170,15 @@ public static class UserEndpoints
             .Produces<UserSessionsResponse>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get user sessions",
                 Description = "Gets the current user's active sessions",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User sessions retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User sessions retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -190,16 +191,16 @@ public static class UserEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Delete user session",
                 Description = "Deletes a specific user session",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["204"] = new() { Description = "Session deleted successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["404"] = new() { Description = "Session not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["204"] = new OpenApiResponse { Description = "Session deleted successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["404"] = new OpenApiResponse { Description = "Session not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -211,15 +212,15 @@ public static class UserEndpoints
             .Produces<UserApiKeysResponse>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get user API keys",
                 Description = "Gets the current user's API keys",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User API keys retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User API keys retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -233,16 +234,16 @@ public static class UserEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ValidationProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Create API key",
                 Description = "Creates a new API key for the current user",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["201"] = new() { Description = "API key created successfully" },
-                    ["400"] = new() { Description = "Invalid input or validation errors" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["201"] = new OpenApiResponse { Description = "API key created successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid input or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -255,16 +256,16 @@ public static class UserEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Delete API key",
                 Description = "Deletes a specific API key",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["204"] = new() { Description = "API key deleted successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["404"] = new() { Description = "API key not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["204"] = new OpenApiResponse { Description = "API key deleted successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["404"] = new OpenApiResponse { Description = "API key not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -276,15 +277,15 @@ public static class UserEndpoints
             .Produces<UserActivityResponse>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get user activity logs",
                 Description = "Gets the current user's activity logs with pagination",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "User activity logs retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "User activity logs retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
     }
@@ -302,10 +303,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var query = new GetUserProfileQuery { UserId = userId.Value };
         var result = await mediator.Send(query, cancellationToken);
@@ -327,10 +325,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         command.UserId = userId.Value;
         var result = await mediator.Send(command, cancellationToken);
@@ -350,10 +345,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var query = new GetUserPreferencesQuery { UserId = userId.Value };
         var result = await mediator.Send(query, cancellationToken);
@@ -375,10 +367,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         command.UserId = userId.Value;
         var result = await mediator.Send(command, cancellationToken);
@@ -398,10 +387,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var query = new GetNotificationSettingsQuery { UserId = userId.Value };
         var result = await mediator.Send(query, cancellationToken);
@@ -423,10 +409,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         command.UserId = userId.Value;
         var result = await mediator.Send(command, cancellationToken);
@@ -446,10 +429,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var query = new GetUserSessionsQuery { UserId = userId.Value };
         var result = await mediator.Send(query, cancellationToken);
@@ -471,10 +451,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var command = new DeleteUserSessionCommand
         {
@@ -498,10 +475,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var query = new GetUserApiKeysQuery { UserId = userId.Value };
         var result = await mediator.Send(query, cancellationToken);
@@ -523,10 +497,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         command.UserId = userId.Value;
         var result = await mediator.Send(command, cancellationToken);
@@ -548,10 +519,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var command = new DeleteApiKeyCommand
         {
@@ -585,10 +553,7 @@ public static class UserEndpoints
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null)
-        {
-            return Results.Unauthorized();
-        }
+        if (userId == null) return Results.Unauthorized();
 
         var query = new GetUserActivityQuery
         {

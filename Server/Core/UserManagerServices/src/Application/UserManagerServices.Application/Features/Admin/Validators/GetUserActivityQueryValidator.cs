@@ -49,8 +49,8 @@ public class GetUserActivityQueryValidator : AbstractValidator<GetUserActivityQu
 
         // Validate date range is not too large (max 1 year)
         RuleFor(x => x)
-            .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue || 
-                      (x.EndDate.Value - x.StartDate.Value).TotalDays <= 365)
+            .Must(x => !x.StartDate.HasValue || !x.EndDate.HasValue ||
+                       (x.EndDate.Value - x.StartDate.Value).TotalDays <= 365)
             .WithMessage("Date range cannot exceed 365 days")
             .When(x => x.StartDate.HasValue && x.EndDate.HasValue);
     }

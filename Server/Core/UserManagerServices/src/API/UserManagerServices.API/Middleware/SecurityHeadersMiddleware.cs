@@ -57,7 +57,7 @@ public class SecurityHeadersMiddleware
         headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
 
         // Content-Security-Policy: Prevent XSS and data injection attacks
-        headers.Append("Content-Security-Policy", 
+        headers.Append("Content-Security-Policy",
             "default-src 'self'; " +
             "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
             "style-src 'self' 'unsafe-inline'; " +
@@ -68,12 +68,10 @@ public class SecurityHeadersMiddleware
 
         // Strict-Transport-Security: Enforce HTTPS
         if (context.Request.IsHttps)
-        {
             headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
-        }
 
         // Permissions-Policy: Control browser features
-        headers.Append("Permissions-Policy", 
+        headers.Append("Permissions-Policy",
             "camera=(), " +
             "microphone=(), " +
             "geolocation=(), " +

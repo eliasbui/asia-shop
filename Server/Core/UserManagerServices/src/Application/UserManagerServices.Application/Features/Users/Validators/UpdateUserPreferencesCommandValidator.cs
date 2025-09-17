@@ -41,12 +41,14 @@ public class UpdateUserPreferencesCommandValidator : AbstractValidator<UpdateUse
                             .MaximumLength(100)
                             .WithMessage("Preference key must not exceed 100 characters")
                             .Matches(@"^[a-zA-Z0-9_\-\.]+$")
-                            .WithMessage("Preference key can only contain letters, numbers, underscores, hyphens, and periods");
+                            .WithMessage(
+                                "Preference key can only contain letters, numbers, underscores, hyphens, and periods");
 
                         preference.RuleFor(x => x.Value.DataType)
                             .NotEmpty()
                             .WithMessage("Data type is required")
-                            .Must(dataType => new[] { "string", "bool", "int", "double", "json" }.Contains(dataType.ToLower()))
+                            .Must(dataType =>
+                                new[] { "string", "bool", "int", "double", "json" }.Contains(dataType.ToLower()))
                             .WithMessage("Data type must be one of: string, bool, int, double, json");
 
                         preference.RuleFor(x => x.Value.Value)

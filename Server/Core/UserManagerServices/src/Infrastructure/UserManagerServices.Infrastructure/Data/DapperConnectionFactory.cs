@@ -19,8 +19,9 @@ public class DapperConnectionFactory : IDapperConnectionFactory
     /// <param name="configuration">Application configuration</param>
     public DapperConnectionFactory(IConfiguration configuration)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection") 
-            ?? throw new InvalidOperationException("DefaultConnection connection string is not configured.");
+        _connectionString = configuration.GetConnectionString("DefaultConnection")
+                            ?? throw new InvalidOperationException(
+                                "DefaultConnection connection string is not configured.");
     }
 
     /// <summary>

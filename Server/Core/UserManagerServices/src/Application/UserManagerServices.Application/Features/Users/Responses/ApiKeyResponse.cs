@@ -43,5 +43,6 @@ public class ApiKeyResponse
     /// <summary>
     /// Important security notice
     /// </summary>
-    public string SecurityNotice { get; set; } = "This is the only time you will see the full API key. Please store it securely.";
+    public string SecurityNotice { get; set; } =
+        "This is the only time you will see the full API key. Please store it securely.";
 }

@@ -29,7 +29,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <param name="sessionToken">Session token</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Session if found, null otherwise</returns>
-    public async Task<UserSession?> GetBySessionTokenAsync(string sessionToken, CancellationToken cancellationToken = default)
+    public async Task<UserSession?> GetBySessionTokenAsync(string sessionToken,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet.FirstOrDefaultAsync(s => s.SessionToken == sessionToken, cancellationToken);
     }
@@ -40,7 +41,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <param name="refreshToken">Refresh token</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Session if found, null otherwise</returns>
-    public async Task<UserSession?> GetByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+    public async Task<UserSession?> GetByRefreshTokenAsync(string refreshToken,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet.FirstOrDefaultAsync(s => s.RefreshToken == refreshToken, cancellationToken);
     }
@@ -51,7 +53,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Active sessions for the user</returns>
-    public async Task<IEnumerable<UserSession>> GetActiveSessionsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserSession>> GetActiveSessionsByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(s => s.UserId == userId && s.IsActive && s.ExpiresAt > DateTime.UtcNow)
@@ -65,7 +68,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>All sessions for the user</returns>
-    public async Task<IEnumerable<UserSession>> GetAllSessionsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserSession>> GetAllSessionsByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(s => s.UserId == userId)
@@ -79,7 +83,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <param name="ipAddress">IP address</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Sessions from the IP address</returns>
-    public async Task<IEnumerable<UserSession>> GetSessionsByIpAddressAsync(string ipAddress, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserSession>> GetSessionsByIpAddressAsync(string ipAddress,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(s => s.IpAddress == ipAddress)
@@ -147,7 +152,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <param name="sessionToken">Session token</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if session was deactivated, false if not found</returns>
-    public async Task<bool> DeactivateSessionByTokenAsync(string sessionToken, CancellationToken cancellationToken = default)
+    public async Task<bool> DeactivateSessionByTokenAsync(string sessionToken,
+        CancellationToken cancellationToken = default)
     {
         var session = await _dbSet.FirstOrDefaultAsync(s => s.SessionToken == sessionToken, cancellationToken);
         if (session == null) return false;
@@ -165,7 +171,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <returns>True if session was updated, false if not found</returns>
     public async Task<bool> UpdateLastAccessedAsync(string sessionToken, CancellationToken cancellationToken = default)
     {
-        var session = await _dbSet.FirstOrDefaultAsync(s => s.SessionToken == sessionToken && !s.IsDeleted, cancellationToken);
+        var session =
+            await _dbSet.FirstOrDefaultAsync(s => s.SessionToken == sessionToken && !s.IsDeleted, cancellationToken);
 
         if (session == null) return false;
 
@@ -210,7 +217,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <returns>Count of active sessions</returns>
     public async Task<int> GetActiveSessionCountByUserAsync(Guid userId, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.CountAsync(s => s.UserId == userId && s.IsActive && s.ExpiresAt > DateTime.UtcNow, cancellationToken);
+        return await _dbSet.CountAsync(s => s.UserId == userId && s.IsActive && s.ExpiresAt > DateTime.UtcNow,
+            cancellationToken);
     }
 
     /// <summary>
@@ -230,7 +238,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <param name="endDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Session statistics</returns>
-    public async Task<Dictionary<DateTime, int>> GetSessionStatisticsAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<DateTime, int>> GetSessionStatisticsAsync(DateTime startDate, DateTime endDate,
+        CancellationToken cancellationToken = default)
     {
         var results = await _dbSet
             .Where(s => s.CreatedAt >= startDate && s.CreatedAt <= endDate && !s.IsDeleted)
@@ -251,14 +260,15 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Sessions from suspicious IPs</returns>
-    public async Task<IEnumerable<UserSession>> GetSuspiciousSessionsAsync(CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserSession>> GetSuspiciousSessionsAsync(
+        CancellationToken cancellationToken = default)
     {
         var since = DateTime.UtcNow.AddHours(-24);
 
         // First get suspicious IP addresses from activity logs
         var suspiciousIps = await _context.UserActivityLogs
             .Where(log => log.Action == Domain.Enums.ActionEnum.Login &&
-                         log.CreatedAt >= since && !log.IsDeleted)
+                          log.CreatedAt >= since && !log.IsDeleted)
             .GroupBy(log => log.IpAddress)
             .Where(g => g.Count() >= 5)
             .Select(g => g.Key)
@@ -277,7 +287,8 @@ public class UserSessionRepository : GenericRepository<UserSession>, IUserSessio
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Concurrent sessions from different IPs</returns>
-    public async Task<IEnumerable<UserSession>> GetConcurrentSessionsAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserSession>> GetConcurrentSessionsAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(s => s.UserId == userId && s.IsActive && s.ExpiresAt > DateTime.UtcNow)

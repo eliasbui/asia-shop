@@ -39,16 +39,19 @@ public class DeleteUserSessionCommandHandler(
             // Verify the session belongs to the requesting user
             if (session.UserId != request.UserId)
             {
-                logger.LogWarning("User {UserId} attempted to delete session {SessionId} belonging to user {SessionUserId}", 
+                logger.LogWarning(
+                    "User {UserId} attempted to delete session {SessionId} belonging to user {SessionUserId}",
                     request.UserId, request.SessionId, session.UserId);
-                return BaseResponse<bool>.Failure("You can only delete your own sessions", new Dictionary<string, object>
-                {
-                    ["errorCode"] = "UNAUTHORIZED_SESSION_ACCESS"
-                });
+                return BaseResponse<bool>.Failure("You can only delete your own sessions",
+                    new Dictionary<string, object>
+                    {
+                        ["errorCode"] = "UNAUTHORIZED_SESSION_ACCESS"
+                    });
             }
 
             // Deactivate the session
-            var deactivated = await unitOfWork.UserSessions.DeactivateSessionAsync(request.SessionId, cancellationToken);
+            var deactivated =
+                await unitOfWork.UserSessions.DeactivateSessionAsync(request.SessionId, cancellationToken);
             if (!deactivated)
             {
                 logger.LogWarning("Failed to deactivate session {SessionId}", request.SessionId);
@@ -60,12 +63,14 @@ public class DeleteUserSessionCommandHandler(
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Successfully deleted session {SessionId} for user: {UserId}", request.SessionId, request.UserId);
+            logger.LogInformation("Successfully deleted session {SessionId} for user: {UserId}", request.SessionId,
+                request.UserId);
             return BaseResponse<bool>.Success(true, "Session deleted successfully");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error deleting session {SessionId} for user: {UserId}", request.SessionId, request.UserId);
+            logger.LogError(ex, "Error deleting session {SessionId} for user: {UserId}", request.SessionId,
+                request.UserId);
             return BaseResponse<bool>.Failure("An error occurred while deleting the session. Please try again.",
                 new Dictionary<string, object>
                 {

@@ -23,21 +23,23 @@ public class EnableMfaCommandHandler : IRequestHandler<EnableMfaCommand, BaseRes
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<BaseResponse<MfaEnableResponse>> Handle(EnableMfaCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<MfaEnableResponse>> Handle(EnableMfaCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
             _logger.LogInformation("Enabling MFA for user {UserId}", request.UserId);
 
             // Verify TOTP setup first
-            var isValidSetup = await _mfaService.VerifyTotpSetupAsync(request.UserId, request.TotpCode, cancellationToken);
+            var isValidSetup =
+                await _mfaService.VerifyTotpSetupAsync(request.UserId, request.TotpCode, cancellationToken);
             if (!isValidSetup)
-            {
-                return BaseResponse<MfaEnableResponse>.Failure("Invalid TOTP code. Please check your authenticator app and try again.");
-            }
+                return BaseResponse<MfaEnableResponse>.Failure(
+                    "Invalid TOTP code. Please check your authenticator app and try again.");
 
             // Enable MFA and generate backup codes
-            var (mfaSettings, backupCodes) = await _mfaService.EnableMfaAsync(request.UserId, request.TotpCode, cancellationToken);
+            var (mfaSettings, backupCodes) =
+                await _mfaService.EnableMfaAsync(request.UserId, request.TotpCode, cancellationToken);
 
             var response = new MfaEnableResponse
             {
@@ -48,7 +50,8 @@ public class EnableMfaCommandHandler : IRequestHandler<EnableMfaCommand, BaseRes
             };
 
             _logger.LogInformation("MFA enabled successfully for user {UserId}", request.UserId);
-            return BaseResponse<MfaEnableResponse>.Success(response, "MFA has been enabled successfully. Please save your backup codes in a secure location.");
+            return BaseResponse<MfaEnableResponse>.Success(response,
+                "MFA has been enabled successfully. Please save your backup codes in a secure location.");
         }
         catch (InvalidOperationException ex)
         {

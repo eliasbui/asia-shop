@@ -57,9 +57,9 @@ public class ChangePasswordCommandHandler(
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 logger.LogWarning("Password change failed for user {UserId}: {Errors}", request.UserId, errors);
 
-                return BaseResponse.Failure("Password change failed", new Dictionary<string, object>()
+                return BaseResponse.Failure("Password change failed", new Dictionary<string, object>
                 {
-                    ["errorsCode"] = "PASSWORD_CHANGE_FAILED",
+                    ["errorsCode"] = "PASSWORD_CHANGE_FAILED"
                 });
             }
 

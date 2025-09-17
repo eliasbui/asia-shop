@@ -135,25 +135,25 @@ public class UserSecuritySettingsConfiguration : IEntityTypeConfiguration<UserSe
         builder.HasQueryFilter(ss => !ss.IsDeleted);
 
         // Constraints
-        builder.HasCheckConstraint("CK_UserSecuritySettings_MaxFailedLoginAttempts", 
+        builder.HasCheckConstraint("CK_UserSecuritySettings_MaxFailedLoginAttempts",
             "\"MaxFailedLoginAttempts\" > 0");
-        
-        builder.HasCheckConstraint("CK_UserSecuritySettings_InitialLockoutDurationMinutes", 
+
+        builder.HasCheckConstraint("CK_UserSecuritySettings_InitialLockoutDurationMinutes",
             "\"InitialLockoutDurationMinutes\" > 0");
-        
-        builder.HasCheckConstraint("CK_UserSecuritySettings_MaxLockoutDurationMinutes", 
+
+        builder.HasCheckConstraint("CK_UserSecuritySettings_MaxLockoutDurationMinutes",
             "\"MaxLockoutDurationMinutes\" >= \"InitialLockoutDurationMinutes\"");
-        
-        builder.HasCheckConstraint("CK_UserSecuritySettings_LockoutDurationMultiplier", 
+
+        builder.HasCheckConstraint("CK_UserSecuritySettings_LockoutDurationMultiplier",
             "\"LockoutDurationMultiplier\" >= 1.0");
-        
-        builder.HasCheckConstraint("CK_UserSecuritySettings_SuspiciousActivityThreshold", 
+
+        builder.HasCheckConstraint("CK_UserSecuritySettings_SuspiciousActivityThreshold",
             "\"SuspiciousActivityThreshold\" >= 0.0 AND \"SuspiciousActivityThreshold\" <= 1.0");
-        
-        builder.HasCheckConstraint("CK_UserSecuritySettings_MaxConcurrentSessions", 
+
+        builder.HasCheckConstraint("CK_UserSecuritySettings_MaxConcurrentSessions",
             "\"MaxConcurrentSessions\" > 0");
-        
-        builder.HasCheckConstraint("CK_UserSecuritySettings_SessionTimeoutMinutes", 
+
+        builder.HasCheckConstraint("CK_UserSecuritySettings_SessionTimeoutMinutes",
             "\"SessionTimeoutMinutes\" > 0");
     }
 }

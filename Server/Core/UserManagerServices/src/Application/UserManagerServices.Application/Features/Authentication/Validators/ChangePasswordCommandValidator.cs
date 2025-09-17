@@ -27,7 +27,8 @@ public class ChangePasswordCommandValidator : AbstractValidator<ChangePasswordCo
             .MinimumLength(8)
             .WithMessage("Password must be at least 8 characters long")
             .Matches(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$")
-            .WithMessage("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
+            .WithMessage(
+                "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
 
         RuleFor(x => x.ConfirmPassword)
             .NotEmpty()

@@ -17,7 +17,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// </summary>
     /// <param name="context">Database context</param>
     /// <param name="dapperConnectionFactory"></param>
-    public UserActivityLogRepository(ApplicationDbContext context,IDapperConnectionFactory dapperConnectionFactory)
+    public UserActivityLogRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
     }
@@ -30,7 +30,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="userId">User identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Activity logs for the user</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(log => log.UserId == userId)
@@ -44,7 +45,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="action">Action type</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Activity logs for the action</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetByActionAsync(ActionEnum action, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetByActionAsync(ActionEnum action,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(log => log.Action == action)
@@ -59,7 +61,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="entityId">Entity identifier</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Activity logs for the entity</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetByEntityAsync(string entity, Guid entityId, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetByEntityAsync(string entity, Guid entityId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(log => log.Entity == entity && log.EntityId == entityId)
@@ -73,7 +76,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="ipAddress">IP address</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Activity logs from the IP address</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetByIpAddressAsync(string ipAddress, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetByIpAddressAsync(string ipAddress,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(log => log.IpAddress == ipAddress)
@@ -88,7 +92,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="endDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Activity logs within the date range</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetByDateRangeAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetByDateRangeAsync(DateTime startDate, DateTime endDate,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(log => log.CreatedAt >= startDate && log.CreatedAt <= endDate)
@@ -102,7 +107,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="count">Number of recent logs to retrieve</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Recent activity logs</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetRecentActivityAsync(int count = 100, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetRecentActivityAsync(int count = 100,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .OrderByDescending(log => log.CreatedAt)
@@ -122,7 +128,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="endDate">End date (optional)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Count of activities for the action</returns>
-    public async Task<int> GetActivityCountByActionAsync(ActionEnum action, DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
+    public async Task<int> GetActivityCountByActionAsync(ActionEnum action, DateTime? startDate = null,
+        DateTime? endDate = null, CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(log => log.Action == action);
 
@@ -143,7 +150,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="endDate">End date (optional)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Count of activities for the user</returns>
-    public async Task<int> GetActivityCountByUserAsync(Guid userId, DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
+    public async Task<int> GetActivityCountByUserAsync(Guid userId, DateTime? startDate = null,
+        DateTime? endDate = null, CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(log => log.UserId == userId);
 
@@ -163,7 +171,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="endDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Dictionary of action types and their counts</returns>
-    public async Task<Dictionary<ActionEnum, int>> GetActivityStatisticsByActionAsync(DateTime startDate, DateTime endDate, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<ActionEnum, int>> GetActivityStatisticsByActionAsync(DateTime startDate,
+        DateTime endDate, CancellationToken cancellationToken = default)
     {
         var results = await _dbSet
             .Where(log => log.CreatedAt >= startDate && log.CreatedAt <= endDate && !log.IsDeleted)
@@ -180,7 +189,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="days">Number of days to look back</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Daily activity statistics</returns>
-    public async Task<Dictionary<DateTime, int>> GetDailyActivityStatisticsAsync(int days, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<DateTime, int>> GetDailyActivityStatisticsAsync(int days,
+        CancellationToken cancellationToken = default)
     {
         var startDate = DateTime.UtcNow.Date.AddDays(-days);
 
@@ -202,7 +212,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="endDate">End date (optional)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Most active users with activity counts</returns>
-    public async Task<Dictionary<Guid, int>> GetMostActiveUsersAsync(int count = 10, DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<Guid, int>> GetMostActiveUsersAsync(int count = 10, DateTime? startDate = null,
+        DateTime? endDate = null, CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(log => !log.IsDeleted);
 
@@ -233,14 +244,15 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="timeWindow">Time window to check (in minutes)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Failed login attempts</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetFailedLoginAttemptsByIpAsync(string ipAddress, int timeWindow = 60, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetFailedLoginAttemptsByIpAsync(string ipAddress,
+        int timeWindow = 60, CancellationToken cancellationToken = default)
     {
         var since = DateTime.UtcNow.AddMinutes(-timeWindow);
 
         return await _dbSet
             .Where(log => log.IpAddress == ipAddress &&
-                         log.Action == ActionEnum.Login &&
-                         log.CreatedAt >= since)
+                          log.Action == ActionEnum.Login &&
+                          log.CreatedAt >= since)
             .OrderByDescending(log => log.CreatedAt)
             .ToListAsync(cancellationToken);
     }
@@ -251,14 +263,15 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="timeWindow">Time window to check (in hours)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Suspicious activities</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetSuspiciousActivitiesAsync(int timeWindow = 24, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetSuspiciousActivitiesAsync(int timeWindow = 24,
+        CancellationToken cancellationToken = default)
     {
         var since = DateTime.UtcNow.AddHours(-timeWindow);
 
         // First, get suspicious IP addresses
         var suspiciousIps = await _dbSet
             .Where(log => log.Action == ActionEnum.Login &&
-                         log.CreatedAt >= since && !log.IsDeleted)
+                          log.CreatedAt >= since && !log.IsDeleted)
             .GroupBy(log => log.IpAddress)
             .Where(g => g.Count() >= 5)
             .Select(g => g.Key)
@@ -267,7 +280,7 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
         // Then get all activities from those IPs
         return await _dbSet
             .Where(log => suspiciousIps.Contains(log.IpAddress) &&
-                         log.CreatedAt >= since && !log.IsDeleted)
+                          log.CreatedAt >= since && !log.IsDeleted)
             .OrderByDescending(log => log.CreatedAt)
             .ToListAsync(cancellationToken);
     }
@@ -279,7 +292,8 @@ public class UserActivityLogRepository : GenericRepository<UserActivityLog>, IUs
     /// <param name="timeWindow">Time window to check (in hours)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Activities from multiple IPs</returns>
-    public async Task<IEnumerable<UserActivityLog>> GetMultipleIpActivitiesAsync(Guid userId, int timeWindow = 24, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserActivityLog>> GetMultipleIpActivitiesAsync(Guid userId, int timeWindow = 24,
+        CancellationToken cancellationToken = default)
     {
         var since = DateTime.UtcNow.AddHours(-timeWindow);
 

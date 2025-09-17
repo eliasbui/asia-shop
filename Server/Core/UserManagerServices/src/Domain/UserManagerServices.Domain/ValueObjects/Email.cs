@@ -13,22 +13,23 @@ public sealed class Email : IEquatable<Email>
 
     public Email(string value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new DomainException("Email cannot be empty.","EMAIL_EMPTY");
-        }
+        if (string.IsNullOrWhiteSpace(value)) throw new DomainException("Email cannot be empty.", "EMAIL_EMPTY");
 
         if (!EmailRegex.IsMatch(value))
-        {
-            throw new DomainException($"Invalid email format: {value}","INVALID_EMAIL_FORMAT");
-        }
+            throw new DomainException($"Invalid email format: {value}", "INVALID_EMAIL_FORMAT");
 
         Value = value.ToLowerInvariant();
     }
 
-    public static implicit operator string(Email email) => email.Value;
+    public static implicit operator string(Email email)
+    {
+        return email.Value;
+    }
 
-    public static explicit operator Email(string value) => new(value);
+    public static explicit operator Email(string value)
+    {
+        return new Email(value);
+    }
 
     public bool Equals(Email? other)
     {

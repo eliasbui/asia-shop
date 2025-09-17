@@ -20,7 +20,8 @@ public class UserMfaBackupCodeRepository : GenericRepository<UserMfaBackupCode>,
     public UserMfaBackupCodeRepository(ApplicationDbContext context, IDapperConnectionFactory dapperConnectionFactory)
         : base(context)
     {
-        _dapperConnectionFactory = dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
+        _dapperConnectionFactory =
+            dapperConnectionFactory ?? throw new ArgumentNullException(nameof(dapperConnectionFactory));
     }
 
     /// <summary>
@@ -29,7 +30,8 @@ public class UserMfaBackupCodeRepository : GenericRepository<UserMfaBackupCode>,
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of backup codes</returns>
-    public async Task<List<UserMfaBackupCode>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<List<UserMfaBackupCode>> GetByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(bc => bc.UserId == userId)
@@ -43,12 +45,13 @@ public class UserMfaBackupCodeRepository : GenericRepository<UserMfaBackupCode>,
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of active backup codes</returns>
-    public async Task<List<UserMfaBackupCode>> GetActiveByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<List<UserMfaBackupCode>> GetActiveByUserIdAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .Where(bc => bc.UserId == userId && 
-                        !bc.IsUsed && 
-                        bc.ExpiresAt > DateTime.UtcNow)
+            .Where(bc => bc.UserId == userId &&
+                         !bc.IsUsed &&
+                         bc.ExpiresAt > DateTime.UtcNow)
             .OrderBy(bc => bc.CreatedAt)
             .ToListAsync(cancellationToken);
     }
@@ -59,7 +62,8 @@ public class UserMfaBackupCodeRepository : GenericRepository<UserMfaBackupCode>,
     /// <param name="batchId">Generation batch ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>List of backup codes in the batch</returns>
-    public async Task<List<UserMfaBackupCode>> GetByBatchIdAsync(Guid batchId, CancellationToken cancellationToken = default)
+    public async Task<List<UserMfaBackupCode>> GetByBatchIdAsync(Guid batchId,
+        CancellationToken cancellationToken = default)
     {
         return await _dbSet
             .Where(bc => bc.GenerationBatchId == batchId)
@@ -76,10 +80,10 @@ public class UserMfaBackupCodeRepository : GenericRepository<UserMfaBackupCode>,
     public async Task<int> GetRemainingCountAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await _dbSet
-            .CountAsync(bc => bc.UserId == userId && 
-                             !bc.IsUsed && 
-                             bc.ExpiresAt > DateTime.UtcNow, 
-                       cancellationToken);
+            .CountAsync(bc => bc.UserId == userId &&
+                              !bc.IsUsed &&
+                              bc.ExpiresAt > DateTime.UtcNow,
+                cancellationToken);
     }
 
     /// <summary>

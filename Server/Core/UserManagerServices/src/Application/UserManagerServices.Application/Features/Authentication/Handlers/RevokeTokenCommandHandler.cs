@@ -29,8 +29,8 @@ public class RevokeTokenCommandHandler(
         try
         {
             var targetUserId = request.TargetUserId ?? request.CurrentUserId;
-            
-            logger.LogInformation("Token revocation attempt for user: {TargetUserId} by user: {CurrentUserId}", 
+
+            logger.LogInformation("Token revocation attempt for user: {TargetUserId} by user: {CurrentUserId}",
                 targetUserId, request.CurrentUserId);
 
             // Check if current user has permission to revoke tokens
@@ -47,17 +47,19 @@ public class RevokeTokenCommandHandler(
                     });
                 }
 
-                var isAdmin = await userManager.IsInRoleAsync(currentUser, "Admin") || 
-                             await userManager.IsInRoleAsync(currentUser, "SuperAdmin");
-                
+                var isAdmin = await userManager.IsInRoleAsync(currentUser, "Admin") ||
+                              await userManager.IsInRoleAsync(currentUser, "SuperAdmin");
+
                 if (!isAdmin)
                 {
-                    logger.LogWarning("Unauthorized token revocation attempt by user: {CurrentUserId} for user: {TargetUserId}", 
+                    logger.LogWarning(
+                        "Unauthorized token revocation attempt by user: {CurrentUserId} for user: {TargetUserId}",
                         request.CurrentUserId, request.TargetUserId);
-                    return BaseResponse.Failure("Insufficient permissions to revoke other users' tokens", new Dictionary<string, object>
-                    {
-                        ["errorCode"] = "INSUFFICIENT_PERMISSIONS"
-                    });
+                    return BaseResponse.Failure("Insufficient permissions to revoke other users' tokens",
+                        new Dictionary<string, object>
+                        {
+                            ["errorCode"] = "INSUFFICIENT_PERMISSIONS"
+                        });
                 }
             }
 
@@ -76,17 +78,17 @@ public class RevokeTokenCommandHandler(
             {
                 // Revoke all tokens by updating security stamp
                 await userManager.UpdateSecurityStampAsync(targetUser);
-                
+
                 // Also deactivate all user sessions
-                var activeSessions = await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(targetUserId, cancellationToken);
+                var activeSessions =
+                    await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(targetUserId, cancellationToken);
                 foreach (var session in activeSessions)
-                {
                     await unitOfWork.UserSessions.DeactivateSessionAsync(session.Id, cancellationToken);
-                }
 
                 await unitOfWork.SaveChangesAsync(cancellationToken);
 
-                logger.LogInformation("All tokens revoked for user: {TargetUserId} by user: {CurrentUserId}. Reason: {Reason}", 
+                logger.LogInformation(
+                    "All tokens revoked for user: {TargetUserId} by user: {CurrentUserId}. Reason: {Reason}",
                     targetUserId, request.CurrentUserId, request.Reason ?? "Not specified");
 
                 return new BaseResponse
@@ -124,12 +126,14 @@ public class RevokeTokenCommandHandler(
                 var tokenUserId = await tokenService.GetUserIdFromTokenAsync(request.Token);
                 if (tokenUserId != targetUserId)
                 {
-                    logger.LogWarning("Token does not belong to target user. Token user: {TokenUserId}, Target user: {TargetUserId}", 
+                    logger.LogWarning(
+                        "Token does not belong to target user. Token user: {TokenUserId}, Target user: {TargetUserId}",
                         tokenUserId, targetUserId);
-                    return BaseResponse.Failure("Token does not belong to the specified user", new Dictionary<string, object>
-                    {
-                        ["errorCode"] = "TOKEN_USER_MISMATCH"
-                    });
+                    return BaseResponse.Failure("Token does not belong to the specified user",
+                        new Dictionary<string, object>
+                        {
+                            ["errorCode"] = "TOKEN_USER_MISMATCH"
+                        });
                 }
 
                 await tokenService.BlacklistTokenAsync(tokenId, tokenExpiry.Value, cancellationToken);
@@ -142,7 +146,8 @@ public class RevokeTokenCommandHandler(
                     await unitOfWork.SaveChangesAsync(cancellationToken);
                 }
 
-                logger.LogInformation("Token {TokenId} revoked for user: {TargetUserId} by user: {CurrentUserId}. Reason: {Reason}", 
+                logger.LogInformation(
+                    "Token {TokenId} revoked for user: {TargetUserId} by user: {CurrentUserId}. Reason: {Reason}",
                     tokenId, targetUserId, request.CurrentUserId, request.Reason ?? "Not specified");
 
                 return new BaseResponse
@@ -155,15 +160,16 @@ public class RevokeTokenCommandHandler(
             else
             {
                 logger.LogWarning("No token or revoke all flag specified in revocation request");
-                return BaseResponse.Failure("Either specify a token to revoke or set RevokeAllTokens to true", new Dictionary<string, object>
-                {
-                    ["errorCode"] = "INVALID_REQUEST"
-                });
+                return BaseResponse.Failure("Either specify a token to revoke or set RevokeAllTokens to true",
+                    new Dictionary<string, object>
+                    {
+                        ["errorCode"] = "INVALID_REQUEST"
+                    });
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error during token revocation for user: {TargetUserId} by user: {CurrentUserId}", 
+            logger.LogError(ex, "Error during token revocation for user: {TargetUserId} by user: {CurrentUserId}",
                 request.TargetUserId, request.CurrentUserId);
             return BaseResponse.Failure("An error occurred during token revocation. Please try again.",
                 new Dictionary<string, object>

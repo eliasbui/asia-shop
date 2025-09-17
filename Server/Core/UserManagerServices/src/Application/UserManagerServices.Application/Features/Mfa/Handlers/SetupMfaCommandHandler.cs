@@ -26,7 +26,8 @@ public class SetupMfaCommandHandler : IRequestHandler<SetupMfaCommand, BaseRespo
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<BaseResponse<MfaSetupResponse>> Handle(SetupMfaCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<MfaSetupResponse>> Handle(SetupMfaCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -34,10 +35,7 @@ public class SetupMfaCommandHandler : IRequestHandler<SetupMfaCommand, BaseRespo
 
             // Check if MFA is already enabled
             var isEnabled = await _mfaService.IsMfaEnabledAsync(request.UserId, cancellationToken);
-            if (isEnabled)
-            {
-                return BaseResponse<MfaSetupResponse>.Failure("MFA is already enabled for this user");
-            }
+            if (isEnabled) return BaseResponse<MfaSetupResponse>.Failure("MFA is already enabled for this user");
 
             // Setup TOTP
             var (secretKey, qrCodeUri) = await _mfaService.SetupTotpAsync(request.UserId, cancellationToken);
@@ -47,7 +45,8 @@ public class SetupMfaCommandHandler : IRequestHandler<SetupMfaCommand, BaseRespo
                 SecretKey = secretKey,
                 QrCodeUri = qrCodeUri,
                 FormattedSecretKey = _totpService.FormatSecretKeyForBackup(secretKey),
-                Instructions = "Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.) or manually enter the secret key. Then verify with a 6-digit code to complete setup.",
+                Instructions =
+                    "Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.) or manually enter the secret key. Then verify with a 6-digit code to complete setup.",
                 IsSuccess = true,
                 NextStep = "Verify TOTP code to complete setup"
             };

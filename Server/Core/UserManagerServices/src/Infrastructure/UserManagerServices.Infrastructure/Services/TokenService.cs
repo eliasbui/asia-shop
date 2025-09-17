@@ -47,7 +47,8 @@ public class TokenService : ITokenService
     /// <param name="roles">User roles</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>JWT token string</returns>
-    public async Task<string> GenerateAccessTokenAsync(User user, IList<string> roles, CancellationToken cancellationToken = default)
+    public async Task<string> GenerateAccessTokenAsync(User user, IList<string> roles,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -60,7 +61,8 @@ public class TokenService : ITokenService
             {
                 new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, tokenId),
-                new(JwtRegisteredClaimNames.Iat, new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64),
+                new(JwtRegisteredClaimNames.Iat, new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
+                    ClaimValueTypes.Integer64),
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Name, user.UserName ?? string.Empty),
                 new(ClaimTypes.Email, user.Email ?? string.Empty),
@@ -70,10 +72,7 @@ public class TokenService : ITokenService
             };
 
             // Add role claims
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            foreach (var role in roles) claims.Add(new Claim(ClaimTypes.Role, role));
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -155,7 +154,7 @@ public class TokenService : ITokenService
     {
         var principal = await ValidateTokenAsync(token);
         var userIdClaim = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        
+
         return userIdClaim != null && Guid.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
@@ -186,13 +185,14 @@ public class TokenService : ITokenService
     /// <param name="expiryTime">Token expiry time</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task representing the operation</returns>
-    public async Task BlacklistTokenAsync(string tokenId, DateTime expiryTime, CancellationToken cancellationToken = default)
+    public async Task BlacklistTokenAsync(string tokenId, DateTime expiryTime,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var cacheKey = $"blacklisted_token:{tokenId}";
             var timeToExpiry = expiryTime - DateTime.UtcNow;
-            
+
             if (timeToExpiry > TimeSpan.Zero)
             {
                 await _cacheService.SetAsync(cacheKey, true, timeToExpiry, cancellationToken);

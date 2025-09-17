@@ -47,7 +47,7 @@ public class LoginCommandHandler(
             }
 
             // Attempt sign in
-            var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+            var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, true);
 
             if (!result.Succeeded)
             {

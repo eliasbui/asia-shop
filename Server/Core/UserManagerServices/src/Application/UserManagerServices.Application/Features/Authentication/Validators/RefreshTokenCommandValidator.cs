@@ -1,5 +1,4 @@
-﻿
-using FluentValidation;
+﻿using FluentValidation;
 using UserManagerServices.Application.Features.Authentication.Commands;
 
 namespace UserManagerServices.Application.Features.Authentication.Validators;

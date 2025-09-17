@@ -15,7 +15,8 @@ namespace UserManagerServices.Application.Features.Users.Handlers;
 public class GetUserSessionsQueryHandler(
     IUnitOfWork unitOfWork,
     IHttpContextAccessor httpContextAccessor,
-    ILogger<GetUserSessionsQueryHandler> logger) : IRequestHandler<GetUserSessionsQuery, BaseResponse<UserSessionsResponse>>
+    ILogger<GetUserSessionsQueryHandler> logger)
+    : IRequestHandler<GetUserSessionsQuery, BaseResponse<UserSessionsResponse>>
 {
     /// <summary>
     /// Handles the get user sessions query
@@ -23,14 +24,16 @@ public class GetUserSessionsQueryHandler(
     /// <param name="request">Get user sessions query</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User sessions</returns>
-    public async Task<BaseResponse<UserSessionsResponse>> Handle(GetUserSessionsQuery request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<UserSessionsResponse>> Handle(GetUserSessionsQuery request,
+        CancellationToken cancellationToken)
     {
         try
         {
             logger.LogInformation("Getting sessions for user: {UserId}", request.UserId);
 
             // Get all active sessions for the user
-            var sessions = await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(request.UserId, cancellationToken);
+            var sessions =
+                await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(request.UserId, cancellationToken);
 
             // Get current session ID from JWT token
             var currentSessionId = GetCurrentSessionId();
@@ -58,15 +61,16 @@ public class GetUserSessionsQueryHandler(
                 CurrentSessionId = currentSessionId
             };
 
-            logger.LogInformation("Successfully retrieved {Count} sessions for user: {UserId}", 
+            logger.LogInformation("Successfully retrieved {Count} sessions for user: {UserId}",
                 sessionInfos.Count, request.UserId);
-            
+
             return BaseResponse<UserSessionsResponse>.Success(response);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error getting sessions for user: {UserId}", request.UserId);
-            return BaseResponse<UserSessionsResponse>.Failure("An error occurred while retrieving user sessions. Please try again.",
+            return BaseResponse<UserSessionsResponse>.Failure(
+                "An error occurred while retrieving user sessions. Please try again.",
                 new Dictionary<string, object>
                 {
                     ["errorCode"] = "SERVER_ERROR"
@@ -87,9 +91,7 @@ public class GetUserSessionsQueryHandler(
             {
                 var sessionIdClaim = httpContext.User.FindFirst("session_id")?.Value;
                 if (!string.IsNullOrEmpty(sessionIdClaim) && Guid.TryParse(sessionIdClaim, out var sessionId))
-                {
                     return sessionId;
-                }
             }
         }
         catch (Exception ex)

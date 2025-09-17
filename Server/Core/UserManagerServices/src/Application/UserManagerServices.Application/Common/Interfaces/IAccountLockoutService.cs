@@ -99,7 +99,8 @@ public interface IAccountLockoutService
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Failed attempts within the time window</returns>
-    Task<List<UserLoginAttempt>> GetRecentFailedAttemptsAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<List<UserLoginAttempt>> GetRecentFailedAttemptsAsync(Guid userId,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets security settings for a user
@@ -116,7 +117,7 @@ public interface IAccountLockoutService
     /// <param name="settings">Security settings</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated security settings</returns>
-    Task<UserSecuritySettings> UpdateSecuritySettingsAsync(Guid userId, UserSecuritySettings settings, 
+    Task<UserSecuritySettings> UpdateSecuritySettingsAsync(Guid userId, UserSecuritySettings settings,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -134,7 +135,7 @@ public interface IAccountLockoutService
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Lockout statistics</returns>
-    Task<Dictionary<string, int>> GetLockoutStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    Task<Dictionary<string, int>> GetLockoutStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -144,7 +145,7 @@ public interface IAccountLockoutService
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Login attempt statistics</returns>
-    Task<Dictionary<string, int>> GetLoginStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    Task<Dictionary<string, int>> GetLoginStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>

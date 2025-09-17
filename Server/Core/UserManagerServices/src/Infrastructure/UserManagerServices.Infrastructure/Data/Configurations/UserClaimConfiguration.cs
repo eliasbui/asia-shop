@@ -26,7 +26,7 @@ public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
         // Identity properties
         builder.Property(uc => uc.ClaimType)
             .HasMaxLength(256);
-            
+
         builder.Property(uc => uc.ClaimValue)
             .HasMaxLength(1024);
 
@@ -34,13 +34,13 @@ public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
         builder.Property(uc => uc.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(uc => uc.UpdatedAt);
-        
+
         builder.Property(uc => uc.CreatedBy);
-        
+
         builder.Property(uc => uc.UpdatedBy);
-        
+
         builder.Property(uc => uc.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -58,7 +58,7 @@ public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
             .HasForeignKey(uc => uc.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_UserClaims_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(uc => uc.UpdatedBy)
@@ -68,16 +68,16 @@ public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
         // Indexes
         builder.HasIndex(uc => uc.UserId)
             .HasDatabaseName("idx_user_claims_user_id");
-            
+
         builder.HasIndex(uc => uc.ClaimType)
             .HasDatabaseName("idx_user_claims_claim_type");
-            
+
         builder.HasIndex(uc => new { uc.UserId, uc.ClaimType })
             .HasDatabaseName("idx_user_claims_user_claim_type");
-            
+
         builder.HasIndex(uc => uc.CreatedAt)
             .HasDatabaseName("idx_user_claims_created_at");
-            
+
         builder.HasIndex(uc => uc.IsDeleted)
             .HasDatabaseName("idx_user_claims_is_deleted");
 

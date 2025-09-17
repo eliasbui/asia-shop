@@ -24,7 +24,7 @@ public interface IUserLockoutHistoryRepository : IGenericRepository<UserLockoutH
     /// <param name="pageSize">Page size</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Paginated lockout history and total count</returns>
-    Task<(List<UserLockoutHistory> history, int totalCount)> GetUserLockoutHistoryAsync(Guid userId, 
+    Task<(List<UserLockoutHistory> history, int totalCount)> GetUserLockoutHistoryAsync(Guid userId,
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -35,7 +35,7 @@ public interface IUserLockoutHistoryRepository : IGenericRepository<UserLockoutH
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Lockout count</returns>
-    Task<int> GetLockoutCountAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    Task<int> GetLockoutCountAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -46,7 +46,7 @@ public interface IUserLockoutHistoryRepository : IGenericRepository<UserLockoutH
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Highest lockout level</returns>
-    Task<int> GetHighestLockoutLevelAsync(Guid userId, DateTime fromDate, DateTime toDate, 
+    Task<int> GetHighestLockoutLevelAsync(Guid userId, DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -67,7 +67,7 @@ public interface IUserLockoutHistoryRepository : IGenericRepository<UserLockoutH
     /// <param name="pageSize">Page size</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Paginated lockouts and total count</returns>
-    Task<(List<UserLockoutHistory> lockouts, int totalCount)> GetLockoutsByTypeAsync(LockoutTypeEnum lockoutType, 
+    Task<(List<UserLockoutHistory> lockouts, int totalCount)> GetLockoutsByTypeAsync(LockoutTypeEnum lockoutType,
         int pageNumber = 1, int pageSize = 20, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -77,7 +77,7 @@ public interface IUserLockoutHistoryRepository : IGenericRepository<UserLockoutH
     /// <param name="toDate">End date</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Lockout statistics</returns>
-    Task<Dictionary<string, int>> GetLockoutStatisticsAsync(DateTime fromDate, DateTime toDate, 
+    Task<Dictionary<string, int>> GetLockoutStatisticsAsync(DateTime fromDate, DateTime toDate,
         CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -88,7 +88,7 @@ public interface IUserLockoutHistoryRepository : IGenericRepository<UserLockoutH
     /// <param name="releasedByUserId">User who released the lockout</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if released successfully</returns>
-    Task<bool> ReleaseLockoutAsync(Guid lockoutId, LockoutReleaseReasonEnum releaseReason, 
+    Task<bool> ReleaseLockoutAsync(Guid lockoutId, LockoutReleaseReasonEnum releaseReason,
         Guid? releasedByUserId = null, CancellationToken cancellationToken = default);
 
     /// <summary>

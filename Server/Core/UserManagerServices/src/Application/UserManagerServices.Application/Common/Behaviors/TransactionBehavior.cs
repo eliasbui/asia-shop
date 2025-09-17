@@ -34,15 +34,13 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
     /// <param name="next">The next handler in the pipeline</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The response</returns>
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
         var requestName = typeof(TRequest).Name;
 
         // Only wrap commands in transactions, not queries
-        if (IsQuery(requestName))
-        {
-            return await next(cancellationToken);
-        }
+        if (IsQuery(requestName)) return await next(cancellationToken);
 
         _logger.LogInformation("Starting transaction for {RequestName}", requestName);
 

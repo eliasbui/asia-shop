@@ -56,7 +56,6 @@ public class GetCurrentUserQueryHandler(
             // Get user preferences
             var preferences = new Dictionary<string, object>();
             foreach (var pref in user.UserPreferences.Where(p => p is { IsActive: true, IsDeleted: false }))
-            {
                 try
                 {
                     var value = pref.DataType.ToLower() switch
@@ -75,10 +74,9 @@ public class GetCurrentUserQueryHandler(
                         pref.Key);
                     preferences[$"{pref.Category}.{pref.Key}"] = pref.Value ?? string.Empty;
                 }
-            }
 
             // Get notification settings using extension method
-            NotificationSettingInfo? notificationSettings = user.NotificationSettings != null && !user.NotificationSettings.IsDeleted
+            var notificationSettings = user.NotificationSettings != null && !user.NotificationSettings.IsDeleted
                 ? user.NotificationSettings.ToNotificationSettingInfo()
                 : null;
 
@@ -136,5 +134,4 @@ public class GetCurrentUserQueryHandler(
                 });
         }
     }
-
 }

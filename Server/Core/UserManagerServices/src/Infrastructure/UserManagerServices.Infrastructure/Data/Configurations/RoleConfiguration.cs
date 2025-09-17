@@ -27,10 +27,10 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(r => r.Name)
             .HasMaxLength(256)
             .IsRequired();
-            
+
         builder.Property(r => r.NormalizedName)
             .HasMaxLength(256);
-            
+
         builder.Property(r => r.ConcurrencyStamp)
             .IsConcurrencyToken();
 
@@ -38,11 +38,11 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(r => r.Description)
             .HasMaxLength(500)
             .IsRequired();
-            
+
         builder.Property(r => r.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
-            
+
         builder.Property(r => r.IsSystemRole)
             .IsRequired()
             .HasDefaultValue(false);
@@ -51,13 +51,13 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.Property(r => r.CreatedAt)
             .IsRequired()
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
-            
+
         builder.Property(r => r.UpdatedAt);
-        
+
         builder.Property(r => r.CreatedBy);
-        
+
         builder.Property(r => r.UpdatedBy);
-        
+
         builder.Property(r => r.IsDeleted)
             .IsRequired()
             .HasDefaultValue(false);
@@ -66,20 +66,20 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.HasIndex(r => r.NormalizedName)
             .HasDatabaseName("idx_roles_normalized_name")
             .IsUnique();
-            
+
         builder.HasIndex(r => r.Name)
             .HasDatabaseName("idx_roles_name")
             .IsUnique();
-            
+
         builder.HasIndex(r => r.IsActive)
             .HasDatabaseName("idx_roles_is_active");
-            
+
         builder.HasIndex(r => r.IsSystemRole)
             .HasDatabaseName("idx_roles_is_system_role");
-            
+
         builder.HasIndex(r => r.CreatedAt)
             .HasDatabaseName("idx_roles_created_at");
-            
+
         builder.HasIndex(r => r.IsDeleted)
             .HasDatabaseName("idx_roles_is_deleted");
 
@@ -89,7 +89,7 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
             .HasForeignKey(r => r.CreatedBy)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("FK_Roles_CreatedBy_Users_Id");
-            
+
         builder.HasOne<User>()
             .WithMany()
             .HasForeignKey(r => r.UpdatedBy)

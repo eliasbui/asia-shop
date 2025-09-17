@@ -24,7 +24,7 @@ public class DeleteUserCommandHandler(
     {
         try
         {
-            logger.LogInformation("Deleting user: {UserId} (deleted by: {DeletedBy})", 
+            logger.LogInformation("Deleting user: {UserId} (deleted by: {DeletedBy})",
                 request.UserId, request.DeletedBy);
 
             // Get user to delete
@@ -55,7 +55,7 @@ public class DeleteUserCommandHandler(
             var result = await userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
-                logger.LogWarning("Failed to delete user {UserId}: {Errors}", 
+                logger.LogWarning("Failed to delete user {UserId}: {Errors}",
                     request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
                 return BaseResponse<bool>.Failure("Failed to delete user", new Dictionary<string, object>
                 {

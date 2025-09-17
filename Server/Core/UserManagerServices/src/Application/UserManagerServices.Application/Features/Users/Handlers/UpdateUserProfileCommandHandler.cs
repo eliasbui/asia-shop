@@ -16,7 +16,8 @@ namespace UserManagerServices.Application.Features.Users.Handlers;
 public class UpdateUserProfileCommandHandler(
     UserManager<User> userManager,
     IUnitOfWork unitOfWork,
-    ILogger<UpdateUserProfileCommandHandler> logger) : IRequestHandler<UpdateUserProfileCommand, BaseResponse<UserProfileResponse>>
+    ILogger<UpdateUserProfileCommandHandler> logger)
+    : IRequestHandler<UpdateUserProfileCommand, BaseResponse<UserProfileResponse>>
 {
     /// <summary>
     /// Handles the update user profile command
@@ -24,7 +25,8 @@ public class UpdateUserProfileCommandHandler(
     /// <param name="request">Update user profile command</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated user profile information</returns>
-    public async Task<BaseResponse<UserProfileResponse>> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
+    public async Task<BaseResponse<UserProfileResponse>> Handle(UpdateUserProfileCommand request,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -79,12 +81,14 @@ public class UpdateUserProfileCommandHandler(
                 if (!updateResult.Succeeded)
                 {
                     var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-                    logger.LogWarning("Failed to update user basic information for user {UserId}: {Errors}", request.UserId, errors);
-                    return BaseResponse<UserProfileResponse>.Failure("Failed to update user information", new Dictionary<string, object>
-                    {
-                        ["errorCode"] = "USER_UPDATE_FAILED",
-                        ["errors"] = updateResult.Errors.Select(e => new { e.Code, e.Description }).ToList()
-                    });
+                    logger.LogWarning("Failed to update user basic information for user {UserId}: {Errors}",
+                        request.UserId, errors);
+                    return BaseResponse<UserProfileResponse>.Failure("Failed to update user information",
+                        new Dictionary<string, object>
+                        {
+                            ["errorCode"] = "USER_UPDATE_FAILED",
+                            ["errors"] = updateResult.Errors.Select(e => new { e.Code, e.Description }).ToList()
+                        });
                 }
             }
 
@@ -131,7 +135,6 @@ public class UpdateUserProfileCommandHandler(
 
             // Update preferences if provided
             if (request.Preferences != null && request.Preferences.Any())
-            {
                 try
                 {
                     var preferencesJson = JsonSerializer.Serialize(request.Preferences);
@@ -141,23 +144,21 @@ public class UpdateUserProfileCommandHandler(
                 {
                     logger.LogWarning(ex, "Failed to serialize preferences for user {UserId}", request.UserId);
                 }
-            }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Get updated preferences for response
             var preferences = new Dictionary<string, object>();
             if (!string.IsNullOrEmpty(userProfile.Preferences))
-            {
                 try
                 {
-                    preferences = JsonSerializer.Deserialize<Dictionary<string, object>>(userProfile.Preferences) ?? new Dictionary<string, object>();
+                    preferences = JsonSerializer.Deserialize<Dictionary<string, object>>(userProfile.Preferences) ??
+                                  new Dictionary<string, object>();
                 }
                 catch (Exception ex)
                 {
                     logger.LogWarning(ex, "Failed to deserialize preferences for user {UserId}", request.UserId);
                 }
-            }
 
             var response = new UserProfileResponse
             {
@@ -193,7 +194,8 @@ public class UpdateUserProfileCommandHandler(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error updating user profile for user: {UserId}", request.UserId);
-            return BaseResponse<UserProfileResponse>.Failure("An error occurred while updating user profile. Please try again.",
+            return BaseResponse<UserProfileResponse>.Failure(
+                "An error occurred while updating user profile. Please try again.",
                 new Dictionary<string, object>
                 {
                     ["errorCode"] = "SERVER_ERROR"
