@@ -50,5 +50,8 @@ public class User : IdentityUser<Guid>, IBaseEntity
     public virtual List<UserMfaBackupCode> UserMfaBackupCodes { get; set; } = null!;
     public virtual List<UserMfaAuditLog> UserMfaAuditLogs { get; set; } = null!;
     public virtual List<UserEmailOtp> UserEmailOtps { get; set; } = null!;
+    public virtual List<UserLoginAttempt> UserLoginAttempts { get; set; } = null!;
+    public virtual List<UserLockoutHistory> UserLockoutHistory { get; set; } = null!;
+    public virtual List<UserSecuritySettings> UserSecuritySettings { get; set; } = null!;
     public virtual UserNotificationSettings? NotificationSettings { get; set; }
 }
