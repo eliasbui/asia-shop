@@ -90,6 +90,14 @@ public interface IUnitOfWork : IDisposable
     /// <returns>Task representing the operation</returns>
     Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Executes a function within a retry-enabled execution strategy
+    /// </summary>
+    /// <typeparam name="T">Return type</typeparam>
+    /// <param name="operation">Operation to execute</param>
+    /// <returns>Operation result</returns>
+    Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> operation);
+
     #endregion
 
     #region Save Operations

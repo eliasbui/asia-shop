@@ -201,6 +201,18 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    /// <summary>
+    /// Executes a function within a retry-enabled execution strategy
+    /// </summary>
+    /// <typeparam name="T">Return type</typeparam>
+    /// <param name="operation">Operation to execute</param>
+    /// <returns>Operation result</returns>
+    public async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> operation)
+    {
+        var strategy = _context.Database.CreateExecutionStrategy();
+        return await strategy.ExecuteAsync(operation);
+    }
+
     #endregion
 
     #region Save Operations

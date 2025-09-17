@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using UserManagerServices.Domain.Common;
 
@@ -7,10 +7,10 @@ namespace UserManagerServices.Domain.Entities;
 [Table("UserTokens")]
 public class UserToken : IdentityUserToken<Guid>, IBaseEntity
 {
-    public new Guid Id { get; } = Guid.CreateVersion7();
-    public DateTime CreatedAt { get; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; } = null;
-    public Guid? CreatedBy { get; } = null;
-    public Guid? UpdatedBy { get; } = null;
-    public bool IsDeleted { get; } = false;
+    public Guid Id { get; set; } = Guid.CreateVersion7();
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
+    public Guid? CreatedBy { get; set; }
+    public Guid? UpdatedBy { get; set; }
+    public bool IsDeleted { get; set; }
 }

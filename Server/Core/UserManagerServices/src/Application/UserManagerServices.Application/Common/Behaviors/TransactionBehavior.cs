@@ -28,7 +28,7 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
     }
 
     /// <summary>
-    /// Handles the request with transaction management
+    /// Handles the request with transaction management using execution strategy
     /// </summary>
     /// <param name="request">The request</param>
     /// <param name="next">The next handler in the pipeline</param>
@@ -44,26 +44,30 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
 
         _logger.LogInformation("Starting transaction for {RequestName}", requestName);
 
-        try
+        // Use execution strategy to handle the entire transaction operation
+        return await _unitOfWork.ExecuteWithRetryAsync(async () =>
         {
-            await _unitOfWork.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            var response = await next(cancellationToken);
+                var response = await next(cancellationToken);
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            _logger.LogInformation("Transaction committed successfully for {RequestName}", requestName);
+                _logger.LogInformation("Transaction committed successfully for {RequestName}", requestName);
 
-            return response;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Transaction failed for {RequestName}. Rolling back.", requestName);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Transaction failed for {RequestName}. Rolling back.", requestName);
 
-            await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                await _unitOfWork.RollbackTransactionAsync(cancellationToken);
 
-            throw;
-        }
+                throw;
+            }
+        });
     }
 
     /// <summary>

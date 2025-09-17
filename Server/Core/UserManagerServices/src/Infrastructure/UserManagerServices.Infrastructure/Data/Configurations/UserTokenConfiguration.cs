@@ -19,13 +19,13 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
         // Table configuration
         builder.ToTable("UserTokens");
 
-        // Primary key
-        builder.HasKey(ut => ut.Id)
+        // Primary key - Use composite key for ASP.NET Identity compatibility
+        builder.HasKey(ut => new { ut.UserId, ut.LoginProvider, ut.Name })
             .HasName("PK_UserTokens");
 
-        // Composite unique index for UserId, LoginProvider, and Name
-        builder.HasIndex(ut => new { ut.UserId, ut.LoginProvider, ut.Name })
-            .HasDatabaseName("idx_user_tokens_user_provider_name")
+        // Add index for the Id field instead
+        builder.HasIndex(ut => ut.Id)
+            .HasDatabaseName("idx_user_tokens_id")
             .IsUnique();
 
         // Identity properties
