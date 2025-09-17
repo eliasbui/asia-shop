@@ -140,7 +140,7 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
             })
             .OrderByDescending(x => x.UserCount)
             .ToListAsync(cancellationToken);
-        
+
         return roleStats.ToDictionary(r => r.Name ?? string.Empty, r => r.UserCount);
     }
 
@@ -207,7 +207,7 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             var lowerSearchTerm = searchTerm.ToLower();
-            query = query.Where(r => (r.Name != null && r.Name.ToLower().Contains(lowerSearchTerm)) || 
+            query = query.Where(r => (r.Name != null && r.Name.ToLower().Contains(lowerSearchTerm)) ||
                                    (r.Description != null && r.Description.ToLower().Contains(lowerSearchTerm)));
         }
 
