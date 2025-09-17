@@ -139,6 +139,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICacheService, CacheService>();
         services.AddScoped<ITotpService, TotpService>();
         services.AddScoped<IMfaService, MfaService>();
+        services.AddScoped<IAccountLockoutService, AccountLockoutService>();
 
         // Register HTTP client and email service
         services.AddHttpClient<ZohoEmailService>(client =>

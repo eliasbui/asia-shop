@@ -10,12 +10,9 @@ namespace UserManagerServices.Infrastructure.Repositories;
 /// <summary>
 /// Repository implementation for UserLockoutHistory entity
 /// </summary>
-public class UserLockoutHistoryRepository : GenericRepository<UserLockoutHistory>, IUserLockoutHistoryRepository
+public class UserLockoutHistoryRepository(ApplicationDbContext context)
+    : GenericRepository<UserLockoutHistory>(context), IUserLockoutHistoryRepository
 {
-    public UserLockoutHistoryRepository(ApplicationDbContext context) : base(context)
-    {
-    }
-
     /// <summary>
     /// Gets active lockout for a user
     /// </summary>
@@ -145,7 +142,7 @@ public class UserLockoutHistoryRepository : GenericRepository<UserLockoutHistory
             ["ManualLockouts"] = (int)result.manuallockouts,
             ["SuspiciousActivityLockouts"] = (int)result.suspiciousactivitylockouts,
             ["UniqueUsersLocked"] = (int)result.uniqueuserslocked,
-            ["AverageLockoutLevel"] = (int)Math.Round((decimal)result.averagelockoutlevel ?? 0)
+            ["AverageLockoutLevel"] = (int)result.averagelockoutlevel
         };
     }
 
