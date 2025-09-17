@@ -23,7 +23,7 @@ public static class AuthEndpoints
     [ApiVersion("1.0")]
     public static void MapAuthEndpoints(this WebApplication app)
     {
-        var authGroup = app.MapGroup("api/{version:apiVersion}/auth")
+        var authGroup = app.MapGroup("api/v1/auth")
             .WithTags("Authentication")
             .WithOpenApi();
 

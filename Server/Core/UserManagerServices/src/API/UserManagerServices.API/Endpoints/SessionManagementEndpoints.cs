@@ -19,10 +19,9 @@ public static class SessionManagementEndpoints
     /// </summary>
     /// <param name="app">Web application</param>
     /// <returns>Web application for chaining</returns>
-    [ApiVersion("1.0")]
     public static void MapSessionManagementEndpoints(this WebApplication app)
     {
-        var sessionGroup = app.MapGroup("api/{version:apiVersion}/sessions")
+        var sessionGroup = app.MapGroup("api/v1/sessions")
             .WithTags("Session Management")
             .RequireAuthorization()
             .WithOpenApi();

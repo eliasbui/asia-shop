@@ -21,7 +21,7 @@ public static class MfaEndpoints
     /// <returns>Web application with MFA endpoints mapped</returns>
     public static WebApplication MapMfaEndpoints(this WebApplication app)
     {
-        var mfaGroup = app.MapGroup("/api/mfa")
+        var mfaGroup = app.MapGroup("api/v1/mfa")
             .WithTags("MFA")
             .WithOpenApi();
 

@@ -25,7 +25,7 @@ public static class UserEndpoints
     [ApiVersion("1.0")]
     public static void MapUserEndpoints(this WebApplication app)
     {
-        var userGroup = app.MapGroup("api/{version:apiVersion}/users")
+        var userGroup = app.MapGroup("api/v1/users")
             .WithTags("User Profile & Preferences")
             .WithOpenApi()
             .RequireAuthorization();
