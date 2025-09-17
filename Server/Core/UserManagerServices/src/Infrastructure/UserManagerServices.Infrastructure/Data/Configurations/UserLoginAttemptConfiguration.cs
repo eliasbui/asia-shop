@@ -82,7 +82,7 @@ public class UserLoginAttemptConfiguration : IEntityTypeConfiguration<UserLoginA
 
         // Relationships
         builder.HasOne(la => la.User)
-            .WithMany()
+            .WithMany(u => u.UserLoginAttempts)
             .HasForeignKey(la => la.UserId)
             .OnDelete(DeleteBehavior.SetNull);
 

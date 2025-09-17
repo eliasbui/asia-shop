@@ -82,6 +82,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     /// </summary>
     public DbSet<UserSecuritySettings> UserSecuritySettings { get; set; } = null!;
 
+    /// <summary>
+    /// User consents for GDPR compliance and data processing consent tracking
+    /// </summary>
+    public DbSet<UserConsent> UserConsents { get; set; } = null!;
+
     #endregion
 
     /// <summary>
@@ -129,6 +134,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<UserApiKey>().ToTable("UserApiKeys");
         modelBuilder.Entity<UserPreference>().ToTable("UserPreferences");
         modelBuilder.Entity<UserNotificationSettings>().ToTable("UserNotificationSettings");
+        modelBuilder.Entity<UserConsent>().ToTable("UserConsents");
     }
 
     /// <summary>
@@ -157,6 +163,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<UserLoginAttempt>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<UserLockoutHistory>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<UserSecuritySettings>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserConsent>().HasQueryFilter(e => !e.IsDeleted);
     }
 
     /// <summary>

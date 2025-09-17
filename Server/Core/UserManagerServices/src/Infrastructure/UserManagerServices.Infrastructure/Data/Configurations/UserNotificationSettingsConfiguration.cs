@@ -133,7 +133,7 @@ public class UserNotificationSettingsConfiguration : IEntityTypeConfiguration<Us
 
         // Relationships
         builder.HasOne(uns => uns.User)
-            .WithOne()
+            .WithOne(u => u.NotificationSettings)
             .HasForeignKey<UserNotificationSettings>(uns => uns.UserId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("FK_UserNotificationSettings_Users_UserId");

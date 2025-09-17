@@ -69,7 +69,6 @@ public class UserRepository : GenericRepository<User>, IUserRepository
             .Include(u => u.UserActivityLogs)
             .Include(u => u.UserApiKeys)
             .Include(u => u.UserPreferences)
-            .Include(u => u.UserNotificationSettings)
             .Include(u => u.UserRoles)
             .Include(u => u.UserClaims)
             .Include(u => u.UserLogins)

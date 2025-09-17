@@ -119,8 +119,8 @@ public class UserSecuritySettingsConfiguration : IEntityTypeConfiguration<UserSe
 
         // Relationships
         builder.HasOne(ss => ss.User)
-            .WithMany()
-            .HasForeignKey(ss => ss.UserId)
+            .WithOne(u => u.UserSecuritySettings)
+            .HasForeignKey<UserSecuritySettings>(ss => ss.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Indexes

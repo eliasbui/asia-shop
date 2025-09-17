@@ -137,11 +137,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne(up => up.User)
             .HasForeignKey(up => up.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasMany(u => u.UserNotificationSettings)
-            .WithOne(uns => uns.User)
-            .HasForeignKey(uns => uns.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+        
 
         builder.HasMany(u => u.UserMfaSettings)
             .WithOne(ums => ums.User)
@@ -173,9 +169,14 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(lh => lh.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasMany(u => u.UserSecuritySettings)
+        builder.HasOne(u => u.UserSecuritySettings)
             .WithOne(ss => ss.User)
-            .HasForeignKey(ss => ss.UserId)
+            .HasForeignKey<UserSecuritySettings>(ss => ss.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(u => u.UserConsents)
+            .WithOne(uc => uc.User)
+            .HasForeignKey(uc => uc.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Query filters

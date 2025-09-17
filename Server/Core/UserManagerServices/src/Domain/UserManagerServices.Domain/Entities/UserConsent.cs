@@ -1,4 +1,5 @@
-﻿using UserManagerServices.Domain.Common;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using UserManagerServices.Domain.Common;
 using UserManagerServices.Domain.Enums;
 
 namespace UserManagerServices.Domain.Entities;

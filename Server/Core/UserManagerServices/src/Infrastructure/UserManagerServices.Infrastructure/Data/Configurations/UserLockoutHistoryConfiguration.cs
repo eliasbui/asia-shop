@@ -87,7 +87,7 @@ public class UserLockoutHistoryConfiguration : IEntityTypeConfiguration<UserLock
 
         // Relationships
         builder.HasOne(lh => lh.User)
-            .WithMany()
+            .WithMany(u => u.UserLockoutHistory)
             .HasForeignKey(lh => lh.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 

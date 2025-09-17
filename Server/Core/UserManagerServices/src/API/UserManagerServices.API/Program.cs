@@ -53,6 +53,14 @@ try
     // Map minimal API endpoints
     app.MapMinimalApiEndpoints();
 
+    // Seed database in development environment
+    if (app.Environment.IsDevelopment())
+    {
+        Log.Information("Seeding database with sample data...");
+        await app.Services.SeedDatabaseIfDevelopmentAsync(true);
+        Log.Information("Database seeding completed");
+    }
+
     Log.Information("UserManagerServices API started successfully");
     await app.RunAsync();
 }

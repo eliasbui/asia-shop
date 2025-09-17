@@ -10,7 +10,7 @@ namespace UserManagerServices.Domain.Entities;
 [Table("UserMfaSettings")]
 public class UserMfaSettings : IBaseEntity
 {
-    public Guid Id { get; } = Guid.CreateVersion7();
+    public Guid Id { get; init; } = Guid.CreateVersion7();
 
     /// <summary>
     /// User ID this MFA setting belongs to
