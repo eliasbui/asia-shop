@@ -31,7 +31,7 @@ public class UserSession : IBaseEntity
     public DateTime? LastAccessedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime CreatedAt { get; } = DateTime.UtcNow;
-    public DateTime? UpdatedAt { get; } = null;
+    public DateTime? UpdatedAt { get; set; } = null;
     public Guid? CreatedBy { get; } = null;
     public Guid? UpdatedBy { get; } = null;
     public bool IsDeleted { get; } = false;

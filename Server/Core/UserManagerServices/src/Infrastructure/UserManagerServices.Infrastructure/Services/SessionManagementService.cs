@@ -35,11 +35,12 @@ public class SessionManagementService(
         try
         {
             // Get user security settings for session timeout and concurrent limits
-            var securitySettings = await unitOfWork.UserSecuritySettings.GetUserSecuritySettingsAsync(userId, cancellationToken);
-            
+            var securitySettings =
+                await unitOfWork.UserSecuritySettings.GetUserSecuritySettingsAsync(userId, cancellationToken);
+
             // Parse device info and user agent for better tracking
             var parsedDeviceInfo = ParseDeviceInfo(userAgent, deviceInfo);
-            
+
             // Create new session
             var session = new UserSession
             {
@@ -64,12 +65,14 @@ public class SessionManagementService(
                 userId, securitySettings.MaxConcurrentSessions, cancellationToken);
 
             // Check for suspicious activity
-            var isSuspicious = await IsSuspiciousSessionActivityAsync(userId, ipAddress, userAgent, locationInfo, cancellationToken);
-            
+            var isSuspicious =
+                await IsSuspiciousSessionActivityAsync(userId, ipAddress, userAgent, locationInfo, cancellationToken);
+
             if (isSuspicious)
             {
-                logger.LogWarning("Suspicious session activity detected for user {UserId} from IP {IpAddress}", userId, ipAddress);
-                
+                logger.LogWarning("Suspicious session activity detected for user {UserId} from IP {IpAddress}", userId,
+                    ipAddress);
+
                 // Send security alert
                 var sessionInfo = new SessionInfo
                 {
@@ -91,7 +94,8 @@ public class SessionManagementService(
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Session created for user {UserId}. Terminated {TerminatedCount} sessions due to limits", 
+            logger.LogInformation(
+                "Session created for user {UserId}. Terminated {TerminatedCount} sessions due to limits",
                 userId, terminatedSessions.Count);
 
             return (session, terminatedSessions);
@@ -106,24 +110,26 @@ public class SessionManagementService(
     /// <summary>
     /// Updates session activity and extends timeout if needed
     /// </summary>
-    public async Task<UserSession?> UpdateSessionActivityAsync(string sessionToken, CancellationToken cancellationToken = default)
+    public async Task<UserSession?> UpdateSessionActivityAsync(string sessionToken,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var session = await unitOfWork.UserSessions.GetBySessionTokenAsync(sessionToken, cancellationToken);
-            
+
             if (session == null || !session.IsActive || session.ExpiresAt <= DateTime.UtcNow)
                 return null;
 
             // Update last accessed time
             session.LastAccessedAt = DateTime.UtcNow;
-            
+
             // Extend session if needed (sliding expiration)
-            var securitySettings = await unitOfWork.UserSecuritySettings.GetUserSecuritySettingsAsync(session.UserId, cancellationToken);
+            var securitySettings =
+                await unitOfWork.UserSecuritySettings.GetUserSecuritySettingsAsync(session.UserId, cancellationToken);
             session.ExpiresAt = DateTime.UtcNow.AddMinutes(securitySettings.SessionTimeoutMinutes);
             session.UpdatedAt = DateTime.UtcNow;
 
-            await unitOfWork.UserSessions.UpdateAsync(session, cancellationToken);
+            unitOfWork.UserSessions.Update(session);
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
             return session;
@@ -138,20 +144,20 @@ public class SessionManagementService(
     /// <summary>
     /// Terminates a specific session
     /// </summary>
-    public async Task<bool> TerminateSessionAsync(Guid userId, Guid sessionId, string reason = "User requested", 
+    public async Task<bool> TerminateSessionAsync(Guid userId, Guid sessionId, string reason = "User requested",
         CancellationToken cancellationToken = default)
     {
         try
         {
             var session = await unitOfWork.UserSessions.GetByIdAsync(sessionId, cancellationToken);
-            
+
             if (session == null || session.UserId != userId)
                 return false;
 
             session.IsActive = false;
             session.UpdatedAt = DateTime.UtcNow;
 
-            await unitOfWork.UserSessions.UpdateAsync(session, cancellationToken);
+            unitOfWork.UserSessions.Update(session);
 
             // Log the session termination
             await LogSessionActivityAsync(userId, ActionEnum.SessionTerminated, new
@@ -164,7 +170,7 @@ public class SessionManagementService(
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Session {SessionId} terminated for user {UserId}. Reason: {Reason}", 
+            logger.LogInformation("Session {SessionId} terminated for user {UserId}. Reason: {Reason}",
                 sessionId, userId, reason);
 
             return true;
@@ -179,7 +185,7 @@ public class SessionManagementService(
     /// <summary>
     /// Terminates all sessions for a user except the current one
     /// </summary>
-    public async Task<int> TerminateAllOtherSessionsAsync(Guid userId, Guid? currentSessionId = null, 
+    public async Task<int> TerminateAllOtherSessionsAsync(Guid userId, Guid? currentSessionId = null,
         string reason = "User requested", CancellationToken cancellationToken = default)
     {
         try
@@ -191,7 +197,7 @@ public class SessionManagementService(
             {
                 session.IsActive = false;
                 session.UpdatedAt = DateTime.UtcNow;
-                await unitOfWork.UserSessions.UpdateAsync(session, cancellationToken);
+                unitOfWork.UserSessions.Update(session);
             }
 
             // Log the bulk session termination
@@ -204,7 +210,7 @@ public class SessionManagementService(
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            logger.LogInformation("Terminated {Count} sessions for user {UserId}. Reason: {Reason}", 
+            logger.LogInformation("Terminated {Count} sessions for user {UserId}. Reason: {Reason}",
                 sessionsToTerminate.Count, userId, reason);
 
             return sessionsToTerminate.Count;
@@ -219,7 +225,7 @@ public class SessionManagementService(
     /// <summary>
     /// Terminates all sessions for a user
     /// </summary>
-    public async Task<int> TerminateAllUserSessionsAsync(Guid userId, string reason = "Security measure", 
+    public async Task<int> TerminateAllUserSessionsAsync(Guid userId, string reason = "Security measure",
         CancellationToken cancellationToken = default)
     {
         try
@@ -230,7 +236,7 @@ public class SessionManagementService(
             {
                 session.IsActive = false;
                 session.UpdatedAt = DateTime.UtcNow;
-                await unitOfWork.UserSessions.UpdateAsync(session, cancellationToken);
+                unitOfWork.UserSessions.Update(session);
             }
 
             // Log the complete session termination
@@ -257,7 +263,7 @@ public class SessionManagementService(
     /// <summary>
     /// Gets active sessions for a user with enhanced information
     /// </summary>
-    public async Task<List<SessionInfo>> GetActiveSessionsAsync(Guid userId, Guid? currentSessionId = null, 
+    public async Task<List<SessionInfo>> GetActiveSessionsAsync(Guid userId, Guid? currentSessionId = null,
         CancellationToken cancellationToken = default)
     {
         try
@@ -301,12 +307,13 @@ public class SessionManagementService(
     /// <summary>
     /// Validates if a session is still valid and active
     /// </summary>
-    public async Task<UserSession?> ValidateSessionAsync(string sessionToken, CancellationToken cancellationToken = default)
+    public async Task<UserSession?> ValidateSessionAsync(string sessionToken,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var session = await unitOfWork.UserSessions.GetBySessionTokenAsync(sessionToken, cancellationToken);
-            
+
             if (session == null || !session.IsActive || session.ExpiresAt <= DateTime.UtcNow)
                 return null;
 
@@ -321,7 +328,8 @@ public class SessionManagementService(
 
     #region Private Helper Methods
 
-    private async Task LogSessionActivityAsync(Guid userId, ActionEnum action, object details, CancellationToken cancellationToken)
+    private async Task LogSessionActivityAsync(Guid userId, ActionEnum action, object details,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -355,7 +363,7 @@ public class SessionManagementService(
         if (!string.IsNullOrEmpty(userAgent))
         {
             var ua = userAgent.ToLower();
-            
+
             // Detect mobile devices
             if (ua.Contains("mobile") || ua.Contains("android") || ua.Contains("iphone"))
                 info.DeviceType = "Mobile";
@@ -388,7 +396,7 @@ public class SessionManagementService(
         try
         {
             // Get recent sessions for comparison
-            var recentSessions = await _unitOfWork.UserSessions.GetRecentSessionsAsync(userId, 30, cancellationToken);
+            var recentSessions = await unitOfWork.UserSessions.GetRecentSessionsAsync(userId, 30, cancellationToken);
 
             if (!recentSessions.Any())
                 return false; // First session, not suspicious
@@ -397,7 +405,7 @@ public class SessionManagementService(
             var knownIpAddresses = recentSessions.Select(s => s.IpAddress).Distinct().ToList();
             if (!knownIpAddresses.Contains(ipAddress))
             {
-                _logger.LogInformation("New IP address detected for user {UserId}: {IpAddress}", userId, ipAddress);
+                logger.LogInformation("New IP address detected for user {UserId}: {IpAddress}", userId, ipAddress);
                 return true;
             }
 
@@ -415,7 +423,7 @@ public class SessionManagementService(
 
                 if (!knownBrowsers.Contains(browserFamily))
                 {
-                    _logger.LogInformation("New browser detected for user {UserId}: {Browser}", userId, browserFamily);
+                    logger.LogInformation("New browser detected for user {UserId}: {Browser}", userId, browserFamily);
                     return true;
                 }
             }
@@ -431,7 +439,7 @@ public class SessionManagementService(
 
                 if (!knownLocations.Any(loc => loc!.Contains(ExtractCountryFromLocation(locationInfo))))
                 {
-                    _logger.LogInformation("New location detected for user {UserId}: {Location}", userId, locationInfo);
+                    logger.LogInformation("New location detected for user {UserId}: {Location}", userId, locationInfo);
                     return true;
                 }
             }
@@ -440,7 +448,7 @@ public class SessionManagementService(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error checking suspicious session activity for user {UserId}", userId);
+            logger.LogError(ex, "Error checking suspicious session activity for user {UserId}", userId);
             return false; // Default to not suspicious on error
         }
     }
@@ -448,11 +456,12 @@ public class SessionManagementService(
     /// <summary>
     /// Gets session statistics for a user
     /// </summary>
-    public async Task<SessionStatistics> GetSessionStatisticsAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<SessionStatistics> GetSessionStatisticsAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         try
         {
-            var allSessions = await _unitOfWork.UserSessions.GetUserSessionsAsync(userId, 1, 1000, cancellationToken);
+            var allSessions = await unitOfWork.UserSessions.GetUserSessionsAsync(userId, 1, 1000, cancellationToken);
             var sessions = allSessions.sessions;
             var activeSessions = sessions.Where(s => s.IsActive && s.ExpiresAt > DateTime.UtcNow).ToList();
             var expiredSessions = sessions.Where(s => !s.IsActive || s.ExpiresAt <= DateTime.UtcNow).ToList();
@@ -500,7 +509,7 @@ public class SessionManagementService(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting session statistics for user {UserId}", userId);
+            logger.LogError(ex, "Error getting session statistics for user {UserId}", userId);
             throw;
         }
     }
@@ -512,15 +521,15 @@ public class SessionManagementService(
     {
         try
         {
-            var cleanedUp = await _unitOfWork.UserSessions.CleanupExpiredSessionsAsync(cancellationToken);
+            var cleanedUp = await unitOfWork.UserSessions.CleanupExpiredSessionsAsync(cancellationToken);
 
-            _logger.LogInformation("Cleaned up {Count} expired sessions", cleanedUp);
+            logger.LogInformation("Cleaned up {Count} expired sessions", cleanedUp);
 
             return cleanedUp;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error cleaning up expired sessions");
+            logger.LogError(ex, "Error cleaning up expired sessions");
             throw;
         }
     }
@@ -532,12 +541,12 @@ public class SessionManagementService(
     {
         try
         {
-            var activeSessions = await _unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
+            var activeSessions = await unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
             return activeSessions.Count();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting concurrent session count for user {UserId}", userId);
+            logger.LogError(ex, "Error getting concurrent session count for user {UserId}", userId);
             throw;
         }
     }
@@ -550,7 +559,7 @@ public class SessionManagementService(
     {
         try
         {
-            var activeSessions = await _unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
+            var activeSessions = await unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
             var sessionsList = activeSessions.OrderBy(s => s.LastAccessedAt ?? s.CreatedAt).ToList();
 
             var terminatedSessions = new List<UserSession>();
@@ -563,11 +572,11 @@ public class SessionManagementService(
                 {
                     session.IsActive = false;
                     session.UpdatedAt = DateTime.UtcNow;
-                    await _unitOfWork.UserSessions.UpdateAsync(session, cancellationToken);
+                    await unitOfWork.UserSessions.UpdateAsync(session, cancellationToken);
                     terminatedSessions.Add(session);
                 }
 
-                _logger.LogInformation("Terminated {Count} sessions for user {UserId} due to concurrent session limit",
+                logger.LogInformation("Terminated {Count} sessions for user {UserId} due to concurrent session limit",
                     sessionsToTerminate.Count, userId);
             }
 
@@ -575,7 +584,7 @@ public class SessionManagementService(
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error enforcing concurrent session limit for user {UserId}", userId);
+            logger.LogError(ex, "Error enforcing concurrent session limit for user {UserId}", userId);
             throw;
         }
     }
@@ -588,10 +597,11 @@ public class SessionManagementService(
     {
         try
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(userId, cancellationToken);
+            var user = await unitOfWork.Users.GetByIdAsync(userId, cancellationToken);
             if (user == null) return;
 
-            var securitySettings = await _unitOfWork.UserSecuritySettings.GetUserSecuritySettingsAsync(userId, cancellationToken);
+            var securitySettings =
+                await unitOfWork.UserSecuritySettings.GetUserSecuritySettingsAsync(userId, cancellationToken);
 
             if (!securitySettings.SendSecurityAlerts) return;
 
@@ -609,13 +619,13 @@ public class SessionManagementService(
                 <p>If this was you, you can ignore this message. If not, please secure your account immediately.</p>
             ";
 
-            await _emailService.SendEmailAsync(user.Email!, subject, body, cancellationToken);
+            await _emailService.SendEmailAsync(user.Email!, subject, body, true, cancellationToken);
 
-            _logger.LogInformation("Security alert sent to user {UserId} for {AlertType}", userId, alertType);
+            logger.LogInformation("Security alert sent to user {UserId} for {AlertType}", userId, alertType);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error sending security alert to user {UserId}", userId);
+            logger.LogError(ex, "Error sending security alert to user {UserId}", userId);
         }
     }
 
@@ -639,7 +649,8 @@ public class SessionManagementService(
         // Simple suspiciousness evaluation - can be enhanced with ML models
         try
         {
-            var recentSessions = await _unitOfWork.UserSessions.GetRecentSessionsAsync(session.UserId, 10, cancellationToken);
+            var recentSessions =
+                await unitOfWork.UserSessions.GetRecentSessionsAsync(session.UserId, 10, cancellationToken);
             var otherSessions = recentSessions.Where(s => s.Id != session.Id).ToList();
 
             if (!otherSessions.Any()) return false;

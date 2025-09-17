@@ -72,5 +72,7 @@ public enum ActionEnum
     TwoFactorDisabled = 67,
     ApiKeyCreated = 68,
     ApiKeyDeleted = 69,
-    SessionTerminated = 70
+    SessionTerminated = 70,
+    BulkUpdate = 71,
+    BulkCreate = 72
 }

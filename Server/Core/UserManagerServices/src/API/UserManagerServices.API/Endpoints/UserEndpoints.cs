@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using UserManagerServices.API.Common;
+using UserManagerServices.Application.Common.Interfaces;
 using UserManagerServices.Application.Features.Admin.Queries;
 using UserManagerServices.Application.Features.Users.Commands;
 using UserManagerServices.Application.Features.Users.Queries;
@@ -417,49 +418,98 @@ public static class UserEndpoints
     }
 
     /// <summary>
-    /// Gets current user's active sessions
+    /// Gets current user's active sessions with enhanced information
     /// </summary>
     /// <param name="user">Claims principal</param>
-    /// <param name="mediator">MediatR sender</param>
+    /// <param name="sessionManagementService">Session management service</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User sessions</returns>
     private static async Task<IResult> GetUserSessionsAsync(
         ClaimsPrincipal user,
-        [FromServices] ISender mediator,
+        [FromServices] ISessionManagementService sessionManagementService,
         CancellationToken cancellationToken = default)
     {
-        var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null) return Results.Unauthorized();
+        try
+        {
+            var userId = ApiHelpers.GetCurrentUserId(user);
+            if (userId == null) return Results.Unauthorized();
 
-        var query = new GetUserSessionsQuery { UserId = userId.Value };
-        var result = await mediator.Send(query, cancellationToken);
-        return ApiHelpers.CreateResponse(result);
+            var currentSessionId = user.FindFirst("session_id")?.Value;
+
+            var sessions = await sessionManagementService.GetActiveSessionsAsync(
+                userId.Value,
+                string.IsNullOrEmpty(currentSessionId) ? null : Guid.Parse(currentSessionId),
+                cancellationToken);
+
+            var response = new UserSessionsResponse
+            {
+                UserId = userId.Value,
+                Sessions = sessions.Select(s => new Application.Features.Users.Responses.SessionInfo
+                {
+                    SessionId = s.SessionId,
+                    Device = s.Device,
+                    OperatingSystem = s.OperatingSystem,
+                    Browser = s.Browser,
+                    IpAddress = s.IpAddress,
+                    Location = s.Location,
+                    CreatedAt = s.CreatedAt,
+                    LastActivity = s.LastActivity,
+                    ExpiresAt = s.ExpiresAt,
+                    IsCurrent = s.IsCurrent,
+                    IsActive = s.IsActive
+                }).ToList(),
+                TotalSessions = sessions.Count,
+                CurrentSessionId = string.IsNullOrEmpty(currentSessionId) ? null : Guid.Parse(currentSessionId)
+            };
+
+            return Results.Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem(
+                title: "Error retrieving user sessions",
+                detail: ex.Message,
+                statusCode: 500);
+        }
     }
 
     /// <summary>
-    /// Deletes a specific user session
+    /// Deletes a specific user session using enhanced session management
     /// </summary>
     /// <param name="sessionId">Session ID to delete</param>
     /// <param name="user">Claims principal</param>
-    /// <param name="mediator">MediatR sender</param>
+    /// <param name="sessionManagementService">Session management service</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>No content if successful</returns>
     private static async Task<IResult> DeleteUserSessionAsync(
         Guid sessionId,
         ClaimsPrincipal user,
-        [FromServices] ISender mediator,
+        [FromServices] ISessionManagementService sessionManagementService,
         CancellationToken cancellationToken = default)
     {
-        var userId = ApiHelpers.GetCurrentUserId(user);
-        if (userId == null) return Results.Unauthorized();
-
-        var command = new DeleteUserSessionCommand
+        try
         {
-            UserId = userId.Value,
-            SessionId = sessionId
-        };
-        var result = await mediator.Send(command, cancellationToken);
-        return ApiHelpers.CreateResponse(result);
+            var userId = ApiHelpers.GetCurrentUserId(user);
+            if (userId == null) return Results.Unauthorized();
+
+            var success = await sessionManagementService.TerminateSessionAsync(
+                userId.Value,
+                sessionId,
+                "User requested termination",
+                cancellationToken);
+
+            if (!success)
+                return Results.NotFound("Session not found or already terminated");
+
+            return Results.NoContent();
+        }
+        catch (Exception ex)
+        {
+            return Results.Problem(
+                title: "Error terminating session",
+                detail: ex.Message,
+                statusCode: 500);
+        }
     }
 
     /// <summary>
