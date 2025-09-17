@@ -122,6 +122,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         services.AddScoped<IUserActivityLogRepository, UserActivityLogRepository>();
+        services.AddScoped<IUserMfaSettingsRepository, UserMfaSettingsRepository>();
+        services.AddScoped<IUserMfaBackupCodeRepository, UserMfaBackupCodeRepository>();
+        services.AddScoped<IUserMfaAuditLogRepository, UserMfaAuditLogRepository>();
+        services.AddScoped<IUserEmailOtpRepository, UserEmailOtpRepository>();
 
         // Register Dapper connection factory
         services.AddScoped<IDapperConnectionFactory, DapperConnectionFactory>();
@@ -130,6 +134,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordHashingService, PasswordHashingService>();
         services.AddScoped<ICacheService, CacheService>();
+        services.AddScoped<ITotpService, TotpService>();
+        services.AddScoped<IMfaService, MfaService>();
 
         // Register HTTP client and email service
         services.AddHttpClient<ZohoEmailService>(client =>

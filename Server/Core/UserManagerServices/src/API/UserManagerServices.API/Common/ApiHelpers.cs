@@ -74,6 +74,22 @@ public static class ApiHelpers
     }
 
     /// <summary>
+    /// Gets the current user ID from HTTP context and throws if not authenticated
+    /// </summary>
+    /// <param name="context">HTTP context</param>
+    /// <returns>User ID</returns>
+    /// <exception cref="UnauthorizedAccessException">Thrown when user is not authenticated</exception>
+    public static Guid GetCurrentUserId(HttpContext context)
+    {
+        var userId = GetCurrentUserId(context.User);
+        if (!userId.HasValue)
+        {
+            throw new UnauthorizedAccessException("User ID not found in token");
+        }
+        return userId.Value;
+    }
+
+    /// <summary>
     /// Gets the current user's IP address
     /// </summary>
     /// <param name="context">HTTP context</param>

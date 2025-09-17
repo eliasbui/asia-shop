@@ -30,6 +30,26 @@ public interface IUnitOfWork : IDisposable
     /// </summary>
     IUserActivityLogRepository UserActivityLogs { get; }
 
+    /// <summary>
+    /// Gets the UserMfaSettings repository
+    /// </summary>
+    IUserMfaSettingsRepository UserMfaSettings { get; }
+
+    /// <summary>
+    /// Gets the UserMfaBackupCode repository
+    /// </summary>
+    IUserMfaBackupCodeRepository UserMfaBackupCodes { get; }
+
+    /// <summary>
+    /// Gets the UserMfaAuditLog repository
+    /// </summary>
+    IUserMfaAuditLogRepository UserMfaAuditLogs { get; }
+
+    /// <summary>
+    /// Gets the UserEmailOtp repository
+    /// </summary>
+    IUserEmailOtpRepository UserEmailOtps { get; }
+
     #endregion
 
     #region Transaction Management

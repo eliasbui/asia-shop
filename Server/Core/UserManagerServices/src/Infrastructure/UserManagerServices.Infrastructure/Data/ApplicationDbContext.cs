@@ -44,7 +44,42 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     /// User notification settings for communication preferences (generic structure)
     /// </summary>
     public DbSet<UserNotificationSettings> UserNotificationSettings { get; set; } = null!;
-    
+
+    /// <summary>
+    /// User MFA settings for multi-factor authentication configuration
+    /// </summary>
+    public DbSet<UserMfaSettings> UserMfaSettings { get; set; } = null!;
+
+    /// <summary>
+    /// User MFA backup codes for recovery purposes
+    /// </summary>
+    public DbSet<UserMfaBackupCode> UserMfaBackupCodes { get; set; } = null!;
+
+    /// <summary>
+    /// User MFA audit logs for security monitoring
+    /// </summary>
+    public DbSet<UserMfaAuditLog> UserMfaAuditLogs { get; set; } = null!;
+
+    /// <summary>
+    /// User email OTPs for MFA fallback authentication
+    /// </summary>
+    public DbSet<UserEmailOtp> UserEmailOtps { get; set; } = null!;
+
+    /// <summary>
+    /// User login attempts for security tracking and lockout management
+    /// </summary>
+    public DbSet<UserLoginAttempt> UserLoginAttempts { get; set; } = null!;
+
+    /// <summary>
+    /// User lockout history for progressive lockout and audit trail
+    /// </summary>
+    public DbSet<UserLockoutHistory> UserLockoutHistory { get; set; } = null!;
+
+    /// <summary>
+    /// User security settings for configurable security policies
+    /// </summary>
+    public DbSet<UserSecuritySettings> UserSecuritySettings { get; set; } = null!;
+
     #endregion
 
     /// <summary>
@@ -105,6 +140,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<UserApiKey>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<UserPreference>().HasQueryFilter(e => !e.IsDeleted);
         modelBuilder.Entity<UserNotificationSettings>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserMfaSettings>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserMfaBackupCode>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserMfaAuditLog>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserEmailOtp>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserLoginAttempt>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserLockoutHistory>().HasQueryFilter(e => !e.IsDeleted);
+        modelBuilder.Entity<UserSecuritySettings>().HasQueryFilter(e => !e.IsDeleted);
     }
 
     /// <summary>

@@ -20,6 +20,9 @@ public static class EndpointExtensions
         // Map user endpoints
         app.MapUserEndpoints();
 
+        // Map MFA endpoints
+        app.MapMfaEndpoints();
+
         // Map admin endpoints
         app.MapAdminEndpoints();
 

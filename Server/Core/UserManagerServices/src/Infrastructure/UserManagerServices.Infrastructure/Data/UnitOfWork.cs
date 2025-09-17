@@ -42,6 +42,26 @@ public class UnitOfWork : IUnitOfWork
     /// </summary>
     public IUserActivityLogRepository UserActivityLogs { get; }
 
+    /// <summary>
+    /// Gets the UserMfaSettings repository
+    /// </summary>
+    public IUserMfaSettingsRepository UserMfaSettings { get; }
+
+    /// <summary>
+    /// Gets the UserMfaBackupCode repository
+    /// </summary>
+    public IUserMfaBackupCodeRepository UserMfaBackupCodes { get; }
+
+    /// <summary>
+    /// Gets the UserMfaAuditLog repository
+    /// </summary>
+    public IUserMfaAuditLogRepository UserMfaAuditLogs { get; }
+
+    /// <summary>
+    /// Gets the UserEmailOtp repository
+    /// </summary>
+    public IUserEmailOtpRepository UserEmailOtps { get; }
+
     #endregion
 
     /// <summary>
@@ -65,6 +85,10 @@ public class UnitOfWork : IUnitOfWork
         Roles = new RoleRepository(_context, _dapperConnectionFactory);
         UserSessions = new UserSessionRepository(_context, _dapperConnectionFactory);
         UserActivityLogs = new UserActivityLogRepository(_context, _dapperConnectionFactory);
+        UserMfaSettings = new UserMfaSettingsRepository(_context, _dapperConnectionFactory);
+        UserMfaBackupCodes = new UserMfaBackupCodeRepository(_context, _dapperConnectionFactory);
+        UserMfaAuditLogs = new UserMfaAuditLogRepository(_context, _dapperConnectionFactory);
+        UserEmailOtps = new UserEmailOtpRepository(_context, _dapperConnectionFactory);
     }
 
     #region Transaction Management

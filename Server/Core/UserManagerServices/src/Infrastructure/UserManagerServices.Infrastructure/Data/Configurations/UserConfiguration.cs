@@ -143,6 +143,26 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(uns => uns.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(u => u.UserMfaSettings)
+            .WithOne(ums => ums.User)
+            .HasForeignKey(ums => ums.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(u => u.UserMfaBackupCodes)
+            .WithOne(bc => bc.User)
+            .HasForeignKey(bc => bc.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(u => u.UserMfaAuditLogs)
+            .WithOne(al => al.User)
+            .HasForeignKey(al => al.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasMany(u => u.UserEmailOtps)
+            .WithOne(otp => otp.User)
+            .HasForeignKey(otp => otp.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // Query filters
         builder.HasQueryFilter(u => !u.IsDeleted);
     }
