@@ -190,7 +190,8 @@ public class SessionManagementService(
     {
         try
         {
-            var activeSessions = await unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
+            var activeSessions =
+                await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(userId, cancellationToken);
             var sessionsToTerminate = activeSessions.Where(s => s.Id != currentSessionId).ToList();
 
             foreach (var session in sessionsToTerminate)
@@ -230,7 +231,8 @@ public class SessionManagementService(
     {
         try
         {
-            var activeSessions = await unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
+            var activeSessions =
+                await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(userId, cancellationToken);
 
             foreach (var session in activeSessions)
             {
@@ -268,7 +270,7 @@ public class SessionManagementService(
     {
         try
         {
-            var sessions = await unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
+            var sessions = await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(userId, cancellationToken);
             var sessionInfos = new List<SessionInfo>();
 
             foreach (var session in sessions)
@@ -396,7 +398,8 @@ public class SessionManagementService(
         try
         {
             // Get recent sessions for comparison
-            var recentSessions = await unitOfWork.UserSessions.GetRecentSessionsAsync(userId, 30, cancellationToken);
+            var recentSessions =
+                await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(userId, cancellationToken);
 
             if (!recentSessions.Any())
                 return false; // First session, not suspicious
@@ -461,8 +464,8 @@ public class SessionManagementService(
     {
         try
         {
-            var allSessions = await unitOfWork.UserSessions.GetUserSessionsAsync(userId, 1, 1000, cancellationToken);
-            var sessions = allSessions.sessions;
+            var allSessions = await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(userId, cancellationToken);
+            var sessions = allSessions.ToList();
             var activeSessions = sessions.Where(s => s.IsActive && s.ExpiresAt > DateTime.UtcNow).ToList();
             var expiredSessions = sessions.Where(s => !s.IsActive || s.ExpiresAt <= DateTime.UtcNow).ToList();
 
@@ -541,7 +544,8 @@ public class SessionManagementService(
     {
         try
         {
-            var activeSessions = await unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
+            var activeSessions =
+                await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(userId, cancellationToken);
             return activeSessions.Count();
         }
         catch (Exception ex)
@@ -559,7 +563,8 @@ public class SessionManagementService(
     {
         try
         {
-            var activeSessions = await unitOfWork.UserSessions.GetActiveSessionsAsync(userId, cancellationToken);
+            var activeSessions =
+                await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(userId, cancellationToken);
             var sessionsList = activeSessions.OrderBy(s => s.LastAccessedAt ?? s.CreatedAt).ToList();
 
             var terminatedSessions = new List<UserSession>();
@@ -572,7 +577,7 @@ public class SessionManagementService(
                 {
                     session.IsActive = false;
                     session.UpdatedAt = DateTime.UtcNow;
-                    await unitOfWork.UserSessions.UpdateAsync(session, cancellationToken);
+                    unitOfWork.UserSessions.Update(session);
                     terminatedSessions.Add(session);
                 }
 
@@ -650,7 +655,7 @@ public class SessionManagementService(
         try
         {
             var recentSessions =
-                await unitOfWork.UserSessions.GetRecentSessionsAsync(session.UserId, 10, cancellationToken);
+                await unitOfWork.UserSessions.GetActiveSessionsByUserIdAsync(session.UserId, cancellationToken);
             var otherSessions = recentSessions.Where(s => s.Id != session.Id).ToList();
 
             if (!otherSessions.Any()) return false;
