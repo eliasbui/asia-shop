@@ -50,6 +50,21 @@ public interface IUnitOfWork : IDisposable
     /// </summary>
     IUserEmailOtpRepository UserEmailOtps { get; }
 
+    /// <summary>
+    /// Gets the UserLoginAttempt repository
+    /// </summary>
+    IUserLoginAttemptRepository UserLoginAttempts { get; }
+
+    /// <summary>
+    /// Gets the UserLockoutHistory repository
+    /// </summary>
+    IUserLockoutHistoryRepository UserLockoutHistory { get; }
+
+    /// <summary>
+    /// Gets the UserSecuritySettings repository
+    /// </summary>
+    IUserSecuritySettingsRepository UserSecuritySettings { get; }
+
     #endregion
 
     #region Transaction Management

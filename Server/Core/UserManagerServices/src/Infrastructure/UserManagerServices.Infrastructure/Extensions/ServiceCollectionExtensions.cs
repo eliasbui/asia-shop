@@ -126,6 +126,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserMfaBackupCodeRepository, UserMfaBackupCodeRepository>();
         services.AddScoped<IUserMfaAuditLogRepository, UserMfaAuditLogRepository>();
         services.AddScoped<IUserEmailOtpRepository, UserEmailOtpRepository>();
+        services.AddScoped<IUserLoginAttemptRepository, UserLoginAttemptRepository>();
+        services.AddScoped<IUserLockoutHistoryRepository, UserLockoutHistoryRepository>();
+        services.AddScoped<IUserSecuritySettingsRepository, UserSecuritySettingsRepository>();
 
         // Register Dapper connection factory
         services.AddScoped<IDapperConnectionFactory, DapperConnectionFactory>();

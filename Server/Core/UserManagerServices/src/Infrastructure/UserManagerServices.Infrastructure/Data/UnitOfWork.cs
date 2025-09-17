@@ -62,6 +62,21 @@ public class UnitOfWork : IUnitOfWork
     /// </summary>
     public IUserEmailOtpRepository UserEmailOtps { get; }
 
+    /// <summary>
+    /// Gets the UserLoginAttempt repository
+    /// </summary>
+    public IUserLoginAttemptRepository UserLoginAttempts { get; }
+
+    /// <summary>
+    /// Gets the UserLockoutHistory repository
+    /// </summary>
+    public IUserLockoutHistoryRepository UserLockoutHistory { get; }
+
+    /// <summary>
+    /// Gets the UserSecuritySettings repository
+    /// </summary>
+    public IUserSecuritySettingsRepository UserSecuritySettings { get; }
+
     #endregion
 
     /// <summary>
@@ -89,6 +104,9 @@ public class UnitOfWork : IUnitOfWork
         UserMfaBackupCodes = new UserMfaBackupCodeRepository(_context, _dapperConnectionFactory);
         UserMfaAuditLogs = new UserMfaAuditLogRepository(_context, _dapperConnectionFactory);
         UserEmailOtps = new UserEmailOtpRepository(_context, _dapperConnectionFactory);
+        UserLoginAttempts = new UserLoginAttemptRepository(_context);
+        UserLockoutHistory = new UserLockoutHistoryRepository(_context);
+        UserSecuritySettings = new UserSecuritySettingsRepository(_context);
     }
 
     #region Transaction Management

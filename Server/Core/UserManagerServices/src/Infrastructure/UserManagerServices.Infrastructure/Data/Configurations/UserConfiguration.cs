@@ -163,6 +163,21 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasForeignKey(otp => otp.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasMany(u => u.UserLoginAttempts)
+            .WithOne(la => la.User)
+            .HasForeignKey(la => la.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasMany(u => u.UserLockoutHistory)
+            .WithOne(lh => lh.User)
+            .HasForeignKey(lh => lh.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(u => u.UserSecuritySettings)
+            .WithOne(ss => ss.User)
+            .HasForeignKey(ss => ss.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // Query filters
         builder.HasQueryFilter(u => !u.IsDeleted);
     }
