@@ -57,7 +57,7 @@ public class TokenService : ITokenService
     /// <param name="roles">User roles</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>JWT token string</returns>
-    public async Task<string> GenerateAccessTokenAsync(User user, IList<string> roles,
+    public Task<string> GenerateAccessTokenAsync(User user, IList<string> roles,
         CancellationToken cancellationToken = default)
     {
         try
@@ -69,9 +69,9 @@ public class TokenService : ITokenService
 
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-                new(JwtRegisteredClaimNames.Jti, tokenId),
-                new(JwtRegisteredClaimNames.Iat, new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
+                new("sub", user.Id.ToString()),
+                new("jid", tokenId),
+                new("iat", new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
                     ClaimValueTypes.Integer64),
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new(ClaimTypes.Name, user.UserName ?? string.Empty),
@@ -96,17 +96,17 @@ public class TokenService : ITokenService
                 SigningCredentials = credentials
             };
 
-            var token = _tokenHandler.CreateToken(tokenDescriptor);
+            var token = _tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
             var tokenString = _tokenHandler.WriteToken(token);
 
             _logger.LogInformation("JWT token generated for user {UserId} with token ID {TokenId}", user.Id, tokenId);
 
-            return tokenString;
+            return Task.FromResult(tokenString);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating JWT token for user {UserId}", user.Id);
-            throw;
+            return Task.FromResult(string.Empty);
         }
     }
 

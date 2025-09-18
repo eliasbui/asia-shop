@@ -152,6 +152,13 @@ public static class WebApplicationExtensions
                 options.Theme = ScalarTheme.Purple;
                 options.DefaultHttpClient =
                     new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
+
+                // Enable authentication in Scalar UI
+                options.Authentication = new ScalarAuthenticationOptions
+                {
+                    PreferredSecuritySchemes = ["Bearer"]
+                };
+
             });
         }
     }
@@ -171,6 +178,41 @@ public static class WebApplicationExtensions
                     Name = "Asia Shop user manager services",
                     Email = "support@example.com"
                 };
+
+                // Add Bearer token authentication scheme
+                document.Components ??= new OpenApiComponents();
+                document.Components.SecuritySchemes = new Dictionary<string, OpenApiSecurityScheme>
+                {
+                    ["Bearer"] = new OpenApiSecurityScheme
+                    {
+                        Type = SecuritySchemeType.Http,
+                        Scheme = "bearer",
+                        BearerFormat = "JWT",
+                        In = ParameterLocation.Header,
+                        Name = "Authorization",
+                        Description = "Enter your JWT token in the format: Bearer {your_token}"
+                    }
+                };
+
+                // Add global security requirement
+                document.SecurityRequirements = new List<OpenApiSecurityRequirement>
+                {
+                    new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    }
+                };
+
                 return Task.CompletedTask;
             });
         });

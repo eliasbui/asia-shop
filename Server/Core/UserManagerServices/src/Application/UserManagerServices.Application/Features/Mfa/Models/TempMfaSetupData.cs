@@ -49,4 +49,6 @@ public class TempMfaSetupData
     /// Unique setup session ID for this QR code generation
     /// </summary>
     public string SetupSessionId { get; set; } = string.Empty;
+    
+    public string QrCodeBase64 { get; set; } = string.Empty;
 }

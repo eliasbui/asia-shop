@@ -32,9 +32,13 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
+        var autoMapperLicenseKey = Environment.GetEnvironmentVariable("AutoMapperLicenseKey") ??
+                                  configuration.GetSection("AutoMapperLicenseKey").Value;
+
         // Add MediatR
         services.AddMediatR(cfg =>
         {
+            cfg.LicenseKey = autoMapperLicenseKey;
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
 
             // Add pipeline behaviors in order of execution
@@ -48,8 +52,6 @@ public static class ServiceCollectionExtensions
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         // Add AutoMapper
-        var autoMapperLicenseKey = Environment.GetEnvironmentVariable("AutoMapperLicenseKey") ??
-                                   configuration.GetSection("AutoMapperLicenseKey").Value;
 
         services.AddAutoMapper(cfg =>
         {

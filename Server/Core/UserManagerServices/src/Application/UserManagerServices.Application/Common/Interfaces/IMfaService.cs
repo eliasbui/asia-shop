@@ -44,12 +44,12 @@ public interface IMfaService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Sets up TOTP for a user (generates secret and QR code)
+    /// Generates QR code for MFA setup (first time)
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Secret key, QR code URI, and setup session ID</returns>
-    Task<(string secretKey, string qrCodeUri, string setupSessionId)> SetupTotpAsync(Guid userId,
+    Task<(string secretKey, string qrCodeUri, string setupSessionId)> GenerateQrCodeAsync(Guid userId,
         CancellationToken cancellationToken = default);
 
     /// <summary>

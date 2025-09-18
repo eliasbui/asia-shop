@@ -176,22 +176,43 @@ public static class MfaEndpoints
                 }
             });
 
-        // Regenerate QR code
-        mfaGroup.MapPost("/generate-qr", GenerateQrCode)
+        // Generate QR code (first time)
+        mfaGroup.MapPost("/qr-code/generate", GenerateQrCode)
             .RequireAuthorization()
             .WithName("GenerateQrCode")
-            .WithSummary("Generate QR code for MFA setup")
-            .WithDescription("Generate QR code with a new 60-second expiration time")
+            .WithSummary("Generate QR code for MFA setup (first time)")
+            .WithDescription("Generates new QR code for MFA setup with 60-second expiration")
             .Produces<BaseResponse<MfaSetupResponse>>()
             .Produces<BaseResponse<MfaSetupResponse>>(400)
             .Produces(401)
             .WithOpenApi(operation => new OpenApiOperation(operation)
             {
-                Summary = "Generate QR code for MFA setup",
-                Description = "Generate QR code with a new 60-second expiration time",
+                Summary = "Generate QR code for MFA setup (first time)",
+                Description = "Generates new QR code for MFA setup with 60-second expiration",
                 Responses = new OpenApiResponses
                 {
-                    ["200"] = new OpenApiResponse { Description = "QR code Generate successfully" },
+                    ["200"] = new OpenApiResponse { Description = "QR code generated successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "Unauthorized" }
+                }
+            });
+
+        // Regenerate QR code (when expired)
+        mfaGroup.MapPost("/qr-code/regenerate", RegenerateQrCode)
+            .RequireAuthorization()
+            .WithName("RegenerateQrCode")
+            .WithSummary("Regenerate QR code when expired")
+            .WithDescription("Regenerates QR code with same secret but new 60-second expiration")
+            .Produces<BaseResponse<MfaSetupResponse>>()
+            .Produces<BaseResponse<MfaSetupResponse>>(400)
+            .Produces(401)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Regenerate QR code when expired",
+                Description = "Regenerates QR code with same secret but new 60-second expiration",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "QR code regenerated successfully" },
                     ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" },
                     ["401"] = new OpenApiResponse { Description = "Unauthorized" }
                 }
@@ -437,10 +458,9 @@ public static class MfaEndpoints
     }
 
     /// <summary>
-    /// Regenerate QR code endpoint handler
+    /// Generate QR code endpoint handler (first time)
     /// </summary>
     private static async Task<IResult> GenerateQrCode(
-        GenerateQrCodeRequest request,
         HttpContext context,
         IMediator mediator,
         ILogger<Program> logger)
@@ -448,7 +468,38 @@ public static class MfaEndpoints
         try
         {
             var userId = ApiHelpers.GetCurrentUserId(context);
-            var command = new GenerateQrCodeCommand
+            var command = new SetupMfaCommand { UserId = userId };
+
+            var result = await mediator.Send(command);
+
+            return result.IsSuccess
+                ? Results.Ok(result)
+                : Results.BadRequest(result);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Results.Unauthorized();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error generating QR code");
+            return Results.StatusCode(500);
+        }
+    }
+
+    /// <summary>
+    /// Regenerate QR code endpoint handler (when expired)
+    /// </summary>
+    private static async Task<IResult> RegenerateQrCode(
+        Records.RegenerateQrCodeRequest request,
+        HttpContext context,
+        IMediator mediator,
+        ILogger<Program> logger)
+    {
+        try
+        {
+            var userId = ApiHelpers.GetCurrentUserId(context);
+            var command = new RegenerateQrCodeCommand
             {
                 UserId = userId,
                 SetupSessionId = request.SetupSessionId

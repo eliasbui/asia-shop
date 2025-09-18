@@ -67,7 +67,7 @@ try
     if (app.Environment.IsDevelopment())
     {
         Log.Information("Seeding database with sample data...");
-        await app.Services.SeedDatabaseIfDevelopmentAsync(true);
+        // await app.Services.SeedDatabaseIfDevelopmentAsync(true);
         Log.Information("Database seeding completed");
     }
 

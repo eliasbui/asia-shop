@@ -20,30 +20,17 @@ using UserManagerServices.Infrastructure.Data;
 
 namespace UserManagerServices.Infrastructure.Data.SeedData;
 
-public class DatabaseSeeder
+public class DatabaseSeeder(
+    ApplicationDbContext context,
+    UserManager<User> userManager,
+    RoleManager<Role> roleManager,
+    ILogger<DatabaseSeeder> logger)
 {
-    private readonly ApplicationDbContext _context;
-    private readonly UserManager<User> _userManager;
-    private readonly RoleManager<Role> _roleManager;
-    private readonly ILogger<DatabaseSeeder> _logger;
-
-    public DatabaseSeeder(
-        ApplicationDbContext context,
-        UserManager<User> userManager,
-        RoleManager<Role> roleManager,
-        ILogger<DatabaseSeeder> logger)
-    {
-        _context = context;
-        _userManager = userManager;
-        _roleManager = roleManager;
-        _logger = logger;
-    }
-
     public async Task SeedAsync()
     {
         try
         {
-            _logger.LogInformation("Starting database seeding...");
+            logger.LogInformation("Starting database seeding...");
 
             // Seed in order of dependencies
             await SeedRolesAsync();
@@ -65,21 +52,21 @@ public class DatabaseSeeder
             await SeedUserMfaAuditLogsAsync();
             await SeedUserConsentsAsync();
 
-            await _context.SaveChangesAsync();
-            _logger.LogInformation("Database seeding completed successfully!");
+            await context.SaveChangesAsync();
+            logger.LogInformation("Database seeding completed successfully!");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occurred during database seeding");
+            logger.LogError(ex, "Error occurred during database seeding");
             throw;
         }
     }
 
     private async Task SeedRolesAsync()
     {
-        if (await _roleManager.Roles.AnyAsync()) return;
+        if (await roleManager.Roles.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding roles...");
+        logger.LogInformation("Seeding roles...");
 
         var roles = new[]
         {
@@ -130,14 +117,14 @@ public class DatabaseSeeder
             }
         };
 
-        foreach (var role in roles) await _roleManager.CreateAsync(role);
+        foreach (var role in roles) await roleManager.CreateAsync(role);
     }
 
     private async Task SeedUsersAsync()
     {
-        if (await _userManager.Users.AnyAsync()) return;
+        if (await userManager.Users.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding users...");
+        logger.LogInformation("Seeding users...");
 
         var users = new[]
         {
@@ -260,18 +247,18 @@ public class DatabaseSeeder
         foreach (var user in users)
         {
             // Set a default password for all users
-            var result = await _userManager.CreateAsync(user, "AsiaShop123!");
+            var result = await userManager.CreateAsync(user, "AsiaShop123!");
             if (!result.Succeeded)
-                _logger.LogWarning("Failed to create user {Email}: {Errors}",
+                logger.LogWarning("Failed to create user {Email}: {Errors}",
                     user.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
         }
     }
 
     private async Task SeedUserRolesAsync()
     {
-        if (await _context.UserRoles.AnyAsync()) return;
+        if (await context.UserRoles.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user roles...");
+        logger.LogInformation("Seeding user roles...");
 
         var userRoles = new[]
         {
@@ -313,14 +300,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserRoles.AddRangeAsync(userRoles);
+        await context.UserRoles.AddRangeAsync(userRoles);
     }
 
     private async Task SeedUserProfilesAsync()
     {
-        if (await _context.UserProfiles.AnyAsync()) return;
+        if (await context.UserProfiles.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user profiles...");
+        logger.LogInformation("Seeding user profiles...");
 
         var preferences = JsonSerializer.Serialize(new
         {
@@ -404,14 +391,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserProfiles.AddRangeAsync(userProfiles);
+        await context.UserProfiles.AddRangeAsync(userProfiles);
     }
 
     private async Task SeedUserClaimsAsync()
     {
-        if (await _context.UserClaims.AnyAsync()) return;
+        if (await context.UserClaims.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user claims...");
+        logger.LogInformation("Seeding user claims...");
 
         var userClaims = new[]
         {
@@ -447,14 +434,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserClaims.AddRangeAsync(userClaims);
+        await context.UserClaims.AddRangeAsync(userClaims);
     }
 
     private async Task SeedUserPreferencesAsync()
     {
-        if (await _context.UserPreferences.AnyAsync()) return;
+        if (await context.UserPreferences.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user preferences...");
+        logger.LogInformation("Seeding user preferences...");
 
         var userPreferences = new List<UserPreference>();
 
@@ -508,14 +495,14 @@ public class DatabaseSeeder
                 }
             });
 
-        await _context.UserPreferences.AddRangeAsync(userPreferences);
+        await context.UserPreferences.AddRangeAsync(userPreferences);
     }
 
     private async Task SeedUserNotificationSettingsAsync()
     {
-        if (await _context.UserNotificationSettings.AnyAsync()) return;
+        if (await context.UserNotificationSettings.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user notification settings...");
+        logger.LogInformation("Seeding user notification settings...");
 
         var userIds = new[]
         {
@@ -557,14 +544,14 @@ public class DatabaseSeeder
             Frequency = "immediate"
         }).ToArray();
 
-        await _context.UserNotificationSettings.AddRangeAsync(notificationSettings);
+        await context.UserNotificationSettings.AddRangeAsync(notificationSettings);
     }
 
     private async Task SeedUserSecuritySettingsAsync()
     {
-        if (await _context.UserSecuritySettings.AnyAsync()) return;
+        if (await context.UserSecuritySettings.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user security settings...");
+        logger.LogInformation("Seeding user security settings...");
 
         // Global default settings
         var globalSettings = new UserSecuritySettings
@@ -616,14 +603,14 @@ public class DatabaseSeeder
             AutoUnlockAfterLockoutPeriod = false
         };
 
-        await _context.UserSecuritySettings.AddRangeAsync(new[] { globalSettings, adminSettings });
+        await context.UserSecuritySettings.AddRangeAsync(new[] { globalSettings, adminSettings });
     }
 
     private async Task SeedUserMfaSettingsAsync()
     {
-        if (await _context.UserMfaSettings.AnyAsync()) return;
+        if (await context.UserMfaSettings.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user MFA settings...");
+        logger.LogInformation("Seeding user MFA settings...");
 
         var mfaSettings = new[]
         {
@@ -657,14 +644,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserMfaSettings.AddRangeAsync(mfaSettings);
+        await context.UserMfaSettings.AddRangeAsync(mfaSettings);
     }
 
     private async Task SeedUserMfaBackupCodesAsync()
     {
-        if (await _context.UserMfaBackupCodes.AnyAsync()) return;
+        if (await context.UserMfaBackupCodes.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user MFA backup codes...");
+        logger.LogInformation("Seeding user MFA backup codes...");
 
         var batchId1 = Guid.NewGuid();
         var batchId2 = Guid.NewGuid();
@@ -699,14 +686,14 @@ public class DatabaseSeeder
                 ExpiresAt = DateTime.UtcNow.AddYears(1)
             });
 
-        await _context.UserMfaBackupCodes.AddRangeAsync(backupCodes);
+        await context.UserMfaBackupCodes.AddRangeAsync(backupCodes);
     }
 
     private async Task SeedUserSessionsAsync()
     {
-        if (await _context.UserSessions.AnyAsync()) return;
+        if (await context.UserSessions.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user sessions...");
+        logger.LogInformation("Seeding user sessions...");
 
         var deviceInfo = JsonSerializer.Serialize(new
         {
@@ -771,14 +758,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserSessions.AddRangeAsync(userSessions);
+        await context.UserSessions.AddRangeAsync(userSessions);
     }
 
     private async Task SeedUserApiKeysAsync()
     {
-        if (await _context.UserApiKeys.AnyAsync()) return;
+        if (await context.UserApiKeys.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user API keys...");
+        logger.LogInformation("Seeding user API keys...");
 
         var permissions = JsonSerializer.Serialize(new[] { "users.read", "users.write", "profiles.read" });
 
@@ -812,14 +799,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserApiKeys.AddRangeAsync(userApiKeys);
+        await context.UserApiKeys.AddRangeAsync(userApiKeys);
     }
 
     private async Task SeedUserActivityLogsAsync()
     {
-        if (await _context.UserActivityLogs.AnyAsync()) return;
+        if (await context.UserActivityLogs.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user activity logs...");
+        logger.LogInformation("Seeding user activity logs...");
 
         var activityLogs = new[]
         {
@@ -858,14 +845,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserActivityLogs.AddRangeAsync(activityLogs);
+        await context.UserActivityLogs.AddRangeAsync(activityLogs);
     }
 
     private async Task SeedUserLoginAttemptsAsync()
     {
-        if (await _context.UserLoginAttempts.AnyAsync()) return;
+        if (await context.UserLoginAttempts.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user login attempts...");
+        logger.LogInformation("Seeding user login attempts...");
 
         var locationInfo = JsonSerializer.Serialize(new
         {
@@ -936,14 +923,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserLoginAttempts.AddRangeAsync(loginAttempts);
+        await context.UserLoginAttempts.AddRangeAsync(loginAttempts);
     }
 
     private async Task SeedUserLockoutHistoryAsync()
     {
-        if (await _context.UserLockoutHistory.AnyAsync()) return;
+        if (await context.UserLockoutHistory.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user lockout history...");
+        logger.LogInformation("Seeding user lockout history...");
 
         var lockoutHistory = new[]
         {
@@ -983,14 +970,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserLockoutHistory.AddRangeAsync(lockoutHistory);
+        await context.UserLockoutHistory.AddRangeAsync(lockoutHistory);
     }
 
     private async Task SeedUserEmailOtpsAsync()
     {
-        if (await _context.UserEmailOtps.AnyAsync()) return;
+        if (await context.UserEmailOtps.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user email OTPs...");
+        logger.LogInformation("Seeding user email OTPs...");
 
         var emailOtps = new[]
         {
@@ -1038,14 +1025,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserEmailOtps.AddRangeAsync(emailOtps);
+        await context.UserEmailOtps.AddRangeAsync(emailOtps);
     }
 
     private async Task SeedUserMfaAuditLogsAsync()
     {
-        if (await _context.UserMfaAuditLogs.AnyAsync()) return;
+        if (await context.UserMfaAuditLogs.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user MFA audit logs...");
+        logger.LogInformation("Seeding user MFA audit logs...");
 
         var mfaAuditLogs = new[]
         {
@@ -1100,14 +1087,14 @@ public class DatabaseSeeder
             }
         };
 
-        await _context.UserMfaAuditLogs.AddRangeAsync(mfaAuditLogs);
+        await context.UserMfaAuditLogs.AddRangeAsync(mfaAuditLogs);
     }
 
     private async Task SeedUserConsentsAsync()
     {
-        if (await _context.UserConsents.AnyAsync()) return;
+        if (await context.UserConsents.AnyAsync()) return;
 
-        _logger.LogInformation("Seeding user consents...");
+        logger.LogInformation("Seeding user consents...");
 
         var userIds = new[]
         {
@@ -1170,6 +1157,6 @@ public class DatabaseSeeder
             });
         }
 
-        await _context.UserConsents.AddRangeAsync(consents);
+        await context.UserConsents.AddRangeAsync(consents);
     }
 }

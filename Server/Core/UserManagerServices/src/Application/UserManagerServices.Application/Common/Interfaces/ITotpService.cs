@@ -82,4 +82,6 @@ public interface ITotpService
     /// </summary>
     /// <returns>Remaining seconds</returns>
     int GetRemainingTimeForCurrentCode();
+
+    Task<string> GenerateQrCodeBase64(string qrCodeUri);
 }

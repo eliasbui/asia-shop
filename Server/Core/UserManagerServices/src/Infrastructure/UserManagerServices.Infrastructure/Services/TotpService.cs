@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using QRCoder;
 using UserManagerServices.Application.Common.Interfaces;
 using UserManagerServices.Domain.Entities;
 
@@ -24,7 +25,6 @@ namespace UserManagerServices.Infrastructure.Services;
 public class TotpService : ITotpService
 {
     private readonly ILogger<TotpService> _logger;
-    private readonly IConfiguration _configuration;
     private readonly string _encryptionKey;
 
     // TOTP configuration constants
@@ -41,10 +41,8 @@ public class TotpService : ITotpService
     public TotpService(ILogger<TotpService> logger, IConfiguration configuration)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-        // Get encryption key from configuration or generate a default one
-        _encryptionKey = _configuration["Security:TotpEncryptionKey"] ??
+        _encryptionKey = configuration["Security:TotpEncryptionKey"] ??
                          "your-totp-encryption-key-32-chars!!";
 
         if (_encryptionKey.Length < 32)
@@ -278,6 +276,15 @@ public class TotpService : ITotpService
     {
         var currentTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         return TotpPeriod - (int)(currentTime % TotpPeriod);
+    }
+
+    public Task<string> GenerateQrCodeBase64(string qrCodeUri)
+    {
+        using var qrGenerator = new QRCodeGenerator();
+        using var qrCodeData = qrGenerator.CreateQrCode(qrCodeUri, QRCodeGenerator.ECCLevel.H);
+        using var qrCode = new PngByteQRCode(qrCodeData);
+        var qrCodeImage = qrCode.GetGraphic(10);
+        return Task.FromResult(Convert.ToBase64String(qrCodeImage));
     }
 
     #region Private Helper Methods

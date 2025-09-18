@@ -185,7 +185,7 @@ public class MfaService(
         }
     }
 
-    public async Task<(string secretKey, string qrCodeUri, string setupSessionId)> SetupTotpAsync(Guid userId,
+    public async Task<(string secretKey, string qrCodeUri, string setupSessionId)> GenerateQrCodeAsync(Guid userId,
         CancellationToken cancellationToken = default)
     {
         try
@@ -197,6 +197,7 @@ public class MfaService(
             var secretKey = _totpService.GenerateSecretKey();
             var encryptedSecret = _totpService.EncryptSecretKey(secretKey);
             var qrCodeUri = _totpService.GenerateQrCodeUri(user, secretKey);
+            var qrCodeBase64 = _totpService.GenerateQrCodeBase64(qrCodeUri);
 
             // Store temporarily in cache instead of database
             var setupSessionId = Guid.NewGuid().ToString();
@@ -221,13 +222,13 @@ public class MfaService(
             await LogMfaActivityAsync(userId, MfaActionEnum.TotpSetup, "TOTP", true,
                 cancellationToken: cancellationToken);
 
-            _logger.LogInformation("TOTP setup initiated for user {UserId} with session {SessionId}", userId,
+            _logger.LogInformation("QR code generated for user {UserId} with session {SessionId}", userId,
                 setupSessionId);
             return (secretKey, qrCodeUri, setupSessionId);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error setting up TOTP for user {UserId}", userId);
+            _logger.LogError(ex, "Error generating QR code for user {UserId}", userId);
             throw;
         }
     }
@@ -240,14 +241,10 @@ public class MfaService(
         {
             // Get existing setup data from cache
             var existingData = await GetTempSetupDataAsync(userId, setupSessionId, cancellationToken);
-            if (existingData == null)
-                throw new InvalidOperationException(
-                    "Setup session not found or expired. Please initiate MFA setup again.");
-
+            if (existingData == null) throw new InvalidOperationException("Setup session not found");
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null) throw new InvalidOperationException("User not found");
 
-            // Generate new QR code with same secret key
             var qrCodeUri = _totpService.GenerateQrCodeUri(user, existingData.SecretKey);
 
             // Create new setup session
@@ -255,7 +252,7 @@ public class MfaService(
             var newTempSetupData = new TempMfaSetupData
             {
                 UserId = userId,
-                SecretKey = existingData.SecretKey, // Keep same secret key
+                SecretKey = existingData.SecretKey,
                 QrCodeUri = qrCodeUri,
                 FormattedSecretKey = existingData.FormattedSecretKey,
                 CreatedAt = DateTime.UtcNow,

@@ -21,21 +21,15 @@ namespace UserManagerServices.Application.Features.Mfa.Handlers;
 /// <summary>
 /// Handler for MFA disable command
 /// </summary>
-public class DisableMfaCommandHandler : IRequestHandler<DisableMfaCommand, BaseResponse<bool>>
+public class DisableMfaCommandHandler(
+    IMfaService mfaService,
+    UserManager<User> userManager,
+    ILogger<DisableMfaCommandHandler> logger)
+    : IRequestHandler<DisableMfaCommand, BaseResponse<bool>>
 {
-    private readonly IMfaService _mfaService;
-    private readonly UserManager<User> _userManager;
-    private readonly ILogger<DisableMfaCommandHandler> _logger;
-
-    public DisableMfaCommandHandler(
-        IMfaService mfaService,
-        UserManager<User> userManager,
-        ILogger<DisableMfaCommandHandler> logger)
-    {
-        _mfaService = mfaService ?? throw new ArgumentNullException(nameof(mfaService));
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IMfaService _mfaService = mfaService ?? throw new ArgumentNullException(nameof(mfaService));
+    private readonly UserManager<User> _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+    private readonly ILogger<DisableMfaCommandHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     public async Task<BaseResponse<bool>> Handle(DisableMfaCommand request, CancellationToken cancellationToken)
     {

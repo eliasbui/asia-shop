@@ -11,9 +11,14 @@
 namespace UserManagerServices.API.Records;
 
 /// <summary>
-/// Request model for regenerating QR code
+/// Request model for generating QR code (first time)
 /// </summary>
 public record GenerateQrCodeRequest(string SetupSessionId);
+
+/// <summary>
+/// Request model for regenerating QR code (when expired)
+/// </summary>
+public record RegenerateQrCodeRequest(string SetupSessionId);
 
 /// <summary>
 /// Request model for enabling MFA

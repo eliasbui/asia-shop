@@ -1,4 +1,4 @@
-﻿#region Author File
+#region Author File
 
 // /*
 //  * Author: Eliasbui
@@ -18,32 +18,34 @@ using UserManagerServices.Application.Features.Mfa.Responses;
 namespace UserManagerServices.Application.Features.Mfa.Handlers;
 
 /// <summary>
-/// Handler for MFA setup command
+/// Handler for regenerating QR code command when expired
 /// </summary>
-public class SetupMfaCommandHandler(
+public class RegenerateQrCodeCommandHandler(
     IMfaService mfaService,
     ITotpService totpService,
-    ILogger<SetupMfaCommandHandler> logger)
-    : IRequestHandler<SetupMfaCommand, BaseResponse<MfaSetupResponse>>
+    ILogger<RegenerateQrCodeCommandHandler> logger)
+    : IRequestHandler<RegenerateQrCodeCommand, BaseResponse<MfaSetupResponse>>
 {
     private readonly IMfaService _mfaService = mfaService ?? throw new ArgumentNullException(nameof(mfaService));
     private readonly ITotpService _totpService = totpService ?? throw new ArgumentNullException(nameof(totpService));
-    private readonly ILogger<SetupMfaCommandHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<RegenerateQrCodeCommandHandler> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-    public async Task<BaseResponse<MfaSetupResponse>> Handle(SetupMfaCommand request,
+    public async Task<BaseResponse<MfaSetupResponse>> Handle(RegenerateQrCodeCommand request,
         CancellationToken cancellationToken)
     {
         try
         {
-            _logger.LogInformation("Setting up MFA for user {UserId}", request.UserId);
+            _logger.LogInformation("Regenerating QR code for user {UserId} with session {SessionId}",
+                request.UserId, request.SetupSessionId);
 
             // Check if MFA is already enabled
             var isEnabled = await _mfaService.IsMfaEnabledAsync(request.UserId, cancellationToken);
-            if (isEnabled) return BaseResponse<MfaSetupResponse>.Failure("MFA is already enabled for this user");
+            if (isEnabled)
+                return BaseResponse<MfaSetupResponse>.Failure("MFA is already enabled for this user");
 
-            // Generate QR code
-            var (secretKey, qrCodeUri, setupSessionId) =
-                await _mfaService.GenerateQrCodeAsync(request.UserId, cancellationToken);
+            // Regenerate QR code
+            var (secretKey, qrCodeUri, setupSessionId) = await _mfaService.RegenerateQrCodeAsync(
+                request.UserId, request.SetupSessionId, cancellationToken);
 
             var expiresAt = DateTime.UtcNow.AddSeconds(60);
             var response = new MfaSetupResponse
@@ -60,13 +62,19 @@ public class SetupMfaCommandHandler(
                 ExpiresInSeconds = 60
             };
 
-            _logger.LogInformation("MFA setup initiated successfully for user {UserId}", request.UserId);
-            return BaseResponse<MfaSetupResponse>.Success(response, "MFA setup initiated successfully");
+            _logger.LogInformation("QR code regenerated successfully for user {UserId} with new session {SessionId}",
+                request.UserId, setupSessionId);
+            return BaseResponse<MfaSetupResponse>.Success(response, "QR code regenerated successfully");
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning(ex, "Invalid operation while regenerating QR code for user {UserId}", request.UserId);
+            return BaseResponse<MfaSetupResponse>.Failure(ex.Message);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error setting up MFA for user {UserId}", request.UserId);
-            return BaseResponse<MfaSetupResponse>.Failure("An error occurred while setting up MFA");
+            _logger.LogError(ex, "Error regenerating QR code for user {UserId}", request.UserId);
+            return BaseResponse<MfaSetupResponse>.Failure("An error occurred while regenerating QR code");
         }
     }
 }
