@@ -1,7 +1,18 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using UserManagerServices.Application.Common.Interfaces;
+using UserManagerServices.Application.Features.Mfa.Models;
 using UserManagerServices.Domain.Entities;
 using UserManagerServices.Domain.Enums;
 using UserManagerServices.Domain.Interfaces;
@@ -18,6 +29,7 @@ public class MfaService(
     IPasswordHashingService passwordHashingService,
     IEmailService emailService,
     UserManager<User> userManager,
+    ICacheService cacheService,
     ILogger<MfaService> logger)
     : IMfaService
 {
@@ -33,6 +45,9 @@ public class MfaService(
     private readonly UserManager<User> _userManager =
         userManager ?? throw new ArgumentNullException(nameof(userManager));
 
+    private readonly ICacheService
+        _cacheService = cacheService ?? throw new ArgumentNullException(nameof(cacheService));
+
     private readonly ILogger<MfaService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     #region MFA Setup and Configuration
@@ -45,30 +60,71 @@ public class MfaService(
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null) throw new InvalidOperationException("User not found");
 
-            // Get or create MFA settings
-            var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (mfaSettings == null)
-                throw new InvalidOperationException("MFA setup not initiated. Please setup TOTP first.");
+            string secretKey;
 
-            // Verify TOTP code
-            var decryptedSecret = _totpService.DecryptSecretKey(mfaSettings.TotpSecretKey!);
-            if (!_totpService.ValidateTotpCode(decryptedSecret, totpCode))
+            // First try to get from temporary cache (new flow)
+            var tempData = await GetLatestTempSetupDataAsync(userId, cancellationToken);
+            if (tempData != null)
             {
-                await LogMfaActivityAsync(userId, MfaActionEnum.TotpFailed, "TOTP", false,
-                    "Invalid TOTP code during MFA enable", cancellationToken: cancellationToken);
-                throw new InvalidOperationException("Invalid TOTP code");
+                // Verify TOTP code with temporary data
+                if (!_totpService.ValidateTotpCode(tempData.SecretKey, totpCode))
+                {
+                    await LogMfaActivityAsync(userId, MfaActionEnum.TotpFailed, "TOTP", false,
+                        "Invalid TOTP code during MFA enable", cancellationToken: cancellationToken);
+                    throw new InvalidOperationException("Invalid TOTP code");
+                }
+
+                secretKey = tempData.SecretKey;
+
+                // Clean up temporary cache data
+                var cacheKey = $"mfa_setup_{userId}_{tempData.SetupSessionId}";
+                await _cacheService.RemoveAsync(cacheKey, cancellationToken);
+            }
+            else
+            {
+                // Fallback to database (legacy flow)
+                var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
+                if (mfaSettings?.TotpSecretKey == null)
+                    throw new InvalidOperationException("MFA setup not initiated. Please setup TOTP first.");
+
+                var decryptedSecret = _totpService.DecryptSecretKey(mfaSettings.TotpSecretKey);
+                if (!_totpService.ValidateTotpCode(decryptedSecret, totpCode))
+                {
+                    await LogMfaActivityAsync(userId, MfaActionEnum.TotpFailed, "TOTP", false,
+                        "Invalid TOTP code during MFA enable", cancellationToken: cancellationToken);
+                    throw new InvalidOperationException("Invalid TOTP code");
+                }
+
+                secretKey = decryptedSecret;
+            }
+
+            // Create or update MFA settings with the verified secret
+            var finalMfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
+            if (finalMfaSettings == null)
+            {
+                finalMfaSettings = new UserMfaSettings
+                {
+                    UserId = userId,
+                    TotpSecretKey = _totpService.EncryptSecretKey(secretKey),
+                    CreatedBy = userId
+                };
+                await _unitOfWork.UserMfaSettings.AddAsync(finalMfaSettings, cancellationToken);
+            }
+            else
+            {
+                finalMfaSettings.TotpSecretKey = _totpService.EncryptSecretKey(secretKey);
             }
 
             // Enable MFA
-            mfaSettings.IsEnabled = true;
-            mfaSettings.IsTotpEnabled = true;
-            mfaSettings.IsBackupCodesEnabled = true;
-            mfaSettings.EnabledAt = DateTime.UtcNow;
-            mfaSettings.UpdatedAt = DateTime.UtcNow;
+            finalMfaSettings.IsEnabled = true;
+            finalMfaSettings.IsTotpEnabled = true;
+            finalMfaSettings.IsBackupCodesEnabled = true;
+            finalMfaSettings.EnabledAt = DateTime.UtcNow;
+            finalMfaSettings.UpdatedAt = DateTime.UtcNow;
 
             // Generate backup codes
             var backupCodes = await GenerateBackupCodesAsync(userId, 10, cancellationToken);
-            mfaSettings.BackupCodesRemaining = backupCodes.Count;
+            finalMfaSettings.BackupCodesRemaining = backupCodes.Count;
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -76,7 +132,7 @@ public class MfaService(
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation("MFA enabled successfully for user {UserId}", userId);
-            return (mfaSettings, backupCodes);
+            return (finalMfaSettings, backupCodes);
         }
         catch (Exception ex)
         {
@@ -129,7 +185,7 @@ public class MfaService(
         }
     }
 
-    public async Task<(string secretKey, string qrCodeUri)> SetupTotpAsync(Guid userId,
+    public async Task<(string secretKey, string qrCodeUri, string setupSessionId)> SetupTotpAsync(Guid userId,
         CancellationToken cancellationToken = default)
     {
         try
@@ -142,31 +198,32 @@ public class MfaService(
             var encryptedSecret = _totpService.EncryptSecretKey(secretKey);
             var qrCodeUri = _totpService.GenerateQrCodeUri(user, secretKey);
 
-            // Create or update MFA settings
-            var existingSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (existingSettings != null)
+            // Store temporarily in cache instead of database
+            var setupSessionId = Guid.NewGuid().ToString();
+            var tempSetupData = new TempMfaSetupData
             {
-                existingSettings.TotpSecretKey = encryptedSecret;
-                existingSettings.UpdatedAt = DateTime.UtcNow;
-            }
-            else
-            {
-                var mfaSettings = new UserMfaSettings
-                {
-                    UserId = userId,
-                    TotpSecretKey = encryptedSecret,
-                    CreatedBy = userId
-                };
-                await _unitOfWork.UserMfaSettings.AddAsync(mfaSettings, cancellationToken);
-            }
+                UserId = userId,
+                SecretKey = secretKey,
+                QrCodeUri = qrCodeUri,
+                FormattedSecretKey = _totpService.FormatSecretKeyForBackup(secretKey),
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddSeconds(60),
+                SetupSessionId = setupSessionId
+            };
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            var cacheKey = $"mfa_setup_{userId}_{setupSessionId}";
+            await _cacheService.SetAsync(cacheKey, tempSetupData, TimeSpan.FromSeconds(60), cancellationToken);
+
+            // Also store the latest session ID for easier lookup
+            var userSetupKey = $"mfa_latest_setup_{userId}";
+            await _cacheService.SetAsync(userSetupKey, setupSessionId, TimeSpan.FromSeconds(60), cancellationToken);
 
             await LogMfaActivityAsync(userId, MfaActionEnum.TotpSetup, "TOTP", true,
                 cancellationToken: cancellationToken);
 
-            _logger.LogInformation("TOTP setup initiated for user {UserId}", userId);
-            return (secretKey, qrCodeUri);
+            _logger.LogInformation("TOTP setup initiated for user {UserId} with session {SessionId}", userId,
+                setupSessionId);
+            return (secretKey, qrCodeUri, setupSessionId);
         }
         catch (Exception ex)
         {
@@ -175,27 +232,154 @@ public class MfaService(
         }
     }
 
-    public async Task<bool> VerifyTotpSetupAsync(Guid userId, string totpCode,
+    public async Task<(string secretKey, string qrCodeUri, string setupSessionId)> RegenerateQrCodeAsync(Guid userId,
+        string setupSessionId,
         CancellationToken cancellationToken = default)
     {
         try
         {
+            // Get existing setup data from cache
+            var existingData = await GetTempSetupDataAsync(userId, setupSessionId, cancellationToken);
+            if (existingData == null)
+                throw new InvalidOperationException(
+                    "Setup session not found or expired. Please initiate MFA setup again.");
+
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null) throw new InvalidOperationException("User not found");
+
+            // Generate new QR code with same secret key
+            var qrCodeUri = _totpService.GenerateQrCodeUri(user, existingData.SecretKey);
+
+            // Create new setup session
+            var newSetupSessionId = Guid.NewGuid().ToString();
+            var newTempSetupData = new TempMfaSetupData
+            {
+                UserId = userId,
+                SecretKey = existingData.SecretKey, // Keep same secret key
+                QrCodeUri = qrCodeUri,
+                FormattedSecretKey = existingData.FormattedSecretKey,
+                CreatedAt = DateTime.UtcNow,
+                ExpiresAt = DateTime.UtcNow.AddSeconds(60),
+                SetupSessionId = newSetupSessionId
+            };
+
+            // Remove old cache entry
+            var oldCacheKey = $"mfa_setup_{userId}_{setupSessionId}";
+            await _cacheService.RemoveAsync(oldCacheKey, cancellationToken);
+
+            // Store new cache entry
+            var newCacheKey = $"mfa_setup_{userId}_{newSetupSessionId}";
+            await _cacheService.SetAsync(newCacheKey, newTempSetupData, TimeSpan.FromSeconds(60), cancellationToken);
+
+            // Update the latest session ID
+            var userSetupKey = $"mfa_latest_setup_{userId}";
+            await _cacheService.SetAsync(userSetupKey, newSetupSessionId, TimeSpan.FromSeconds(60), cancellationToken);
+
+            await LogMfaActivityAsync(userId, MfaActionEnum.TotpSetup, "TOTP", true,
+                "QR code regenerated", cancellationToken: cancellationToken);
+
+            _logger.LogInformation("QR code regenerated for user {UserId} with new session {SessionId}", userId,
+                newSetupSessionId);
+            return (existingData.SecretKey, qrCodeUri, newSetupSessionId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error regenerating QR code for user {UserId}", userId);
+            throw;
+        }
+    }
+
+    public async Task<TempMfaSetupData?> GetTempSetupDataAsync(Guid userId, string setupSessionId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var cacheKey = $"mfa_setup_{userId}_{setupSessionId}";
+            return await _cacheService.GetAsync<TempMfaSetupData>(cacheKey, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting temporary setup data for user {UserId}", userId);
+            return null;
+        }
+    }
+
+    public async Task<bool> VerifyTotpSetupAsync(Guid userId, string totpCode, string? setupSessionId = null,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // If setup session ID is provided, use it directly
+            if (!string.IsNullOrEmpty(setupSessionId))
+            {
+                var tempData = await GetTempSetupDataAsync(userId, setupSessionId, cancellationToken);
+                if (tempData != null)
+                {
+                    var isValid = _totpService.ValidateTotpCode(tempData.SecretKey, totpCode);
+
+                    await LogMfaActivityAsync(userId, isValid ? MfaActionEnum.TotpVerified : MfaActionEnum.TotpFailed,
+                        "TOTP", isValid, isValid ? null : "Invalid TOTP code during setup verification",
+                        cancellationToken: cancellationToken);
+
+                    return isValid;
+                }
+            }
+
+            // Try to get latest temporary setup data
+            var latestTempData = await GetLatestTempSetupDataAsync(userId, cancellationToken);
+            if (latestTempData != null)
+            {
+                var isValid = _totpService.ValidateTotpCode(latestTempData.SecretKey, totpCode);
+
+                await LogMfaActivityAsync(userId, isValid ? MfaActionEnum.TotpVerified : MfaActionEnum.TotpFailed,
+                    "TOTP", isValid, isValid ? null : "Invalid TOTP code during setup verification",
+                    cancellationToken: cancellationToken);
+
+                return isValid;
+            }
+
+            // Fallback to database (legacy flow)
             var mfaSettings = await GetMfaSettingsAsync(userId, cancellationToken);
-            if (mfaSettings?.TotpSecretKey == null) return false;
+            if (mfaSettings?.TotpSecretKey != null)
+            {
+                var decryptedSecret = _totpService.DecryptSecretKey(mfaSettings.TotpSecretKey);
+                var isValid = _totpService.ValidateTotpCode(decryptedSecret, totpCode);
 
-            var decryptedSecret = _totpService.DecryptSecretKey(mfaSettings.TotpSecretKey);
-            var isValid = _totpService.ValidateTotpCode(decryptedSecret, totpCode);
+                await LogMfaActivityAsync(userId, isValid ? MfaActionEnum.TotpVerified : MfaActionEnum.TotpFailed,
+                    "TOTP", isValid, isValid ? null : "Invalid TOTP code during setup verification",
+                    cancellationToken: cancellationToken);
 
-            await LogMfaActivityAsync(userId, isValid ? MfaActionEnum.TotpVerified : MfaActionEnum.TotpFailed,
-                "TOTP", isValid, isValid ? null : "Invalid TOTP code during setup verification",
-                cancellationToken: cancellationToken);
+                return isValid;
+            }
 
-            return isValid;
+            return false;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error verifying TOTP setup for user {UserId}", userId);
             return false;
+        }
+    }
+
+    private async Task<TempMfaSetupData?> GetLatestTempSetupDataAsync(Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            // In production, you'd want to maintain a separate cache entry with active session IDs for a user
+            // For this implementation, we'll use a simpler approach with a user-specific cache key
+            var userSetupKey = $"mfa_latest_setup_{userId}";
+            var latestSessionId = await _cacheService.GetAsync<string>(userSetupKey, cancellationToken);
+
+            if (!string.IsNullOrEmpty(latestSessionId))
+                return await GetTempSetupDataAsync(userId, latestSessionId, cancellationToken);
+
+            return null;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting latest temporary setup data for user {UserId}", userId);
+            return null;
         }
     }
 

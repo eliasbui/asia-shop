@@ -1,4 +1,14 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;

@@ -1,3 +1,13 @@
+#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -137,7 +147,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .WithOne(up => up.User)
             .HasForeignKey(up => up.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
 
         builder.HasMany(u => u.UserMfaSettings)
             .WithOne(ums => ums.User)

@@ -1,4 +1,14 @@
-﻿using System.Security.Claims;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -9,7 +19,7 @@ using UserManagerServices.Application.Features.Users.Commands;
 using UserManagerServices.Application.Features.Users.Queries;
 using UserManagerServices.Application.Features.Users.Responses;
 
-namespace UserManagerServices.API.Endpoints;
+namespace UserManagerServices.API.Endpoints.v1;
 
 /// <summary>
 /// User profile and preferences endpoints
@@ -22,7 +32,6 @@ public static class UserEndpoints
     /// </summary>
     /// <param name="app">Web application</param>
     /// <returns>Web application for chaining</returns>
-    [ApiVersion("1.0")]
     public static void MapUserEndpoints(this WebApplication app)
     {
         var userGroup = app.MapGroup("api/v1/users")
@@ -271,7 +280,7 @@ public static class UserEndpoints
             });
 
         // GET /api/v1/users/activity
-        userGroup.MapGet("/activity", GetUserActivityAsync)
+        userGroup.MapGet("/activity/{mediator}", GetUserActivityAsync)
             .WithName("GetUserActivity")
             .WithSummary("Get user activity logs")
             .WithDescription("Gets the current user's activity logs with pagination")
@@ -598,8 +607,8 @@ public static class UserEndpoints
         [FromQuery] string? action = null,
         [FromQuery] DateTime? startDate = null,
         [FromQuery] DateTime? endDate = null,
-        ClaimsPrincipal user = default!,
-        [FromServices] ISender mediator = default!,
+        ClaimsPrincipal user = null!,
+        [FromServices] ISender mediator = null!,
         CancellationToken cancellationToken = default)
     {
         var userId = ApiHelpers.GetCurrentUserId(user);

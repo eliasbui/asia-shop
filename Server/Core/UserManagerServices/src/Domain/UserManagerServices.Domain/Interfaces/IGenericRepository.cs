@@ -1,4 +1,14 @@
-﻿using System.Linq.Expressions;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using System.Linq.Expressions;
 using UserManagerServices.Domain.Common;
 
 namespace UserManagerServices.Domain.Interfaces;

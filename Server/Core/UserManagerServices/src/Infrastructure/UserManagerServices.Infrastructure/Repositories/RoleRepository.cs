@@ -1,4 +1,14 @@
-﻿using Dapper;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using UserManagerServices.Domain.Entities;
 using UserManagerServices.Domain.Interfaces;
@@ -208,18 +218,12 @@ public class RoleRepository : GenericRepository<Role>, IRoleRepository
         {
             var lowerSearchTerm = searchTerm.ToLower();
             query = query.Where(r => (r.Name != null && r.Name.ToLower().Contains(lowerSearchTerm)) ||
-                                   (r.Description != null && r.Description.ToLower().Contains(lowerSearchTerm)));
+                                     (r.Description != null && r.Description.ToLower().Contains(lowerSearchTerm)));
         }
 
-        if (isActive.HasValue)
-        {
-            query = query.Where(r => r.IsActive == isActive.Value);
-        }
+        if (isActive.HasValue) query = query.Where(r => r.IsActive == isActive.Value);
 
-        if (isSystemRole.HasValue)
-        {
-            query = query.Where(r => r.IsSystemRole == isSystemRole.Value);
-        }
+        if (isSystemRole.HasValue) query = query.Where(r => r.IsSystemRole == isSystemRole.Value);
 
         var totalCount = await query.CountAsync(cancellationToken);
 

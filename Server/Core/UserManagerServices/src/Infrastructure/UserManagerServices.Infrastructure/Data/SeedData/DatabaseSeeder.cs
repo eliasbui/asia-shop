@@ -1,3 +1,13 @@
+#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
@@ -120,10 +130,7 @@ public class DatabaseSeeder
             }
         };
 
-        foreach (var role in roles)
-        {
-            await _roleManager.CreateAsync(role);
-        }
+        foreach (var role in roles) await _roleManager.CreateAsync(role);
     }
 
     private async Task SeedUsersAsync()
@@ -255,10 +262,8 @@ public class DatabaseSeeder
             // Set a default password for all users
             var result = await _userManager.CreateAsync(user, "AsiaShop123!");
             if (!result.Succeeded)
-            {
-                _logger.LogWarning("Failed to create user {Email}: {Errors}", 
+                _logger.LogWarning("Failed to create user {Email}: {Errors}",
                     user.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
-            }
         }
     }
 
@@ -463,7 +468,6 @@ public class DatabaseSeeder
         };
 
         foreach (var userId in userIds)
-        {
             userPreferences.AddRange(new[]
             {
                 new UserPreference
@@ -503,7 +507,6 @@ public class DatabaseSeeder
                     IsActive = true
                 }
             });
-        }
 
         await _context.UserPreferences.AddRangeAsync(userPreferences);
     }
@@ -530,14 +533,15 @@ public class DatabaseSeeder
             EmailSecurityAlerts = true,
             EmailAccountUpdates = true,
             EmailMarketing = false,
-            EmailNewsletter = userId == Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), // Only admin gets newsletter
+            EmailNewsletter =
+                userId == Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), // Only admin gets newsletter
             EmailSystemNotifications = true,
-            SmsEnabled = userId == Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa") || 
-                        userId == Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), // Only admins get SMS
+            SmsEnabled = userId == Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa") ||
+                         userId == Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"), // Only admins get SMS
             SmsSecurityAlerts = userId == Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
             SmsAccountUpdates = false,
-            SmsTwoFactorAuth = userId == Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa") || 
-                              userId == Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+            SmsTwoFactorAuth = userId == Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa") ||
+                               userId == Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
             PushEnabled = true,
             PushSecurityAlerts = true,
             PushAccountUpdates = true,
@@ -668,8 +672,7 @@ public class DatabaseSeeder
         var backupCodes = new List<UserMfaBackupCode>();
 
         // Generate 10 backup codes for SuperAdmin
-        for (int i = 0; i < 10; i++)
-        {
+        for (var i = 0; i < 10; i++)
             backupCodes.Add(new UserMfaBackupCode
             {
                 UserId = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
@@ -681,11 +684,9 @@ public class DatabaseSeeder
                 GenerationBatchId = batchId1,
                 ExpiresAt = DateTime.UtcNow.AddYears(1)
             });
-        }
 
         // Generate 10 backup codes for Admin
-        for (int i = 0; i < 10; i++)
-        {
+        for (var i = 0; i < 10; i++)
             backupCodes.Add(new UserMfaBackupCode
             {
                 UserId = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
@@ -697,7 +698,6 @@ public class DatabaseSeeder
                 GenerationBatchId = batchId2,
                 ExpiresAt = DateTime.UtcNow.AddYears(1)
             });
-        }
 
         await _context.UserMfaBackupCodes.AddRangeAsync(backupCodes);
     }

@@ -1,4 +1,14 @@
-﻿using MediatR;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -43,17 +53,13 @@ public class BulkCreateUsersCommandHandler(
             // Validate the requesting user has permission
             var requestingUser = await userManager.FindByIdAsync(request.RequestingUserId.ToString());
             if (requestingUser == null)
-            {
                 return BaseResponse<BulkCreateResult>.Failure("Requesting user not found",
                     new Dictionary<string, object> { ["errorCode"] = "REQUESTING_USER_NOT_FOUND" });
-            }
 
             var requestingUserRoles = await userManager.GetRolesAsync(requestingUser);
             if (!requestingUserRoles.Contains("Admin") && !requestingUserRoles.Contains("UserManager"))
-            {
                 return BaseResponse<BulkCreateResult>.Failure("Insufficient permissions for bulk user creation",
                     new Dictionary<string, object> { ["errorCode"] = "INSUFFICIENT_PERMISSIONS" });
-            }
 
             // Validate input data
             var validationErrors = ValidateUserData(request.Users);
@@ -65,7 +71,6 @@ public class BulkCreateUsersCommandHandler(
 
             // Process each user
             foreach (var userData in request.Users.Where(u => !validationErrors.Any(e => e.Email == u.Email)))
-            {
                 try
                 {
                     // Check if user already exists
@@ -100,9 +105,7 @@ public class BulkCreateUsersCommandHandler(
                     // Generate password if needed
                     var password = userData.Password;
                     if (string.IsNullOrEmpty(password) && request.GenerateRandomPasswords)
-                    {
                         password = GenerateRandomPassword();
-                    }
 
                     if (string.IsNullOrEmpty(password))
                     {
@@ -126,7 +129,7 @@ public class BulkCreateUsersCommandHandler(
                         LastName = userData.LastName,
                         PhoneNumber = userData.PhoneNumber,
                         IsActive = userData.IsActive,
-                        EmailConfirmed = !request.RequireEmailConfirmation,
+                        EmailConfirmed = !request.RequireEmailConfirmation
                     };
 
                     var createResult = await userManager.CreateAsync(user, password);
@@ -154,15 +157,12 @@ public class BulkCreateUsersCommandHandler(
                     {
                         var roleResult = await userManager.AddToRolesAsync(user, allRoles);
                         if (!roleResult.Succeeded)
-                        {
                             logger.LogWarning("Failed to assign roles to user {Email}: {Errors}",
                                 userData.Email, string.Join(", ", roleResult.Errors.Select(e => e.Description)));
-                        }
                     }
 
                     // Send welcome email if requested
                     if (request.SendWelcomeEmails)
-                    {
                         try
                         {
                             await SendWelcomeEmailAsync(user, password, request.RequireEmailConfirmation,
@@ -172,7 +172,6 @@ public class BulkCreateUsersCommandHandler(
                         {
                             logger.LogWarning(ex, "Failed to send welcome email to {Email}", userData.Email);
                         }
-                    }
 
                     // Add to successful results
                     result.CreatedUsers.Add(new BulkCreatedUser
@@ -198,7 +197,6 @@ public class BulkCreateUsersCommandHandler(
                     });
                     result.FailureCount++;
                 }
-            }
 
             // Log the bulk operation
             await LogBulkCreateOperationAsync(request, result, cancellationToken);
@@ -260,7 +258,6 @@ public class BulkCreateUsersCommandHandler(
 
             // Check for duplicate emails in the batch
             if (!emailSet.Add(user.Email))
-            {
                 errors.Add(new BulkCreateError
                 {
                     Email = user.Email,
@@ -268,7 +265,6 @@ public class BulkCreateUsersCommandHandler(
                     ErrorCode = "DUPLICATE_EMAIL_IN_BATCH",
                     RowNumber = user.RowNumber
                 });
-            }
         }
 
         return errors;
@@ -296,10 +292,7 @@ public class BulkCreateUsersCommandHandler(
         var bytes = new byte[length];
         rng.GetBytes(bytes);
 
-        foreach (var b in bytes)
-        {
-            result.Append(validChars[b % validChars.Length]);
-        }
+        foreach (var b in bytes) result.Append(validChars[b % validChars.Length]);
 
         return result.ToString();
     }

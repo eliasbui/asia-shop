@@ -1,4 +1,15 @@
-﻿using UserManagerServices.Domain.Entities;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using UserManagerServices.Application.Features.Mfa.Models;
+using UserManagerServices.Domain.Entities;
 using UserManagerServices.Domain.Enums;
 
 namespace UserManagerServices.Application.Common.Interfaces;
@@ -37,18 +48,40 @@ public interface IMfaService
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Secret key and QR code URI</returns>
-    Task<(string secretKey, string qrCodeUri)> SetupTotpAsync(Guid userId,
+    /// <returns>Secret key, QR code URI, and setup session ID</returns>
+    Task<(string secretKey, string qrCodeUri, string setupSessionId)> SetupTotpAsync(Guid userId,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Verifies TOTP setup with a code
+    /// Regenerates QR code for an existing setup session
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <param name="setupSessionId">Setup session ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>New secret key, QR code URI, and setup session ID</returns>
+    Task<(string secretKey, string qrCodeUri, string setupSessionId)> RegenerateQrCodeAsync(Guid userId,
+        string setupSessionId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets temporary setup data from cache
+    /// </summary>
+    /// <param name="userId">User ID</param>
+    /// <param name="setupSessionId">Setup session ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Temporary setup data if found</returns>
+    Task<TempMfaSetupData?> GetTempSetupDataAsync(Guid userId, string setupSessionId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Verifies TOTP setup with a code using setup session ID
     /// </summary>
     /// <param name="userId">User ID</param>
     /// <param name="totpCode">TOTP code to verify</param>
+    /// <param name="setupSessionId">Setup session ID (optional, will search all active sessions if not provided)</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if verification successful</returns>
-    Task<bool> VerifyTotpSetupAsync(Guid userId, string totpCode,
+    Task<bool> VerifyTotpSetupAsync(Guid userId, string totpCode, string? setupSessionId = null,
         CancellationToken cancellationToken = default);
 
     #endregion
@@ -183,6 +216,7 @@ public interface IMfaService
     /// <param name="ipAddress">Client IP address</param>
     /// <param name="userAgent">Client user agent</param>
     /// <param name="additionalDetails">Additional details</param>
+    /// <param name="reason"></param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Task</returns>
     Task LogMfaActivityAsync(Guid userId, MfaActionEnum action, string? method = null,

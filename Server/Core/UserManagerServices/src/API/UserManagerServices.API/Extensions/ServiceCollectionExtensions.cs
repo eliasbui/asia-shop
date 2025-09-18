@@ -1,8 +1,16 @@
-﻿using System.Reflection;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
 using System.Text;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
@@ -45,7 +53,7 @@ public static class ServiceCollectionExtensions
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
                     httpContext.User.Identity?.Name ?? httpContext.Request.Headers.Host.ToString(),
-                    partition => new FixedWindowRateLimiterOptions
+                    _ => new FixedWindowRateLimiterOptions
                     {
                         AutoReplenishment = true,
                         PermitLimit = 100,
@@ -152,7 +160,7 @@ public static class WebApplicationExtensions
     {
         services.AddOpenApi(options =>
         {
-            options.AddDocumentTransformer((document, context, cancellationToken) =>
+            options.AddDocumentTransformer((document, _, _) =>
             {
                 document.Info.Title = "User Manager Services API";
                 document.Info.Description =

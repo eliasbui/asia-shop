@@ -1,4 +1,14 @@
-﻿using MediatR;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -42,21 +52,16 @@ public class BulkUpdateUsersCommandHandler(
             // Validate the requesting user has permission
             var requestingUser = await userManager.FindByIdAsync(request.RequestingUserId.ToString());
             if (requestingUser == null)
-            {
                 return BaseResponse<BulkOperationResult>.Failure("Requesting user not found",
                     new Dictionary<string, object> { ["errorCode"] = "REQUESTING_USER_NOT_FOUND" });
-            }
 
             var requestingUserRoles = await userManager.GetRolesAsync(requestingUser);
             if (!requestingUserRoles.Contains("Admin") && !requestingUserRoles.Contains("UserManager"))
-            {
                 return BaseResponse<BulkOperationResult>.Failure("Insufficient permissions for bulk operations",
                     new Dictionary<string, object> { ["errorCode"] = "INSUFFICIENT_PERMISSIONS" });
-            }
 
             // Process each user
             foreach (var userId in request.UserIds)
-            {
                 try
                 {
                     var user = await userManager.FindByIdAsync(userId.ToString());
@@ -112,7 +117,6 @@ public class BulkUpdateUsersCommandHandler(
                     });
                     result.FailureCount++;
                 }
-            }
 
             // Log the bulk operation
             await LogBulkOperationAsync(request, result, cancellationToken);
@@ -339,12 +343,19 @@ public class BulkUpdateUsersCommandHandler(
         public string ErrorCode { get; set; } = string.Empty;
         public Dictionary<string, object> Details { get; set; } = new();
 
-        public static OperationResult SuccessOperation() => new() { Success = true };
+        public static OperationResult SuccessOperation()
+        {
+            return new OperationResult { Success = true };
+        }
 
-        public static OperationResult Skipped(string reason) =>
-            new() { Success = true, WasSkipped = true, ErrorMessage = reason };
+        public static OperationResult Skipped(string reason)
+        {
+            return new OperationResult { Success = true, WasSkipped = true, ErrorMessage = reason };
+        }
 
-        public static OperationResult Failure(string message, string code) =>
-            new() { Success = false, ErrorMessage = message, ErrorCode = code };
+        public static OperationResult Failure(string message, string code)
+        {
+            return new OperationResult { Success = false, ErrorMessage = message, ErrorCode = code };
+        }
     }
 }

@@ -1,4 +1,14 @@
-﻿namespace UserManagerServices.Application.Features.Users.Responses;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+namespace UserManagerServices.Application.Features.Users.Responses;
 
 /// <summary>
 /// Response model for user profile information

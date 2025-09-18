@@ -1,6 +1,15 @@
-﻿using System.Security.Claims;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using System.Security.Claims;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 using UserManagerServices.Application.Common.Models;
 
 namespace UserManagerServices.API.Common;
@@ -31,7 +40,7 @@ public static class ApiHelpers
     {
         if (result.IsSuccess) return Results.Ok(result);
 
-        if (result.ValidationErrors.Any()) return Results.BadRequest(result);
+        if (result.ValidationErrors.Any()) return Results.BadRequest(result.ValidationErrors);
 
         return Results.BadRequest(result);
     }
@@ -45,7 +54,7 @@ public static class ApiHelpers
     {
         if (result.IsSuccess) return Results.Ok(result);
 
-        if (result.ValidationErrors.Any()) return Results.BadRequest(result);
+        if (result.ValidationErrors.Any()) return Results.BadRequest(result.ValidationErrors);
 
         return Results.BadRequest(result);
     }

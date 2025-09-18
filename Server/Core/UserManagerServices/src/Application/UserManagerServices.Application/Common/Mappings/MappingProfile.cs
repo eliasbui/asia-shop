@@ -1,4 +1,14 @@
-﻿using AutoMapper;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using AutoMapper;
 using UserManagerServices.Application.Common.Models;
 using UserManagerServices.Domain.Entities;
 

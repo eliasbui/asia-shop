@@ -1,4 +1,14 @@
-﻿using System.Reflection;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using System.Reflection;
 using AutoMapper;
 using FluentValidation;
 using MediatR;

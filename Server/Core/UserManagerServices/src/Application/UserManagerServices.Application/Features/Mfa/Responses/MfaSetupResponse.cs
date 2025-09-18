@@ -1,4 +1,14 @@
-﻿namespace UserManagerServices.Application.Features.Mfa.Responses;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+namespace UserManagerServices.Application.Features.Mfa.Responses;
 
 /// <summary>
 /// Response for MFA setup operation
@@ -34,4 +44,19 @@ public class MfaSetupResponse
     /// Next step in the MFA setup process
     /// </summary>
     public string NextStep { get; set; } = "Verify TOTP code to complete setup";
+
+    /// <summary>
+    /// When this QR code expires (UTC)
+    /// </summary>
+    public DateTime? ExpiresAt { get; set; }
+
+    /// <summary>
+    /// Setup session ID for QR code regeneration
+    /// </summary>
+    public string? SetupSessionId { get; set; }
+
+    /// <summary>
+    /// Number of seconds until QR code expires
+    /// </summary>
+    public int? ExpiresInSeconds { get; set; }
 }

@@ -1,4 +1,14 @@
-﻿using System.Net;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using System.Net;
 using System.Text.Json;
 using FluentValidation;
 using UserManagerServices.Application.Common.Models;
@@ -10,22 +20,8 @@ namespace UserManagerServices.API.Middleware;
 /// Global exception handling middleware for centralized error processing
 /// Provides consistent error responses and comprehensive logging
 /// </summary>
-public class GlobalExceptionHandlingMiddleware
+public class GlobalExceptionHandlingMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlingMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<GlobalExceptionHandlingMiddleware> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the GlobalExceptionHandlingMiddleware
-    /// </summary>
-    /// <param name="next">Next middleware in the pipeline</param>
-    /// <param name="logger">Logger instance</param>
-    public GlobalExceptionHandlingMiddleware(RequestDelegate next, ILogger<GlobalExceptionHandlingMiddleware> logger)
-    {
-        _next = next ?? throw new ArgumentNullException(nameof(next));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     /// <summary>
     /// Invokes the middleware
     /// </summary>
@@ -35,7 +31,7 @@ public class GlobalExceptionHandlingMiddleware
     {
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (Exception ex)
         {
@@ -198,9 +194,9 @@ public class GlobalExceptionHandlingMiddleware
             Timestamp = DateTime.UtcNow
         };
 
-        using (_logger.BeginScope(requestInfo))
+        using (logger.BeginScope(requestInfo))
         {
-            _logger.Log(logLevel, exception,
+            logger.Log(logLevel, exception,
                 "Unhandled exception occurred. ErrorId: {ErrorId}, Path: {RequestPath}, Method: {RequestMethod}",
                 errorId, context.Request.Path, context.Request.Method);
         }

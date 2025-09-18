@@ -1,4 +1,14 @@
-﻿using MediatR;
+﻿#region Author File
+
+// /*
+//  * Author: $Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using UserManagerServices.Application.Common.Interfaces;

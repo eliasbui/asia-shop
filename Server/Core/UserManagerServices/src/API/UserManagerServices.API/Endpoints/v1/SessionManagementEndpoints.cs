@@ -1,12 +1,23 @@
-﻿using MediatR;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.OpenApi.Models;
 using UserManagerServices.Application.Common.Interfaces;
 using UserManagerServices.Application.Features.Sessions.Commands;
 using UserManagerServices.Application.Features.Sessions.Queries;
 using UserManagerServices.API.Common;
 
-namespace UserManagerServices.API.Endpoints;
+namespace UserManagerServices.API.Endpoints.v1;
 
 /// <summary>
 /// Enhanced session management endpoints for concurrent session limits, remote revocation, and configurable timeouts
@@ -34,15 +45,15 @@ public static class SessionManagementEndpoints
             .Produces<int>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Terminate all other sessions",
                 Description = "Terminates all other active sessions for the current user except the current session",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Sessions terminated successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Sessions terminated successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -56,16 +67,16 @@ public static class SessionManagementEndpoints
             .Produces(400, contentType: "application/json", responseType: typeof(ValidationProblemDetails))
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Update session timeout settings",
                 Description = "Updates session timeout and concurrent session limit settings for the current user",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Session settings updated successfully" },
-                    ["400"] = new() { Description = "Invalid request data" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Session settings updated successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request data" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -77,15 +88,15 @@ public static class SessionManagementEndpoints
             .Produces<SessionStatistics>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get session statistics",
                 Description = "Gets comprehensive session statistics for the current user",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Session statistics retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Session statistics retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -97,15 +108,15 @@ public static class SessionManagementEndpoints
             .Produces<List<SessionInfo>>(200, "application/json")
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Get active sessions",
                 Description = "Gets all active sessions for the current user with enhanced information",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Active sessions retrieved successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Active sessions retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
 
@@ -118,16 +129,16 @@ public static class SessionManagementEndpoints
             .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
             .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new(operation)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
             {
                 Summary = "Terminate specific session",
                 Description = "Terminates a specific session by ID",
-                Responses = new()
+                Responses = new OpenApiResponses
                 {
-                    ["200"] = new() { Description = "Session terminated successfully" },
-                    ["401"] = new() { Description = "User not authenticated" },
-                    ["404"] = new() { Description = "Session not found" },
-                    ["500"] = new() { Description = "Internal server error" }
+                    ["200"] = new OpenApiResponse { Description = "Session terminated successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
+                    ["404"] = new OpenApiResponse { Description = "Session not found" },
+                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
                 }
             });
     }

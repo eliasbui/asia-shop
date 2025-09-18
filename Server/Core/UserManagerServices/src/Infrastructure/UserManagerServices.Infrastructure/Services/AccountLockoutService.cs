@@ -1,4 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 using UserManagerServices.Application.Common.Interfaces;
 using UserManagerServices.Domain.Entities;

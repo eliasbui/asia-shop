@@ -1,25 +1,21 @@
-﻿namespace UserManagerServices.API.Middleware;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+namespace UserManagerServices.API.Middleware;
 
 /// <summary>
 /// Middleware for adding security headers to HTTP responses
 /// Implements security best practices for web APIs
 /// </summary>
-public class SecurityHeadersMiddleware
+public class SecurityHeadersMiddleware(RequestDelegate next, ILogger<SecurityHeadersMiddleware> logger)
 {
-    private readonly RequestDelegate _next;
-    private readonly ILogger<SecurityHeadersMiddleware> _logger;
-
-    /// <summary>
-    /// Initializes a new instance of the SecurityHeadersMiddleware
-    /// </summary>
-    /// <param name="next">Next middleware in the pipeline</param>
-    /// <param name="logger">Logger instance</param>
-    public SecurityHeadersMiddleware(RequestDelegate next, ILogger<SecurityHeadersMiddleware> logger)
-    {
-        _next = next ?? throw new ArgumentNullException(nameof(next));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
-
     /// <summary>
     /// Invokes the middleware
     /// </summary>
@@ -30,7 +26,7 @@ public class SecurityHeadersMiddleware
         // Add security headers
         AddSecurityHeaders(context);
 
-        await _next(context);
+        await next(context);
     }
 
     /// <summary>
@@ -105,8 +101,8 @@ public static class SecurityHeadersMiddlewareExtensions
     /// </summary>
     /// <param name="builder">Application builder</param>
     /// <returns>Application builder for chaining</returns>
-    public static IApplicationBuilder UseSecurityHeaders(this IApplicationBuilder builder)
+    public static void UseSecurityHeaders(this IApplicationBuilder builder)
     {
-        return builder.UseMiddleware<SecurityHeadersMiddleware>();
+        builder.UseMiddleware<SecurityHeadersMiddleware>();
     }
 }

@@ -1,13 +1,23 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using MediatR;
 using UserManagerServices.Application.Features.Mfa.Commands;
 using UserManagerServices.Application.Features.Mfa.Queries;
 using UserManagerServices.Application.Features.Mfa.Responses;
 using UserManagerServices.Application.Common.Models;
 using UserManagerServices.API.Common;
+using Microsoft.OpenApi.Models;
+using UserManagerServices.API.Records;
 
-namespace UserManagerServices.API.Endpoints;
+namespace UserManagerServices.API.Endpoints.v1;
 
 /// <summary>
 /// Multi-Factor Authentication endpoints
@@ -31,9 +41,20 @@ public static class MfaEndpoints
             .WithName("SetupMfa")
             .WithSummary("Setup MFA for the current user")
             .WithDescription("Initiates MFA setup by generating TOTP secret and QR code")
-            .Produces<BaseResponse<MfaSetupResponse>>(200)
+            .Produces<BaseResponse<MfaSetupResponse>>()
             .Produces<BaseResponse<MfaSetupResponse>>(400)
-            .Produces(401);
+            .Produces(401)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Setup MFA for the current user",
+                Description = "Initiates MFA setup by generating TOTP secret and QR code",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "MFA setup successful" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" }
+                }
+            });
 
         // Enable MFA - Complete setup with TOTP verification
         mfaGroup.MapPost("/enable", EnableMfa)
@@ -41,9 +62,20 @@ public static class MfaEndpoints
             .WithName("EnableMfa")
             .WithSummary("Enable MFA for the current user")
             .WithDescription("Enables MFA after verifying TOTP code and returns backup codes")
-            .Produces<BaseResponse<MfaEnableResponse>>(200)
+            .Produces<BaseResponse<MfaEnableResponse>>()
             .Produces<BaseResponse<MfaEnableResponse>>(400)
-            .Produces(401);
+            .Produces(401)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Enable MFA for the current user",
+                Description = "Enables MFA after verifying TOTP code and returns backup codes",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "MFA enabled successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" }
+                }
+            });
 
         // Verify MFA - Used during login process
         mfaGroup.MapPost("/verify", VerifyMfa)
@@ -51,8 +83,18 @@ public static class MfaEndpoints
             .WithName("VerifyMfa")
             .WithSummary("Verify MFA code during authentication")
             .WithDescription("Verifies MFA code (TOTP, backup code, or email OTP) during login")
-            .Produces<BaseResponse<bool>>(200)
-            .Produces<BaseResponse<bool>>(400);
+            .Produces<BaseResponse<bool>>()
+            .Produces<BaseResponse<bool>>(400)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Verify MFA code during authentication",
+                Description = "Verifies MFA code (TOTP, backup code, or email OTP) during login",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "MFA code verified successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" }
+                }
+            });
 
         // Disable MFA
         mfaGroup.MapPost("/disable", DisableMfa)
@@ -60,9 +102,20 @@ public static class MfaEndpoints
             .WithName("DisableMfa")
             .WithSummary("Disable MFA for the current user")
             .WithDescription("Disables MFA after verifying current password and MFA code")
-            .Produces<BaseResponse<bool>>(200)
+            .Produces<BaseResponse<bool>>()
             .Produces<BaseResponse<bool>>(400)
-            .Produces(401);
+            .Produces(401)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Disable MFA for the current user",
+                Description = "Disables MFA after verifying current password and MFA code",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "MFA disabled successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" }
+                }
+            });
 
         // Generate backup codes
         mfaGroup.MapPost("/backup-codes/generate", GenerateBackupCodes)
@@ -70,9 +123,20 @@ public static class MfaEndpoints
             .WithName("GenerateBackupCodes")
             .WithSummary("Generate new backup codes")
             .WithDescription("Generates new backup codes for the current user")
-            .Produces<BaseResponse<List<string>>>(200)
+            .Produces<BaseResponse<List<string>>>()
             .Produces<BaseResponse<List<string>>>(400)
-            .Produces(401);
+            .Produces(401)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Generate new backup codes",
+                Description = "Generates new backup codes for the current user",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "Backup codes generated successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" }
+                }
+            });
 
         // Get MFA status
         mfaGroup.MapGet("/status", GetMfaStatus)
@@ -80,8 +144,18 @@ public static class MfaEndpoints
             .WithName("GetMfaStatus")
             .WithSummary("Get MFA status for the current user")
             .WithDescription("Returns current MFA configuration and status")
-            .Produces<BaseResponse<MfaStatusResponse>>(200)
-            .Produces(401);
+            .Produces<BaseResponse<MfaStatusResponse>>()
+            .Produces(401)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Get MFA status for the current user",
+                Description = "Returns current MFA configuration and status",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "MFA status retrieved successfully" },
+                    ["401"] = new OpenApiResponse { Description = "User not authenticated" }
+                }
+            });
 
         // Send email OTP
         mfaGroup.MapPost("/email-otp/send", SendEmailOtp)
@@ -89,8 +163,39 @@ public static class MfaEndpoints
             .WithName("SendEmailOtp")
             .WithSummary("Send email OTP for MFA verification")
             .WithDescription("Sends an OTP code to the user's email for MFA verification")
-            .Produces<BaseResponse<bool>>(200)
-            .Produces<BaseResponse<bool>>(400);
+            .Produces<BaseResponse<bool>>()
+            .Produces<BaseResponse<bool>>(400)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Send email OTP for MFA verification",
+                Description = "Sends an OTP code to the user's email for MFA verification",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "Email OTP sent successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" }
+                }
+            });
+
+        // Regenerate QR code
+        mfaGroup.MapPost("/generate-qr", GenerateQrCode)
+            .RequireAuthorization()
+            .WithName("GenerateQrCode")
+            .WithSummary("Generate QR code for MFA setup")
+            .WithDescription("Generate QR code with a new 60-second expiration time")
+            .Produces<BaseResponse<MfaSetupResponse>>()
+            .Produces<BaseResponse<MfaSetupResponse>>(400)
+            .Produces(401)
+            .WithOpenApi(operation => new OpenApiOperation(operation)
+            {
+                Summary = "Generate QR code for MFA setup",
+                Description = "Generate QR code with a new 60-second expiration time",
+                Responses = new OpenApiResponses
+                {
+                    ["200"] = new OpenApiResponse { Description = "QR code Generate successfully" },
+                    ["400"] = new OpenApiResponse { Description = "Invalid request or validation errors" },
+                    ["401"] = new OpenApiResponse { Description = "Unauthorized" }
+                }
+            });
 
         return app;
     }
@@ -331,29 +436,40 @@ public static class MfaEndpoints
         }
     }
 
+    /// <summary>
+    /// Regenerate QR code endpoint handler
+    /// </summary>
+    private static async Task<IResult> GenerateQrCode(
+        GenerateQrCodeRequest request,
+        HttpContext context,
+        IMediator mediator,
+        ILogger<Program> logger)
+    {
+        try
+        {
+            var userId = ApiHelpers.GetCurrentUserId(context);
+            var command = new GenerateQrCodeCommand
+            {
+                UserId = userId,
+                SetupSessionId = request.SetupSessionId
+            };
+
+            var result = await mediator.Send(command);
+
+            return result.IsSuccess
+                ? Results.Ok(result)
+                : Results.BadRequest(result);
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Results.Unauthorized();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error regenerating QR code");
+            return Results.StatusCode(500);
+        }
+    }
+
     #endregion
 }
-
-#region Request Models
-
-/// <summary>
-/// Request model for enabling MFA
-/// </summary>
-public record EnableMfaRequest(string TotpCode);
-
-/// <summary>
-/// Request model for verifying MFA
-/// </summary>
-public record VerifyMfaRequest(Guid UserId, string MfaCode, string MfaType);
-
-/// <summary>
-/// Request model for disabling MFA
-/// </summary>
-public record DisableMfaRequest(string CurrentPassword, string MfaCode, string? Reason = null);
-
-/// <summary>
-/// Request model for sending email OTP
-/// </summary>
-public record SendEmailOtpRequest(Guid UserId, string? Purpose = "MFA");
-
-#endregion

@@ -1,4 +1,15 @@
-﻿using UserManagerServices.API.Endpoints;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using UserManagerServices.API.Endpoints;
+using UserManagerServices.API.Endpoints.v1;
 
 namespace UserManagerServices.API.Extensions;
 
@@ -28,8 +39,5 @@ public static class EndpointExtensions
 
         // Map admin endpoints
         app.MapAdminEndpoints();
-
-        // Map health check endpoints
-        app.MapHealthEndpoints();
     }
 }

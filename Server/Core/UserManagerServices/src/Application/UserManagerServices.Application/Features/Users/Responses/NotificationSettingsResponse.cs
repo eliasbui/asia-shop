@@ -1,4 +1,14 @@
-﻿using UserManagerServices.Application.Features.Users.Commands;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using UserManagerServices.Application.Features.Users.Commands;
 
 namespace UserManagerServices.Application.Features.Users.Responses;
 

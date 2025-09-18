@@ -1,4 +1,14 @@
-﻿using Dapper;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using Dapper;
 using Microsoft.EntityFrameworkCore;
 using UserManagerServices.Domain.Entities;
 using UserManagerServices.Domain.Enums;

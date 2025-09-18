@@ -1,4 +1,14 @@
-﻿using System.Security.Claims;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -7,7 +17,7 @@ using UserManagerServices.Application.Features.Authentication.Commands;
 using UserManagerServices.Application.Features.Authentication.Queries;
 using UserManagerServices.Application.Features.Authentication.Responses;
 
-namespace UserManagerServices.API.Endpoints;
+namespace UserManagerServices.API.Endpoints.v1;
 
 /// <summary>
 /// Authentication endpoints for user login, logout, and token management
@@ -20,7 +30,6 @@ public static class AuthEndpoints
     /// </summary>
     /// <param name="app">Web application</param>
     /// <returns>Web application for chaining</returns>
-    [ApiVersion("1.0")]
     public static void MapAuthEndpoints(this WebApplication app)
     {
         var authGroup = app.MapGroup("api/v1/auth")

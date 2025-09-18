@@ -1,6 +1,16 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿#region Author File
+
+// /*
+//  * Author: Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
 using System.Security.Claims;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using UserManagerServices.API.Common;
 using UserManagerServices.Application.Features.Admin.Commands;
@@ -8,7 +18,7 @@ using UserManagerServices.Application.Features.Admin.Queries;
 using UserManagerServices.Application.Features.Admin.Responses;
 using UserManagerServices.Application.Features.Users.Responses;
 
-namespace UserManagerServices.API.Endpoints;
+namespace UserManagerServices.API.Endpoints.v1;
 
 /// <summary>
 /// Admin endpoints for user management system

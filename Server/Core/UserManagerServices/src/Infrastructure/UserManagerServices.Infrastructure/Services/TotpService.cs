@@ -1,4 +1,14 @@
-﻿using System.Security.Cryptography;
+﻿#region Author File
+
+// /*
+//  * Author: $Eliasbui
+//  * Created: 2025/09/18
+//  * Description: This code is not for the faint of heart!!
+//  */
+
+#endregion
+
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
