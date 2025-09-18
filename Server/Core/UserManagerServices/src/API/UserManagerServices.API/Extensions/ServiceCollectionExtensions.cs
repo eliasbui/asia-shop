@@ -141,7 +141,7 @@ public static class WebApplicationExtensions
             app.MapScalarApiReference(options =>
             {
                 options.Title = "User Manager Services API";
-                options.Theme = ScalarTheme.BluePlanet;
+                options.Theme = ScalarTheme.Purple;
                 options.DefaultHttpClient =
                     new KeyValuePair<ScalarTarget, ScalarClient>(ScalarTarget.CSharp, ScalarClient.HttpClient);
             });

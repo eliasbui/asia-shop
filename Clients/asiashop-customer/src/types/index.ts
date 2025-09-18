@@ -21,18 +21,61 @@ export interface UserPreference {
   timezone: string
 }
 
+// Category and Brand types
+export interface Category {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  image?: string
+  parentId?: string | null
+  isActive: boolean
+  sortOrder: number
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface Brand {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  logo?: string
+  website?: string
+  isActive: boolean
+  createdAt?: Date
+  updatedAt?: Date
+}
+
 // Product types
-export interface ProductWithDetails extends Product {
-  category: {
-    id: string
-    name: string
-    slug: string
-  }
-  brand?: {
-    id: string
-    name: string
-    slug: string
-  }
+export interface ProductWithDetails {
+  id: string
+  name: string
+  slug: string
+  description?: string
+  shortDescription?: string
+  sku: string
+  price: number
+  comparePrice?: number
+  cost?: number
+  weight?: number
+  dimensions?: any
+  images: string[]
+  inventory: number
+  lowStockThreshold: number
+  trackInventory: boolean
+  allowBackorder: boolean
+  isActive: boolean
+  isFeatured: boolean
+  metaTitle?: string
+  metaDescription?: string
+  tags?: string[]
+  rating: number
+  reviewCount: number
+  createdAt: Date
+  updatedAt: Date
+  category: Category
+  brand?: Brand
   variants: ProductVariant[]
   reviews: ReviewWithUser[]
 }
