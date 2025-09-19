@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MongoDB.EntityFrameworkCore" Version="9.0.1"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.9"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.9"/>
+        <PackageReference Include="Confluent.Kafka" Version="2.11.1"/>
+        <PackageReference Include="MailKit" Version="4.13.0"/>
+        <PackageReference Include="MimeKit" Version="4.13.0"/>
+        <PackageReference Include="Twilio" Version="7.13.1"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9"/>
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="9.0.9"/>
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" Version="9.0.9"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Application\NotificationService.Application\NotificationService.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

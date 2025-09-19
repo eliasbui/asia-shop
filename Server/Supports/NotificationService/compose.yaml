@@ -1,0 +1,62 @@
+﻿services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=Abc@12345
+      - MONGO_INITDB_DATABASE=asiashop
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - notification-network
+      - asiashop-network
+
+  zookeeper:
+    image: bitnami/zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=no
+      - ZOO_ENABLE_AUTH=yes
+      - ZOO_SERVER_USERS=admin
+      - ZOO_SERVER_PASSWORDS=Abc@12345
+    volumes:
+      - zookeeper_data:/bitnami/zookeeper
+    networks:
+      - notification-network
+      - asiashop-network
+
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CLIENT_USER=admin
+      - KAFKA_CLIENT_PASSWORD=Abc@12345
+      - KAFKA_INTER_BROKER_USER=admin
+      - KAFKA_INTER_BROKER_PASSWORD=Abc@12345
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
+    volumes:
+      - kafka_data:/bitnami/kafka
+    networks:
+      - notification-network
+      - asiashop-network
+
+volumes:
+  mongo_data:
+  kafka_data:
+  zookeeper_data:
+
+networks:
+  notification-network:
+  asiashop-network:
