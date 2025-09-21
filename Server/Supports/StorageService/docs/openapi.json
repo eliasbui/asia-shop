@@ -1,0 +1,746 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AsiaShop Storage Service API",
+    "description": "A comprehensive file storage service with user authentication, file management, and administrative features. Built with Go, Gin, MinIO, and MySQL.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "AsiaShop Development Team",
+      "url": "https://github.com/eliasbui/asia-shop"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Development server"
+    }
+  ],
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token obtained from external authentication service"
+      }
+    },
+    "schemas": {
+      "FileResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique file identifier"
+          },
+          "original_name": {
+            "type": "string",
+            "description": "Original filename as uploaded"
+          },
+          "stored_name": {
+            "type": "string",
+            "description": "Internal storage filename"
+          },
+          "file_size": {
+            "type": "integer",
+            "format": "int64",
+            "description": "File size in bytes"
+          },
+          "mime_type": {
+            "type": "string",
+            "description": "MIME type of the file"
+          },
+          "is_public": {
+            "type": "boolean",
+            "description": "Whether the file is publicly accessible"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Custom metadata associated with the file"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "File creation timestamp"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "File last update timestamp"
+          },
+          "download_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Presigned download URL (optional)"
+          }
+        },
+        "required": ["id", "original_name", "stored_name", "file_size", "mime_type", "is_public", "metadata", "created_at", "updated_at"]
+      },
+      "FileListResponse": {
+        "type": "object",
+        "properties": {
+          "files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileResponse"
+            }
+          }
+        },
+        "required": ["files"]
+      },
+      "MultiFileUploadResponse": {
+        "type": "object",
+        "properties": {
+          "uploaded_files": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FileResponse"
+            }
+          },
+          "uploaded_count": {
+            "type": "integer",
+            "description": "Number of successfully uploaded files"
+          },
+          "total_files": {
+            "type": "integer",
+            "description": "Total number of files in the request"
+          },
+          "failed_files": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of files that failed to upload with error messages"
+          },
+          "failed_count": {
+            "type": "integer",
+            "description": "Number of files that failed to upload"
+          }
+        },
+        "required": ["uploaded_files", "uploaded_count", "total_files"]
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "current_page": {
+            "type": "integer",
+            "description": "Current page number"
+          },
+          "page_size": {
+            "type": "integer",
+            "description": "Number of items per page"
+          },
+          "total_items": {
+            "type": "integer",
+            "description": "Total number of items"
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "Total number of pages"
+          },
+          "has_next": {
+            "type": "boolean",
+            "description": "Whether there is a next page"
+          },
+          "has_prev": {
+            "type": "boolean",
+            "description": "Whether there is a previous page"
+          }
+        },
+        "required": ["current_page", "page_size", "total_items", "total_pages", "has_next", "has_prev"]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "Error code"
+              },
+              "message": {
+                "type": "string",
+                "description": "Error message"
+              },
+              "details": {
+                "type": "string",
+                "description": "Additional error details"
+              }
+            },
+            "required": ["code", "message"]
+          }
+        },
+        "required": ["success", "error"]
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/files/upload": {
+      "post": {
+        "tags": ["Files"],
+        "summary": "Upload a single file",
+        "description": "Upload a single file to the storage service",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The file to upload"
+                  },
+                  "is_public": {
+                    "type": "boolean",
+                    "description": "Whether the file should be publicly accessible",
+                    "default": false
+                  },
+                  "metadata": {
+                    "type": "string",
+                    "description": "JSON string containing custom metadata"
+                  }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FileResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - invalid file or parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - invalid or missing JWT token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large - file exceeds maximum size",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/multi-upload": {
+      "post": {
+        "tags": ["Files"],
+        "summary": "Upload multiple files",
+        "description": "Upload multiple files in a single request (maximum 10 files)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "files": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    },
+                    "maxItems": 10,
+                    "description": "Array of files to upload (max 10)"
+                  },
+                  "is_public": {
+                    "type": "boolean",
+                    "description": "Whether the files should be publicly accessible",
+                    "default": false
+                  }
+                },
+                "required": ["files"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Multi-file upload completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/MultiFileUploadResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "List user files",
+        "description": "Get a paginated list of files uploaded by the authenticated user",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (default: 1)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items per page (default: 20, max: 100)",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search term to filter files by filename",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "mime_type",
+            "in": "query",
+            "description": "Filter by MIME type (exact match or category like 'image')",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of user files",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FileListResponse"
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/{id}": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "Get file details",
+        "description": "Get details of a specific file by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "File ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "include_download_url",
+            "in": "query",
+            "description": "Include presigned download URL in response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FileResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Files"],
+        "summary": "Update file metadata",
+        "description": "Update file metadata such as name, public status, or custom metadata",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "File ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "original_name": {
+                    "type": "string",
+                    "description": "New filename"
+                  },
+                  "is_public": {
+                    "type": "boolean",
+                    "description": "Public access flag"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Custom metadata"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/FileResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Files"],
+        "summary": "Delete file",
+        "description": "Delete a file from both storage and database",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "File ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string",
+                          "example": "File deleted successfully"
+                        },
+                        "file_id": {
+                          "type": "string",
+                          "format": "uuid"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/files/{id}/download": {
+      "get": {
+        "tags": ["Files"],
+        "summary": "Download file",
+        "description": "Download a file directly from storage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "File ID",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File content",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "headers": {
+              "Content-Disposition": {
+                "description": "Attachment with original filename",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Content-Type": {
+                "description": "File MIME type",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Content-Length": {
+                "description": "File size in bytes",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "File not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/docs": {
+      "get": {
+        "tags": ["Documentation"],
+        "summary": "API Documentation",
+        "description": "Interactive API documentation using Scalar",
+        "responses": {
+          "200": {
+            "description": "HTML documentation page",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/docs/openapi.json": {
+      "get": {
+        "tags": ["Documentation"],
+        "summary": "OpenAPI Specification",
+        "description": "OpenAPI 3.0 specification in JSON format",
+        "responses": {
+          "200": {
+            "description": "OpenAPI specification",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Files",
+      "description": "File upload, download, and management operations"
+    },
+    {
+      "name": "Documentation",
+      "description": "API documentation and specification endpoints"
+    }
+  ]
+}

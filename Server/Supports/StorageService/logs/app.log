@@ -1,0 +1,67 @@
+{"level":"fatal","msg":"Failed to connect to database:dial tcp 127.0.0.1:3306: connect: connection refused","time":"2025-09-21T01:52:08.084+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:dial tcp 127.0.0.1:3306: connect: connection refused","time":"2025-09-21T02:11:14.449+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:dial tcp 127.0.0.1:3306: connect: connection refused","time":"2025-09-21T02:26:19.050+07:00"}
+{"level":"fatal","msg":"Failed to initialize MinIO service:failed to ensure bucket exists: failed to check bucket existence: Head \"http://localhost:9000/files/\": dial tcp 127.0.0.1:9000: connect: connection refused","time":"2025-09-21T12:22:34.383+07:00"}
+{"bucket":"files","level":"info","msg":"MinIO bucket created","time":"2025-09-21T12:23:23.248+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-21T12:23:23.248+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/","request_id":"7dd3e12e-5992-4284-8c3e-62fec609ff4f","response_time":"4.291µs","status_code":404,"time":"2025-09-21T12:23:39.280+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/favicon.ico","request_id":"f6ca3def-38ef-4825-b1a5-0db944ac10db","response_time":"1.25µs","status_code":404,"time":"2025-09-21T12:23:39.428+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"4b480d20-a5b0-4110-9d7f-1679e7e39609","response_time":"10.6655ms","status_code":200,"time":"2025-09-21T12:23:47.113+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"029e7dc4-3516-45ff-959b-b816ae37f33f","response_time":"16.550208ms","status_code":200,"time":"2025-09-21T12:23:47.115+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/api/v1/health","request_id":"a2ca8494-7bca-425c-885f-f4aa12172410","response_time":"2.75µs","status_code":404,"time":"2025-09-21T12:23:54.110+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/api/v1/metrics","request_id":"623eab2e-db90-4475-bce5-b694cbbfb992","response_time":"2.875µs","status_code":404,"time":"2025-09-21T12:23:59.695+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/api/v1/metrics","request_id":"b20253d6-0a4a-4940-a65c-ac9eff08b263","response_time":"1.458µs","status_code":404,"time":"2025-09-21T12:24:00.553+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/api/v1/metrics","request_id":"a15aaca3-9441-4d6a-8b52-1657773e9a01","response_time":"2.5µs","status_code":404,"time":"2025-09-21T12:24:00.755+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/api/v1/metrics","request_id":"97c0cfba-61c3-4157-9ace-4073e982d9cd","response_time":"2µs","status_code":404,"time":"2025-09-21T12:24:00.952+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/api/v1/metrics","request_id":"1bbbd9b6-123a-416b-8315-77afdece81a5","response_time":"1.25µs","status_code":404,"time":"2025-09-21T12:24:01.138+07:00"}
+{"level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"25a0cd7a-8803-4c3c-9461-0968e101a9c2","response_time":"376.25µs","status_code":401,"time":"2025-09-21T12:24:05.805+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/api/v1/profile","request_id":"4be1dc83-b35a-4605-bd5c-601d27a71be0","response_time":"2.667µs","status_code":404,"time":"2025-09-21T12:24:12.042+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"d5e75c53-c8c0-44b9-8217-fdd9e35b1809","response_time":"6.815ms","status_code":200,"time":"2025-09-21T12:25:38.503+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"d660a34e-71b3-4db4-85b0-871e9fcb5798","response_time":"15.558292ms","status_code":200,"time":"2025-09-21T12:25:38.506+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"75efb3a7-00f4-4ba5-bb3b-40a45b689653","response_time":"104.417µs","status_code":200,"time":"2025-09-21T12:25:38.933+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"54b09e7c-8c0f-45a8-80d6-a623a1ec7237","response_time":"710.125µs","status_code":200,"time":"2025-09-21T12:25:38.933+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"d6d122e7-d229-4d62-80a3-d0fac710976c","response_time":"208.417µs","status_code":200,"time":"2025-09-21T12:25:40.714+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"5a777bfc-6cfc-495c-811d-b029280ecceb","response_time":"2.288917ms","status_code":200,"time":"2025-09-21T12:25:40.716+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-21T12:25:49.530+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-21T12:25:49.531+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-21T12:25:51.086+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"777dfc36-ddd3-444e-a83f-2c6d5e9c13ee","response_time":"10.438042ms","status_code":200,"time":"2025-09-21T12:26:03.585+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"bb0fe0c1-eafd-45c9-a8c0-bf9f67a7c2bf","response_time":"15.331584ms","status_code":200,"time":"2025-09-21T12:26:03.588+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"8777370f-714e-4d9f-85f7-d192c9e95a51","response_time":"191.75µs","status_code":200,"time":"2025-09-21T12:26:08.603+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"b9c9614c-9d3d-4438-b43d-c70a80de4347","response_time":"1.895709ms","status_code":200,"time":"2025-09-21T12:26:08.604+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"275c629f-a4f6-4241-8ec7-2c9fffc66b4b","response_time":"1.375µs","status_code":404,"time":"2025-09-21T12:26:12.224+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"4bfb3350-442d-441a-84d7-ffc9b10ed8e3","response_time":"176.709µs","status_code":200,"time":"2025-09-21T12:26:14.505+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"aba16ec5-4393-4361-9bc7-5ddf321288b7","response_time":"848.25µs","status_code":200,"time":"2025-09-21T12:26:14.505+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"0f1249ea-8993-4991-97e9-c580d8a8dbf4","response_time":"2.25µs","status_code":404,"time":"2025-09-21T12:26:14.519+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"116d8bb4-9020-40e1-859f-e2a6f51cb85e","response_time":"962.25µs","status_code":200,"time":"2025-09-21T12:26:31.424+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"6ba2c62d-e990-4008-9d26-e4916dfad701","response_time":"17.067ms","status_code":200,"time":"2025-09-21T12:26:31.438+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"e65aaf51-4ea6-4c6d-8a3c-e889066d0a40","response_time":"2.417µs","status_code":404,"time":"2025-09-21T12:26:31.472+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"44938518-3668-4de0-8f28-ff15e029d8be","response_time":"108.375µs","status_code":200,"time":"2025-09-21T12:26:32.386+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"240c2f49-e838-40bf-a2cf-8d97f8a8ea08","response_time":"560.417µs","status_code":200,"time":"2025-09-21T12:26:32.386+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"3be9b2ff-b138-4e19-9f1e-590cea5b8b29","response_time":"1.334µs","status_code":404,"time":"2025-09-21T12:26:32.402+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-21T12:27:21.696+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-21T12:27:21.697+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-21T12:27:22.864+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"09a15773-39ce-4a23-9114-5077a27feb42","response_time":"4.415292ms","status_code":200,"time":"2025-09-21T12:27:26.383+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"81fac920-a13c-4a42-be92-5d5736afb582","response_time":"11.167959ms","status_code":200,"time":"2025-09-21T12:27:26.384+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"d0987490-b963-426d-8be3-3fb6a6deb78d","response_time":"1.125µs","status_code":404,"time":"2025-09-21T12:27:26.414+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"7fd5a89a-b39a-4643-845b-0252636834c7","response_time":"169.292µs","status_code":200,"time":"2025-09-21T12:27:27.576+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"4a0d4f98-b9c1-4780-b2a2-96ef831609dd","response_time":"1.587417ms","status_code":200,"time":"2025-09-21T12:27:27.577+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"36f7f6e0-bb0a-4568-8a6f-c5147efde685","response_time":"1.417µs","status_code":404,"time":"2025-09-21T12:27:27.591+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-21T12:29:41.225+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-21T12:29:41.226+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-21T18:49:53.563+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-21T18:50:36.645+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-21T18:50:36.647+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-21T18:54:07.380+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"d7a71d97-0e53-472c-9f4b-fc1d795eaf0a","response_time":"22.076875ms","status_code":200,"time":"2025-09-21T18:54:09.820+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"a07b8449-2d41-4ddd-91f3-1646a9d0a2c5","response_time":"47.525584ms","status_code":200,"time":"2025-09-21T18:54:09.821+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"7a76fc4f-a7a9-499f-9691-d65b5db0febe","response_time":"366.167µs","status_code":200,"time":"2025-09-21T18:54:11.770+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"de5f6262-4583-471b-b364-ae8233c32713","response_time":"1.50625ms","status_code":200,"time":"2025-09-21T18:54:11.771+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"81371fcd-9509-44fb-b4b6-6dcc9e906c37","response_time":"1.084µs","status_code":404,"time":"2025-09-21T18:54:11.814+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"c4396f7f-7961-4588-ac56-5c61d9c31a81","response_time":"3.461667ms","status_code":200,"time":"2025-09-21T18:56:27.041+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"5cbd9eb0-ce5d-4159-8e88-eeb73fa78877","response_time":"13.405584ms","status_code":200,"time":"2025-09-21T18:56:27.042+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"e3b7e2af-b2d4-40c3-b723-fc7b91f9aa88","response_time":"17.584µs","status_code":404,"time":"2025-09-21T18:56:27.056+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-21T19:12:00.492+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-21T19:12:00.499+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1049 (42000): Unknown database 'storage-service'","time":"2025-09-21T23:36:11.017+07:00"}
