@@ -154,14 +154,128 @@ func GetRequestID(c *gin.Context) string {
 	return ""
 }
 
-// GetUserID extracts user ID from context
+// GetUserID extracts user ID from context and converts to UUID
 func GetUserID(c *gin.Context) uuid.UUID {
 	if userID, exists := c.Get("user_id"); exists {
-		if id, ok := userID.(uuid.UUID); ok {
+		switch id := userID.(type) {
+		case uuid.UUID:
+			// Already a UUID
 			return id
+		case string:
+			// Convert string to UUID
+			if parsed, err := uuid.Parse(id); err == nil {
+				return parsed
+			}
 		}
 	}
 	return uuid.Nil
+}
+
+// GetUserIDString extracts user ID from context as string
+func GetUserIDString(c *gin.Context) string {
+	if userID, exists := c.Get("user_id"); exists {
+		switch id := userID.(type) {
+		case string:
+			// Already a string
+			return id
+		case uuid.UUID:
+			// Convert UUID to string
+			return id.String()
+		}
+	}
+	return ""
+}
+
+// GetUserEmail extracts user email from context
+func GetUserEmail(c *gin.Context) string {
+	if email, exists := c.Get("user_email"); exists {
+		if emailStr, ok := email.(string); ok {
+			return emailStr
+		}
+	}
+	return ""
+}
+
+// GetUserUsername extracts username from context
+func GetUserUsername(c *gin.Context) string {
+	if username, exists := c.Get("user_username"); exists {
+		if usernameStr, ok := username.(string); ok {
+			return usernameStr
+		}
+	}
+	return ""
+}
+
+// GetUserRoles extracts user roles from context
+func GetUserRoles(c *gin.Context) []string {
+	if roles, exists := c.Get("user_roles"); exists {
+		if roleSlice, ok := roles.([]string); ok {
+			return roleSlice
+		}
+	}
+	return []string{}
+}
+
+// GetUserFullName extracts user full name from context
+func GetUserFullName(c *gin.Context) string {
+	if fullName, exists := c.Get("user_full_name"); exists {
+		if nameStr, ok := fullName.(string); ok {
+			return nameStr
+		}
+	}
+	return ""
+}
+
+// IsEmailConfirmed checks if user email is confirmed
+func IsEmailConfirmed(c *gin.Context) bool {
+	if confirmed, exists := c.Get("email_confirmed"); exists {
+		if confirmedBool, ok := confirmed.(bool); ok {
+			return confirmedBool
+		}
+	}
+	return false
+}
+
+// HasRole checks if user has a specific role
+func HasRole(c *gin.Context, role string) bool {
+	roles := GetUserRoles(c)
+	for _, userRole := range roles {
+		if userRole == role {
+			return true
+		}
+	}
+	return false
+}
+
+// HasAnyRole checks if user has any of the specified roles
+func HasAnyRole(c *gin.Context, roles ...string) bool {
+	userRoles := GetUserRoles(c)
+	for _, userRole := range userRoles {
+		for _, requiredRole := range roles {
+			if userRole == requiredRole {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+// IsAuthenticated checks if user is authenticated (has valid user_id)
+func IsAuthenticated(c *gin.Context) bool {
+	userID := GetUserIDString(c)
+	return userID != ""
+}
+
+// RequireAuthentication middleware to ensure user is authenticated
+func RequireAuthentication() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !IsAuthenticated(c) {
+			UnauthorizedError(c, "User not authenticated")
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }
 
 // CalculatePagination calculates pagination metadata

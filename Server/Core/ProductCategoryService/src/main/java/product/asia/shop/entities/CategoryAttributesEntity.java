@@ -10,44 +10,54 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "CATEGORY_ATTRIBUTES") // -- Which attributes in which category (category-specific features)
+@Table(name = "CATEGORY_ATTRIBUTES")
 public class CategoryAttributesEntity extends BaseEntity {
 
-    @Column(name = "CATEGORY_ID", nullable = false, length = 36)
-    private UUID categoryId;
+    // Remove these duplicate column mappings
+    // @Column(name = "CATEGORY_ID", nullable = false, length = 36)
+    // private UUID categoryId;
 
-    @Column(name = "ATTRIBUTE_ID", nullable = false, length = 36)
-    private UUID attributeId;
+    // @Column(name = "ATTRIBUTE_ID", nullable = false, length = 36)
+    // private UUID attributeId;
 
     // display order
     @Column(name = "DISPLAY_ORDER", nullable = false, length = 100)
     private Integer displayOrder;
 
-    // refence table CATEGORIES
+    // reference table CATEGORIES
     @ManyToOne
     @JoinColumn(name = "CATEGORY_ID", nullable = false)
     private CategoriesEntity category;
 
-    // refence table ATTRIBUTES
+    // reference table ATTRIBUTES
     @ManyToOne
     @JoinColumn(name = "ATTRIBUTE_ID", nullable = false)
     private AttributesEntity attribute;
 
-    // Getter and Setter
-    public UUID getCategoryId() {
-        return categoryId;
+    // Getter and Setter methods for the relationship entities
+    public CategoriesEntity getCategory() {
+        return category;
     }
 
-    public void setCategoryId(UUID categoryId) {
-        this.categoryId = categoryId;
+    public void setCategory(CategoriesEntity category) {
+        this.category = category;
+    }
+
+    public AttributesEntity getAttribute() {
+        return attribute;
+    }
+
+    public void setAttribute(AttributesEntity attribute) {
+        this.attribute = attribute;
+    }
+
+    // Convenience methods to get IDs from relationships
+    public UUID getCategoryId() {
+        return category != null ? category.getId() : null;
     }
 
     public UUID getAttributeId() {
-        return attributeId;
-    }
-
-    public void setAttributeId(UUID attributeId) {
-        this.attributeId = attributeId;
+        return attribute != null ? attribute.getId() : null;
     }
 
     public Integer getDisplayOrder() {
@@ -58,17 +68,15 @@ public class CategoryAttributesEntity extends BaseEntity {
         this.displayOrder = displayOrder;
     }
 
-    // toString
     @Override
     public String toString() {
         return "CategoryAttributesEntity{" +
-                "categoryId=" + categoryId +
-                ", attributeId=" + attributeId +
+                "categoryId=" + getCategoryId() +
+                ", attributeId=" + getAttributeId() +
                 ", displayOrder=" + displayOrder +
                 '}';
     }
 
-    // equals
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -76,7 +84,9 @@ public class CategoryAttributesEntity extends BaseEntity {
         if (o == null || getClass() != o.getClass())
             return false;
         CategoryAttributesEntity that = (CategoryAttributesEntity) o;
-        return Objects.equals(super.getId(), that.getId()) && Objects.equals(categoryId, that.categoryId)
-                && Objects.equals(attributeId, that.attributeId) && Objects.equals(displayOrder, that.displayOrder);
+        return Objects.equals(super.getId(), that.getId()) &&
+                Objects.equals(getCategoryId(), that.getCategoryId()) &&
+                Objects.equals(getAttributeId(), that.getAttributeId()) &&
+                Objects.equals(displayOrder, that.displayOrder);
     }
 }

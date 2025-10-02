@@ -34,6 +34,9 @@ public static class ServiceCollectionExtensions
         // Add API Explorer for documentation (required for minimal APIs)
         services.AddEndpointsApiExplorer();
 
+        // Add output caching for JWKS endpoint
+        services.AddOutputCache();
+
         // Add CORS
         services.AddCors(options =>
         {

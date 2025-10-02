@@ -21,6 +21,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import product.asia.shop.dto.ApiResponse;
@@ -216,9 +217,9 @@ public class GlobalExceptionHandler {
     /**
      * Handle JPA EntityNotFoundException
      */
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler(jakarta.persistence.EntityNotFoundException.class)
     public ResponseEntity<ApiResponse<ErrorResponse>> handleJpaEntityNotFoundException(
-            EntityNotFoundException ex, WebRequest request) {
+            jakarta.persistence.EntityNotFoundException ex, WebRequest request) {
 
         logger.warn("JPA Entity not found: {}", ex.getMessage());
         ApiResponse<ErrorResponse> response = ApiResponse.error("Entity not found");

@@ -52,6 +52,7 @@ try
 
     app.UseHttpsRedirection();
     app.UseResponseCompression();
+    app.UseOutputCache();
     app.UseCors("DefaultCorsPolicy");
     app.UseAuthentication();
     app.UseAuthorization();

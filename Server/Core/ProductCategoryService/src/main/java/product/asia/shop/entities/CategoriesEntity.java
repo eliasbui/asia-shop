@@ -16,7 +16,7 @@ public class CategoriesEntity extends BaseEntity {
     @Column(name = "DESCRIPTION", nullable = false, length = 500)
     private String description;
 
-    @Column(name = "PARENT_ID", nullable = false, length = 36)
+    @Column(name = "PARENT_ID", nullable = false, length = 36, insertable = false, updatable = false)
     private UUID parentId;
 
     //Getter and Setter

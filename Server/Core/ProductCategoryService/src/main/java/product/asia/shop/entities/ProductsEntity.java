@@ -34,11 +34,11 @@ public class ProductsEntity extends BaseEntity {
     private String status; // ACTIVE, INACTIVE, SOLD_OUT, etc.
 
     // SHOP_ID
-    @Column(name = "SHOP_ID", nullable = false, length = 36)
+    @Column(name = "SHOP_ID", nullable = false, length = 36, insertable = false, updatable = false)
     private UUID shopId;
 
     // CATEGORY_ID
-    @Column(name = "CATEGORY_ID", nullable = false, length = 36)
+    @Column(name = "CATEGORY_ID", nullable = false, length = 36, insertable = false, updatable = false)
     private UUID categoryId;
 
     // refence table PRODUCT_CATEGORIES

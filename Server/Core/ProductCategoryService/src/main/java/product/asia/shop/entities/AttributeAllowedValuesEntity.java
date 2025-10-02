@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 @Table(name = "ATTRIBUTE_ALLOWED_VALUES") // --Attribute value options (select/multiselect)
 public class AttributeAllowedValuesEntity extends BaseEntity {
 
-    @Column(name = "ATTRIBUTE_ID", nullable = false, length = 36)
+    @Column(name = "ATTRIBUTE_ID", nullable = false, length = 36, insertable = false, updatable = false)
     private UUID attributeId;
 
     @Column(name = "VALUE", nullable = false, length = 100)
@@ -51,6 +51,14 @@ public class AttributeAllowedValuesEntity extends BaseEntity {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public AttributesEntity getAttribute() {
+        return attribute;
+    }
+
+    public void setAttribute(AttributesEntity attribute) {
+        this.attribute = attribute;
     }
 
     // toString

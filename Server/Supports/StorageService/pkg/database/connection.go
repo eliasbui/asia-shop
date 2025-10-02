@@ -9,7 +9,6 @@ import (
 	"gorm.io/gorm/logger"
 
 	"storage-service/internal/config"
-	"storage-service/internal/models"
 )
 
 func NewConnection(config config.DatabaseConfig) (*gorm.DB, error) {
@@ -37,10 +36,6 @@ func NewConnection(config config.DatabaseConfig) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetConnMaxLifetime(time.Hour)
-
-	if err := db.AutoMigrate(&models.File{}); err != nil {
-		return nil, err
-	}
 
 	return db, nil
 }

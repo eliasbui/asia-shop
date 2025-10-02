@@ -57,7 +57,7 @@ public class TokenService : ITokenService
     /// <param name="roles">User roles</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>JWT token string</returns>
-    public Task<string> GenerateAccessTokenAsync(User user, IList<string> roles,
+    public async Task<string> GenerateAccessTokenAsync(User user, IList<string> roles,
         CancellationToken cancellationToken = default)
     {
         try
@@ -67,10 +67,13 @@ public class TokenService : ITokenService
             var expiryMinutes = _configuration.GetValue<int>("Jwt:ExpiryInMinutes", 60);
             var expiry = issuedAt.AddMinutes(expiryMinutes);
 
+            var issuerUrl = _configuration["Jwt:IssuerUrl"] ?? _configuration["Jwt:Issuer"];
+            
             var claims = new List<Claim>
             {
                 new("sub", user.Id.ToString()),
                 new("jid", tokenId),
+                new("iss", issuerUrl!), // Issuer URL claim
                 new("iat", new DateTimeOffset(issuedAt).ToUnixTimeSeconds().ToString(),
                     ClaimValueTypes.Integer64),
                 new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -84,7 +87,12 @@ public class TokenService : ITokenService
             // Add role claims
             foreach (var role in roles) claims.Add(new Claim(ClaimTypes.Role, role));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!));
+            var keyBytes = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!);
+            var key = new SymmetricSecurityKey(keyBytes);
+            
+            // Generate key ID (kid) from the key
+            var keyId = await GenerateKeyIdAsync(keyBytes);
+            
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -97,16 +105,21 @@ public class TokenService : ITokenService
             };
 
             var token = _tokenHandler.CreateJwtSecurityToken(tokenDescriptor);
+            
+            // Add kid and alg to the JWT header
+            token.Header["kid"] = keyId;
+            token.Header["alg"] = SecurityAlgorithms.HmacSha256;
+            
             var tokenString = _tokenHandler.WriteToken(token);
 
             _logger.LogInformation("JWT token generated for user {UserId} with token ID {TokenId}", user.Id, tokenId);
 
-            return Task.FromResult(tokenString);
+            return tokenString;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating JWT token for user {UserId}", user.Id);
-            return Task.FromResult(string.Empty);
+            return string.Empty;
         }
     }
 
@@ -273,5 +286,17 @@ public class TokenService : ITokenService
             IssuerSigningKey = key,
             ClockSkew = TimeSpan.FromMinutes(5) // Allow 5 minutes clock skew
         };
+    }
+
+    /// <summary>
+    /// Generates a key ID from the key bytes
+    /// </summary>
+    /// <param name="keyBytes">Key bytes</param>
+    /// <returns>Key ID</returns>
+    private static async Task<string> GenerateKeyIdAsync(byte[] keyBytes)
+    {
+        using var sha256 = SHA256.Create();
+        var hash = await Task.Run(() => sha256.ComputeHash(keyBytes));
+        return Base64UrlEncoder.Encode(hash)[..8]; // Use first 8 characters of the hash
     }
 }

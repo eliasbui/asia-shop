@@ -65,3 +65,61 @@
 {"level":"info","msg":"Shutting down server...","time":"2025-09-21T19:12:00.492+07:00"}
 {"level":"info","msg":"Server exited","time":"2025-09-21T19:12:00.499+07:00"}
 {"level":"fatal","msg":"Failed to connect to database:Error 1049 (42000): Unknown database 'storage-service'","time":"2025-09-21T23:36:11.017+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1049 (42000): Unknown database 'storage-service'","time":"2025-09-22T00:04:00.387+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1049 (42000): Unknown database 'storage-service'","time":"2025-09-22T00:15:58.318+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1045 (28000): Access denied for user 'root'@'192.168.65.1' (using password: YES)","time":"2025-09-22T00:17:19.317+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1045 (28000): Access denied for user 'root'@'192.168.65.1' (using password: YES)","time":"2025-09-22T00:18:09.648+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1045 (28000): Access denied for user 'root'@'192.168.65.1' (using password: YES)","time":"2025-09-22T00:18:37.901+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1045 (28000): Access denied for user 'root'@'192.168.65.1' (using password: YES)","time":"2025-09-22T00:19:00.197+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1045 (28000): Access denied for user 'root'@'192.168.65.1' (using password: YES)","time":"2025-09-22T00:21:03.165+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1044 (42000): Access denied for user 'apiuser'@'%' to database 'storage_service'","time":"2025-09-22T00:29:43.890+07:00"}
+{"level":"fatal","msg":"Failed to connect to database:Error 1060 (42S21): Duplicate column name 'id'","time":"2025-09-22T00:30:23.600+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-22T00:31:08.703+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"775cff28-bff6-40d5-90e9-28d555fece6c","response_time":"10.698875ms","status_code":200,"time":"2025-09-22T00:31:23.490+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"cb2af45b-bc28-44c3-a347-7532c945bae0","response_time":"13.008125ms","status_code":200,"time":"2025-09-22T00:31:23.491+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"52e17e99-117d-4825-bbd6-b44a4315fda2","response_time":"1.333µs","status_code":404,"time":"2025-09-22T00:31:23.527+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs/openapi.json","request_id":"03e53fc1-59b6-4dbf-b15a-958105622c6f","response_time":"4.001375ms","status_code":200,"time":"2025-09-22T00:32:08.417+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/docs","request_id":"ea382dd7-c150-4a2e-ab20-7a8537271aec","response_time":"10.887125ms","status_code":200,"time":"2025-09-22T00:32:08.424+07:00"}
+{"level":"info","method":"GET","msg":"HTTP Request","path":"/.well-known/appspecific/com.chrome.devtools.json","request_id":"870f5ea2-c6b6-45f1-98da-f9419c789331","response_time":"1.458µs","status_code":404,"time":"2025-09-22T00:32:08.444+07:00"}
+{"error":"missing kid in token header","level":"warning","msg":"JWT validation failed","time":"2025-09-22T00:32:24.653+07:00"}
+{"level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"ee3c4835-915d-429e-a85b-438fe857d4bb","response_time":"4.486375ms","status_code":401,"time":"2025-09-22T00:32:24.657+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-22T00:34:07.277+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-22T00:34:07.281+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-22T00:41:26.524+07:00"}
+{"error":"missing kid in token header","level":"warning","msg":"JWT validation failed","time":"2025-09-22T00:42:31.737+07:00"}
+{"level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"13c103c1-55c5-4326-a649-3622fd563930","response_time":"4.834125ms","status_code":401,"time":"2025-09-22T00:42:31.741+07:00"}
+{"error":"missing kid in token header","level":"warning","msg":"JWT validation failed","time":"2025-09-22T00:43:13.438+07:00"}
+{"level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"39b67be8-1edd-49ca-ad80-c84425cdaa04","response_time":"18.481449s","status_code":401,"time":"2025-09-22T00:43:20.986+07:00"}
+{"error":"missing kid in token header","level":"warning","msg":"JWT validation failed","time":"2025-09-22T00:44:11.251+07:00"}
+{"level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"1d16d677-23d0-4340-88fb-3c08ae159416","response_time":"47.25466175s","status_code":401,"time":"2025-09-22T00:44:11.256+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-22T00:44:51.065+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-22T00:44:51.069+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-22T00:49:08.744+07:00"}
+{"error":"failed to get public key: key is not an RSA public key","level":"warning","msg":"JWT validation failed","time":"2025-09-22T00:49:28.711+07:00"}
+{"level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"37ee00b0-e091-4b06-ab31-4506e78d6ff0","response_time":"17.188272292s","status_code":401,"time":"2025-09-22T00:49:28.711+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-22T00:49:47.566+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-22T00:49:47.566+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-22T23:59:11.588+07:00"}
+{"error":"failed to get public key: key is not an RSA public key","level":"warning","msg":"JWT validation failed","time":"2025-09-23T00:01:15.831+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-23T00:01:15.834+07:00"}
+{"level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"1c90ea50-aeaa-4adc-ba56-2738d719070c","response_time":"1m20.166202667s","status_code":401,"time":"2025-09-23T00:01:15.838+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-23T00:01:15.839+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-23T00:06:10.213+07:00"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-23T00:07:52.723+07:00"}
+{"error":"failed to get public key: key is not an RSA public key","level":"warning","msg":"JWT validation failed","time":"2025-09-23T00:07:52.723+07:00"}
+{"level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"151fb083-aa96-41c7-9c63-35d3847be2ad","response_time":"1m22.401352708s","status_code":401,"time":"2025-09-23T00:07:52.731+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-23T00:07:52.734+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-23T00:10:32.362+07:00"}
+{"issuer":"UserManagerServices","level":"debug","msg":"JWT validated successfully","time":"2025-09-23T00:11:24.827+07:00","user_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+{"issuer":"UserManagerServices","level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"74feda5c-6e8f-4f91-a07c-76256081a3c7","response_time":"46.79009275s","status_code":401,"time":"2025-09-23T00:11:27.116+07:00","user_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+{"issuer":"UserManagerServices","level":"debug","msg":"JWT validated successfully","time":"2025-09-23T00:12:36.664+07:00","user_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+{"issuer":"UserManagerServices","level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"f6ec9d69-ba07-4b82-9012-2dd666a00d7b","response_time":"35.363657375s","status_code":401,"time":"2025-09-23T00:13:06.474+07:00","user_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-23T00:14:26.125+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-23T00:14:26.129+07:00"}
+{"level":"info","msg":"Starting server on port: 8080","time":"2025-09-23T00:14:30.146+07:00"}
+{"issuer":"UserManagerServices","level":"debug","msg":"JWT validated successfully","time":"2025-09-23T00:14:51.848+07:00","user_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+{"bucket":"files","etag":"a6745b43734f09741cbb234886ab7486","level":"info","msg":"File uploaded successfully to MinIO","object_name":"users/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa/Screenshot_2025-09-21_at_21.38.23_20250923001502.png","size":17737,"time":"2025-09-23T00:15:07.988+07:00"}
+{"file_id":"e16caf14-cfd6-4da4-9e20-345a15f663b0","file_size":17737,"filename":"Screenshot 2025-09-21 at 21.38.23.png","level":"info","msg":"File uploaded successfully","time":"2025-09-23T00:15:23.444+07:00","user_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+{"issuer":"UserManagerServices","level":"info","method":"POST","msg":"HTTP Request","path":"/api/v1/files/upload","request_id":"09e94f78-70dd-4e86-a4bc-477b7879ded2","response_time":"40.294539s","status_code":201,"time":"2025-09-23T00:15:25.268+07:00","user_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"}
+{"level":"info","msg":"Shutting down server...","time":"2025-09-23T00:15:38.199+07:00"}
+{"level":"info","msg":"Server exited","time":"2025-09-23T00:15:38.199+07:00"}

@@ -29,7 +29,7 @@ public class AttributesEntity extends BaseEntity {
     private String unit;
 
     // group id -- group for display (e.g., Tech Specs)
-    @Column(name = "GROUP_ID", nullable = false, length = 36)
+    @Column(name = "GROUP_ID", nullable = false, length = 36, insertable = false, updatable = false)
     private UUID groupId;
 
     // is_filterable BOOLEAN DEFAULT false,

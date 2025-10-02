@@ -1,0 +1,55 @@
+# AsiaShop Storage Service Configuration
+app:
+  environment: development
+  port: "8080"
+  version: "1.0.0"
+
+database:
+  host: localhost
+  port: 3306
+  username: root
+  password: rootpassword
+  database: storage_service
+
+minio:
+  endpoint: localhost:9000
+  access_key: minioadmin
+  secret_key: minioadmin
+  use_ssl: false
+  bucket_name: files
+  region: us-east-1
+
+jwt:
+  jwks_cache_ttl: 1h
+  jwks_timeout: 10s
+  allowed_algorithms:
+    - RS256
+    - RS384
+    - RS512
+    - HS256
+  clock_skew: 5m
+  issuers:
+    - name: "UserManagerServices"
+      issuer: "UserManagerServices"
+      audience:
+        - "UserManagerServices.Client"
+      jwks_url: "https://localhost:7031/.well-known/jwks.json"
+      username_claim: "unique_name"
+      roles_claim: "role"
+
+rate_limit:
+  requests_per_minute: 100
+  burst_size: 10
+  ip_whitelist: []
+  enable_redis: false
+  user_based_limit: true
+
+log:
+  level: debug
+  format: json
+  output_file: logs/app.log
+  output_console: true
+  max_size: 100
+  max_age: 30
+  max_backups: 5
+  compress: true

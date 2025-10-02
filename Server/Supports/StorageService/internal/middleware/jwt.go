@@ -22,7 +22,7 @@ import (
 type JWTMiddleware struct {
 	config      *config.ExternalJWTConfig
 	logger      *logger.Logger
-	keyCache    map[string]*rsa.PublicKey
+	keyCache    map[string]interface{} // Changed to interface{} to support both RSA and HMAC keys
 	cacheMutex  sync.RWMutex
 	cacheExpiry map[string]time.Time
 	httpClient  *retryablehttp.Client
@@ -30,11 +30,23 @@ type JWTMiddleware struct {
 
 type JWTClaims struct {
 	jwt.RegisteredClaims
-	UserID   string                 `json:"user_id,omitempty"`
-	Email    string                 `json:"email,omitempty"`
-	Username string                 `json:"username,omitempty"`
-	Roles    []string               `json:"roles,omitempty"`
-	Custom   map[string]interface{} `json:"custom,omitempty"`
+	// Standard claims
+	UserID   string   `json:"user_id,omitempty"`
+	Email    string   `json:"email,omitempty"`
+	Username string   `json:"username,omitempty"`
+	Roles    []string `json:"roles,omitempty"`
+
+	// C# service specific claims
+	JID            string `json:"jid,omitempty"`            // JWT ID
+	NameID         string `json:"nameid,omitempty"`         // Name identifier
+	UniqueName     string `json:"unique_name,omitempty"`    // Unique name (email)
+	FirstName      string `json:"firstName,omitempty"`      // First name
+	LastName       string `json:"lastName,omitempty"`       // Last name
+	EmailConfirmed string `json:"emailConfirmed,omitempty"` // Email confirmation status
+	Role           string `json:"role,omitempty"`           // Single role (C# format)
+
+	// Custom claims for extensibility
+	Custom map[string]interface{} `json:"custom,omitempty"`
 }
 
 type JWKSResponse struct {
@@ -46,6 +58,7 @@ type JWKSResponse struct {
 		E   string   `json:"e"`
 		X5c []string `json:"x5c"`
 		Alg string   `json:"alg"`
+		K   string   `json:"k"` // Added for symmetric keys (HMAC)
 	} `json:"keys"`
 }
 
@@ -59,7 +72,7 @@ func NewJWTMiddleware(cfg *config.ExternalJWTConfig, log *logger.Logger) *JWTMid
 	return &JWTMiddleware{
 		config:      cfg,
 		logger:      log,
-		keyCache:    make(map[string]*rsa.PublicKey),
+		keyCache:    make(map[string]interface{}),
 		cacheExpiry: make(map[string]time.Time),
 		httpClient:  httpClient,
 	}
@@ -112,10 +125,15 @@ func (j *JWTMiddleware) ValidateJWT() gin.HandlerFunc {
 
 		// Set user context
 		c.Set("user_id", userID)
-		c.Set("user_email", claims.Email)
-		c.Set("user_username", claims.Username)
-		c.Set("user_roles", claims.Roles)
+		c.Set("user_email", j.extractEmail(claims))
+		c.Set("user_username", j.extractUsername(claims))
+		c.Set("user_roles", j.extractRoles(claims))
+		c.Set("user_first_name", claims.FirstName)
+		c.Set("user_last_name", claims.LastName)
+		c.Set("user_full_name", j.extractFullName(claims))
+		c.Set("email_confirmed", claims.EmailConfirmed == "True")
 		c.Set("issuer", claims.Issuer)
+		c.Set("jwt_id", claims.JID)
 		c.Set("jwt_claims", claims)
 
 		j.logger.WithFields(map[string]interface{}{
@@ -164,16 +182,16 @@ func (j *JWTMiddleware) parseAndValidateToken(tokenString string) (*jwt.Token, *
 		return nil, nil, fmt.Errorf("unknown issuer: %s", unverifiedToken.Claims.(*JWTClaims).Issuer)
 	}
 
-	// Get public key for verification
-	publicKey, err := j.getPublicKey(issuerConfig.JWKSURL, kid)
+	// Get key for verification (can be RSA public key or HMAC secret)
+	key, err := j.getVerificationKey(issuerConfig.JWKSURL, kid)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to get public key: %w", err)
+		return nil, nil, fmt.Errorf("failed to get verification key: %w", err)
 	}
 
-	// Parse and validate token with public key
+	// Parse and validate token with key
 	claims := &JWTClaims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-		return publicKey, nil
+		return key, nil
 	}, jwt.WithValidMethods(j.config.AllowedAlgorithms))
 
 	if err != nil {
@@ -221,7 +239,8 @@ func (j *JWTMiddleware) parseAndValidateToken(tokenString string) (*jwt.Token, *
 	return token, claims, nil
 }
 
-func (j *JWTMiddleware) getPublicKey(jwksURL, kid string) (*rsa.PublicKey, error) {
+// Updated method name and return type to handle both RSA and HMAC keys
+func (j *JWTMiddleware) getVerificationKey(jwksURL, kid string) (interface{}, error) {
 	cacheKey := fmt.Sprintf("%s:%s", jwksURL, kid)
 
 	// Check cache first
@@ -252,29 +271,54 @@ func (j *JWTMiddleware) getPublicKey(jwksURL, kid string) (*rsa.PublicKey, error
 	}
 
 	// Find key with matching kid
-	key, found := keySet.LookupKeyID(kid)
+	jwkKey, found := keySet.LookupKeyID(kid)
 	if !found {
 		return nil, fmt.Errorf("key with kid %s not found", kid)
 	}
 
-	// Convert to RSA public key
-	var rawKey interface{}
-	if err := key.Raw(&rawKey); err != nil {
-		return nil, fmt.Errorf("failed to get raw key: %w", err)
-	}
+	// Get the key type
+	keyType := jwkKey.KeyType()
 
-	rsaKey, ok := rawKey.(*rsa.PublicKey)
-	if !ok {
-		return nil, fmt.Errorf("key is not an RSA public key")
+	var verificationKey interface{}
+
+	switch keyType {
+	case "RSA":
+		// Handle RSA keys (asymmetric)
+		var rawKey interface{}
+		if err := jwkKey.Raw(&rawKey); err != nil {
+			return nil, fmt.Errorf("failed to get raw RSA key: %w", err)
+		}
+
+		rsaKey, ok := rawKey.(*rsa.PublicKey)
+		if !ok {
+			return nil, fmt.Errorf("key is not an RSA public key")
+		}
+		verificationKey = rsaKey
+
+	case "oct":
+		// Handle symmetric keys (HMAC)
+		var rawKey interface{}
+		if err := jwkKey.Raw(&rawKey); err != nil {
+			return nil, fmt.Errorf("failed to get raw symmetric key: %w", err)
+		}
+
+		symmetricKey, ok := rawKey.([]byte)
+		if !ok {
+			return nil, fmt.Errorf("symmetric key is not in the expected format")
+		}
+		verificationKey = symmetricKey
+
+	default:
+		return nil, fmt.Errorf("unsupported key type: %s", keyType)
 	}
 
 	// Cache the key
 	j.cacheMutex.Lock()
-	j.keyCache[cacheKey] = rsaKey
+	j.keyCache[cacheKey] = verificationKey
 	j.cacheExpiry[cacheKey] = time.Now().Add(j.config.JWKSCacheTTL)
 	j.cacheMutex.Unlock()
 
-	return rsaKey, nil
+	return verificationKey, nil
 }
 
 func (j *JWTMiddleware) isAlgorithmAllowed(alg string) bool {
@@ -287,12 +331,15 @@ func (j *JWTMiddleware) isAlgorithmAllowed(alg string) bool {
 }
 
 func (j *JWTMiddleware) extractUserID(claims *JWTClaims) string {
-	// Try UserID field first
-	if claims.UserID != "" {
-		return claims.UserID
+	// Try NameID first (C# service primary identifier)
+	if claims.NameID != "" {
+		// Validate UUID format
+		if _, err := uuid.Parse(claims.NameID); err == nil {
+			return claims.NameID
+		}
 	}
 
-	// Try Subject
+	// Try Subject (standard JWT claim)
 	if claims.Subject != "" {
 		// Validate UUID format
 		if _, err := uuid.Parse(claims.Subject); err == nil {
@@ -300,17 +347,119 @@ func (j *JWTMiddleware) extractUserID(claims *JWTClaims) string {
 		}
 	}
 
+	// Try UserID field
+	if claims.UserID != "" {
+		// Validate UUID format
+		if _, err := uuid.Parse(claims.UserID); err == nil {
+			return claims.UserID
+		}
+	}
+
 	// Try custom claims
 	if claims.Custom != nil {
 		if userID, ok := claims.Custom["user_id"].(string); ok && userID != "" {
-			return userID
+			if _, err := uuid.Parse(userID); err == nil {
+				return userID
+			}
 		}
-		if userID, ok := claims.Custom["sub"].(string); ok && userID != "" {
-			return userID
+		if userID, ok := claims.Custom["nameid"].(string); ok && userID != "" {
+			if _, err := uuid.Parse(userID); err == nil {
+				return userID
+			}
 		}
 	}
 
 	return ""
+}
+
+func (j *JWTMiddleware) extractEmail(claims *JWTClaims) string {
+	// Try Email field first
+	if claims.Email != "" {
+		return claims.Email
+	}
+
+	// Try UniqueName (C# service uses this for email)
+	if claims.UniqueName != "" {
+		return claims.UniqueName
+	}
+
+	return ""
+}
+
+func (j *JWTMiddleware) extractUsername(claims *JWTClaims) string {
+	// Try Username field first
+	if claims.Username != "" {
+		return claims.Username
+	}
+
+	// Try UniqueName (C# service uses this)
+	if claims.UniqueName != "" {
+		return claims.UniqueName
+	}
+
+	// Try Email as fallback
+	if claims.Email != "" {
+		return claims.Email
+	}
+
+	return ""
+}
+
+func (j *JWTMiddleware) extractRoles(claims *JWTClaims) []string {
+	var roles []string
+
+	// Try Roles array first (standard format)
+	if len(claims.Roles) > 0 {
+		roles = append(roles, claims.Roles...)
+	}
+
+	// Try single Role field (C# service format)
+	if claims.Role != "" {
+		// Check if it's already in the roles array
+		found := false
+		for _, role := range roles {
+			if role == claims.Role {
+				found = true
+				break
+			}
+		}
+		if !found {
+			roles = append(roles, claims.Role)
+		}
+	}
+
+	// Try custom claims
+	if claims.Custom != nil {
+		if rolesClaim, ok := claims.Custom["roles"]; ok {
+			switch v := rolesClaim.(type) {
+			case []string:
+				roles = append(roles, v...)
+			case []interface{}:
+				for _, role := range v {
+					if roleStr, ok := role.(string); ok {
+						roles = append(roles, roleStr)
+					}
+				}
+			case string:
+				roles = append(roles, v)
+			}
+		}
+	}
+
+	return roles
+}
+
+func (j *JWTMiddleware) extractFullName(claims *JWTClaims) string {
+	if claims.FirstName != "" && claims.LastName != "" {
+		return claims.FirstName + " " + claims.LastName
+	}
+	if claims.FirstName != "" {
+		return claims.FirstName
+	}
+	if claims.LastName != "" {
+		return claims.LastName
+	}
+	return j.extractUsername(claims)
 }
 
 // Optional middleware for role-based access control

@@ -25,6 +25,9 @@ public static class EndpointExtensions
     /// <returns>Web application for chaining</returns>
     public static void MapMinimalApiEndpoints(this WebApplication app)
     {
+        // Map JWKS endpoints (must be first for .well-known path)
+        app.MapJwksEndpoints();
+
         // Map authentication endpoints
         app.MapAuthEndpoints();
 

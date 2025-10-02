@@ -14,10 +14,10 @@ import jakarta.persistence.Table;
 @Table(name = "PRODUCT_ATTRIBUTE_VALUES") // Values for each attribute of each product (supports all types)
 public class ProductAttributeValuesEntity extends BaseEntity {
 
-    @Column(name = "PRODUCT_ID", nullable = false, length = 36)
+    @Column(name = "PRODUCT_ID", nullable = false, length = 36, insertable = false, updatable = false)
     private UUID productId;
 
-    @Column(name = "ATTRIBUTE_ID", nullable = false, length = 36)
+    @Column(name = "ATTRIBUTE_ID", nullable = false, length = 36, insertable = false, updatable = false)
     private UUID attributeId;
 
     @Column(name = "VALUE_STRING", nullable = false, length = 100)
@@ -33,7 +33,7 @@ public class ProductAttributeValuesEntity extends BaseEntity {
     private LocalDateTime valueDate;
 
     // value options id reference attribute allowed values
-    @Column(name = "VALUE_OPTIONS_ID", nullable = false, length = 36)
+    @Column(name = "VALUE_OPTIONS_ID", nullable = false, length = 36, insertable = false, updatable = false)
     private UUID valueOptionsId;
 
     // refence table PRODUCTS
