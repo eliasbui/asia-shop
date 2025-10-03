@@ -1,3 +1,5 @@
+"use client"
+
 import { ReviewStep } from '@/components/checkout/steps/ReviewStep';
 import { useCheckoutData, useCheckoutNavigation } from '@/lib/state/checkoutStore';
 import { useCartStore } from '@/lib/state/cartStore';

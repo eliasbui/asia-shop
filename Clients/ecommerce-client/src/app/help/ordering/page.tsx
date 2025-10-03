@@ -24,7 +24,7 @@ import {
   ArrowRight,
   Plus,
   Minus,
-  Compare,
+  GitCompare,
   Ruler,
   TrendingUp,
   Shield,
@@ -37,7 +37,10 @@ import {
   Zap,
   Target,
   Award,
-  Lightbulb
+  Lightbulb,
+  Phone,
+  MessageSquare,
+  Mail
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -299,7 +302,7 @@ const shoppingTips = [
   {
     title: 'So sánh giá trước khi mua',
     description: 'Sử dụng tính năng so sánh để tìm sản phẩm tốt nhất',
-    icon: Compare,
+    icon: GitCompare,
     benefit: 'Tìm được giá tốt nhất',
   },
   {
@@ -423,7 +426,7 @@ export default function OrderingHelpPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Compare className="h-5 w-5" />
+                    <GitCompare className="h-5 w-5" />
                     Tính năng so sánh sản phẩm
                   </CardTitle>
                   <CardDescription>

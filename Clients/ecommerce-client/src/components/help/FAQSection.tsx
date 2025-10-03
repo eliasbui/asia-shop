@@ -62,7 +62,7 @@ export function FAQSection({
 
   const handleHelpful = (id: string, helpful: boolean) => {
     // Here you would normally send this to your analytics/backend
-    console.log(\`FAQ \${id} was \${helpful ? 'helpful' : 'not helpful'}\`);
+    console.log(`FAQ ${id} was ${helpful ? 'helpful' : 'not helpful'}`);
   };
 
   return (

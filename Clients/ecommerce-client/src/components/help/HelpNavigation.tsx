@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { HelpCircle, Package, FileText, Shield, MessageSquare, ShoppingCart, Wrench } from 'lucide-react';
+import { HelpCircle, Package, FileText, Shield, MessageSquare, ShoppingCart, Wrench, Users } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 interface HelpNavItem {
@@ -27,6 +27,13 @@ const helpNavItems: HelpNavItem[] = [
     href: '/help/ordering',
     icon: <ShoppingCart className="w-5 h-5" />,
     description: 'Cách đặt hàng và mua sắm'
+  },
+  {
+    id: 'account',
+    title: 'Quản lý tài khoản',
+    href: '/help/account',
+    icon: <Users className="w-5 h-5" />,
+    description: 'Hướng dẫn quản lý tài khoản'
   },
   {
     id: 'shipping',

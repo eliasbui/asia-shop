@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/common/Breadcrumbs';
 import { HelpNavigation } from '@/components/help/HelpNavigation';
-import { FAQSection } from '@/components/FAQSection';
+import { FAQSection } from '@/components/help/FAQSection';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -193,36 +193,60 @@ const serviceCenters = [
 
 const warrantyFAQs = [
   {
+    id: 'warranty-check',
     question: 'Làm thế nào để kiểm tra tình trạng bảo hành của sản phẩm?',
     answer: 'Bạn có thể kiểm tra tình trạng bảo hành bằng các cách sau: 1) Nhập số serial sản phẩm vào công cụ kiểm tra bảo hành trên website, 2) Quét mã QR trên phiếu bảo hành, 3) Gọi hotline 1900 1234 và cung cấp số serial, 4) Mang sản phẩm và phiếu bảo hành đến trung tâm bảo hành gần nhất.',
+    category: 'Kiểm tra bảo hành',
+    tags: ['serial', 'QR', 'hotline']
   },
   {
+    id: 'warranty-conditions',
     question: 'Những điều kiện nào để được hưởng chế độ bảo hành?',
     answer: 'Để được hưởng chế độ bảo hành, sản phẩm phải: 1) Còn trong thời hạn bảo hành, 2) Có phiếu bảo hành gốc và hóa đơn mua hàng, 3) Lỗi phát sinh do nhà sản xuất, 4) Không có dấu hiệu can thiệp, sửa chữa trái phép, 5) Sử dụng đúng theo hướng dẫn của nhà sản xuất.',
+    category: 'Điều kiện bảo hành',
+    tags: ['điều kiện', 'phiếu bảo hành', 'hóa đơn']
   },
   {
+    id: 'warranty-time',
     question: 'Thời gian xử lý bảo hành thường mất bao lâu?',
     answer: 'Thời gian xử lý bảo hành phụ thuộc vào loại lỗi và sản phẩm: Lỗi đơn giản: 1-3 ngày làm việc, Lỗi phức tạp: 5-7 ngày làm việc, Cần đặt linh kiện: 10-15 ngày làm việc. Các sản phẩm cao cấp có dịch vụ ưu tiên sẽ được xử lý trong 24-48 giờ.',
+    category: 'Thời gian xử lý',
+    tags: ['thời gian', 'xử lý', 'lỗi']
   },
   {
+    id: 'warranty-home-service',
     question: 'Tôi có thể được hỗ trợ tại nhà không?',
     answer: 'AsiaShop cung cấp dịch vụ hỗ trợ tại nhà cho: 1) Sản phẩm gia dụng lớn (tủ lạnh, máy giặt từ 10 triệu), 2) Khách hàng mua bảo hành cao cấp, 3) Khách hàng VIP, 4) Các sản phẩm trong khuyến mãi đặc biệt. Phí dịch vụ áp dụng theo khu vực.',
+    category: 'Hỗ trợ tại nhà',
+    tags: ['tại nhà', 'hỗ trợ', 'khách hàng VIP']
   },
   {
+    id: 'warranty-replacement',
     question: 'Sản phẩm bị lỗi có được đổi mới không?',
     answer: 'Chính sách đổi mới áp dụng khi: 1) Lỗi nghiêm trọng không thể sửa chữa, 2) Lỗi lặp lại 3 lần trong vòng 6 tháng, 3) Sản phẩm mới mua dưới 7 ngày có lỗi từ nhà sản xuất, 4) Sản phẩm bảo hành cao cấp có quyền lợi đổi mới. Sản phẩm đổi mới sẽ có thông số kỹ thuật tương đương hoặc cao hơn.',
+    category: 'Đổi mới',
+    tags: ['đổi mới', 'lỗi nghiêm trọng', 'thay thế']
   },
   {
+    id: 'warranty-extended',
     question: 'Tôi có thể mua bảo hành mở rộng không?',
     answer: 'Có, bạn có thể mua bảo hành mở rộng trong vòng 30 ngày kể từ ngày mua hàng. Gói bảo hành mở rộng: Gói Silver: +20% giá sản phẩm (bảo hành 24 tháng), Gói Gold: +35% giá sản phẩm (bảo hành 36 tháng + bảo vệ tai nạn), Gói Platinum: +50% giá sản phẩm (bảo hành 48 tháng + hỗ trợ tại nhà).',
+    category: 'Bảo hành mở rộng',
+    tags: ['mở rộng', 'Silver', 'Gold', 'Platinum']
   },
   {
+    id: 'warranty-exclusions',
     question: 'Những trường hợp nào không được bảo hành?',
     answer: 'Các trường hợp không được bảo hành bao gồm: 1) Hết thời hạn bảo hành, 2) Không có phiếu bảo hành hoặc hóa đơn, 3) Lỗi do người dùng (rơi rớt, vào nước, quá điện), 4) Tự ý sửa chữa, thay thế linh kiện, 5) Sử dụng sai mục đích, không theo hướng dẫn, 6) Thiên tai, hỏa hoạn, chiến tranh, 7) Hao mòn tự nhiên.',
+    category: 'Loại trừ',
+    tags: ['loại trừ', 'hết hạn', 'người dùng']
   },
   {
+    id: 'warranty-expired',
     question: 'Làm thế nào khi sản phẩm hết hạn bảo hành nhưng còn lỗi?',
     answer: 'Khi sản phẩm hết hạn bảo hành, AsiaShop vẫn hỗ trợ: 1) Kiểm tra và báo giá sửa chữa, 2) Cung cấp linh kiện chính hãng với giá ưu đãi, 3) Giảm 10% chi phí sửa chữa cho khách hàng thân thiết, 4) Chính sách thu cũ đổi mới với ưu đãi đặc biệt. Liên hệ trung tâm bảo hành để được tư vấn chi tiết.',
+    category: 'Hết hạn bảo hành',
+    tags: ['hết hạn', 'sửa chữa', 'linh kiện']
   },
 ];
 
@@ -694,7 +718,7 @@ export default function WarrantyHelpPage() {
             <section>
               <FAQSection
                 title="Câu hỏi thường gặp về bảo hành"
-                items={warrantyFAQs}
+                faqs={warrantyFAQs}
                 maxItems={6}
               />
             </section>

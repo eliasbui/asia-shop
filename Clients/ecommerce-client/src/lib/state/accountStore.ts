@@ -188,9 +188,6 @@ export const useAccountStore = create<AccountStore>()(
           const updatedAddresses = addresses.map(addr => {
             if (addr.id === id) {
               const updatedAddr = { ...addr, ...data, updatedAt: new Date().toISOString() };
-              if (data.isDefault) {
-                return addresses.map(a => a.id === id ? updatedAddr : { ...a, isDefault: false }));
-              }
               return updatedAddr;
             }
             if (data.isDefault) {
