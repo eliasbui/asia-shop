@@ -1,0 +1,66 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "retry": "Thử lại",
+    "addToCart": "Thêm vào giỏ hàng",
+    "buyNow": "Mua ngay",
+    "price": "Giá",
+    "search": "Tìm kiếm",
+    "searchPlaceholder": "Tìm kiếm sản phẩm...",
+    "cart": "Giỏ hàng",
+    "checkout": "Thanh toán",
+    "account": "Tài khoản",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "addresses": "Địa chỉ",
+    "orders": "Đơn hàng",
+    "wishlist": "Yêu thích"
+  },
+  "product": {
+    "outOfStock": "Hết hàng",
+    "inStock": "Còn hàng",
+    "lowStock": "Số lượng có hạn",
+    "description": "Mô tả",
+    "specifications": "Thông số kỹ thuật",
+    "reviews": "Đánh giá",
+    "addToCartSuccess": "Đã thêm vào giỏ hàng",
+    "variant": "Phân loại"
+  },
+  "cart": {
+    "empty": "Giỏ hàng trống",
+    "total": "Tổng cộng",
+    "subtotal": "Tạm tính",
+    "shipping": "Phí vận chuyển",
+    "discount": "Giảm giá",
+    "remove": "Xóa",
+    "quantity": "Số lượng",
+    "updateCart": "Cập nhật giỏ hàng",
+    "continueShopping": "Tiếp tục mua sắm"
+  },
+  "checkout": {
+    "shipping": "Thông tin giao hàng",
+    "payment": "Phương thức thanh toán",
+    "review": "Xem lại đơn hàng",
+    "placeOrder": "Đặt hàng",
+    "shippingAddress": "Địa chỉ giao hàng",
+    "billingAddress": "Địa chỉ thanh toán",
+    "orderSummary": "Tóm tắt đơn hàng"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "loginTitle": "Đăng nhập tài khoản",
+    "registerTitle": "Tạo tài khoản mới",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "dontHaveAccount": "Chưa có tài khoản?",
+    "otp": "Mã OTP",
+    "twoFactor": "Xác thực hai yếu tố",
+    "google": "Đăng nhập với Google"
+  }
+}

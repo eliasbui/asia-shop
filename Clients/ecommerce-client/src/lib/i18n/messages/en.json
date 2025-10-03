@@ -1,0 +1,153 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "price": "Price",
+    "search": "Search",
+    "searchPlaceholder": "Search products...",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "account": "Account",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile",
+    "addresses": "Addresses",
+    "orders": "Orders",
+    "wishlist": "Wishlist"
+  },
+  "product": {
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock",
+    "lowStock": "Low Stock",
+    "description": "Description",
+    "specifications": "Specifications",
+    "reviews": "Reviews",
+    "addToCartSuccess": "Added to Cart",
+    "variant": "Variant"
+  },
+  "cart": {
+    "empty": "Your cart is empty",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "discount": "Discount",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "updateCart": "Update Cart",
+    "continueShopping": "Continue Shopping"
+  },
+  "checkout": {
+    "shipping": "Shipping Information",
+    "payment": "Payment Method",
+    "review": "Review Order",
+    "placeOrder": "Place Order",
+    "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "orderSummary": "Order Summary"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "loginTitle": "Login to Your Account",
+    "registerTitle": "Create New Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "otp": "OTP Code",
+    "twoFactor": "Two-Factor Authentication",
+    "google": "Login with Google"
+  },
+  "legal": {
+    "title": "Legal",
+    "overview": "Legal Information",
+    "description": "Learn about terms, policies, and legal regulations when using AsiaShop services.",
+    "importantNote": "Important Notice",
+    "lastUpdated": "Last Updated",
+    "backToLegal": "Back to Legal Page",
+    "contactInfo": "Need Legal Support?",
+    "relatedPolicies": "Related Policies",
+    "tableOfContents": "Table of Contents",
+    "chapters": {
+      "chapter1": "Chapter 1: {title}",
+      "chapter2": "Chapter 2: {title}",
+      "chapter3": "Chapter 3: {title}",
+      "chapter4": "Chapter 4: {title}",
+      "chapter5": "Chapter 5: {title}",
+      "chapter6": "Chapter 6: {title}",
+      "chapter7": "Chapter 7: {title}",
+      "chapter8": "Chapter 8: {title}"
+    }
+  },
+  "termsOfService": {
+    "title": "Terms of Service",
+    "description": "Terms and conditions for using AsiaShop services. Rights and obligations of users.",
+    "section1": "General Provisions",
+    "section2": "User Rights and Obligations",
+    "section3": "Transaction Regulations",
+    "section4": "Warranty and Return Policy",
+    "section5": "Information Security",
+    "section6": "Dispute Resolution"
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "description": "AsiaShop's personal information privacy policy. How we collect, use, and protect your data.",
+    "section1": "Introduction",
+    "section2": "Information Collection",
+    "section3": "Information Usage",
+    "section4": "Information Sharing and Disclosure",
+    "section5": "Information Security",
+    "section6": "User Rights",
+    "section7": "Cookies and Similar Technologies",
+    "section8": "Policy Changes"
+  },
+  "cookiePolicy": {
+    "title": "Cookie Policy",
+    "description": "AsiaShop's cookie usage policy. Learn about cookie types and how we use them.",
+    "section1": "Cookie Introduction",
+    "section2": "Cookie Types",
+    "section3": "Cookie Management",
+    "section4": "Third-Party Cookies",
+    "section5": "Storage Duration"
+  },
+  "refundPolicy": {
+    "title": "Return & Refund Policy",
+    "description": "AsiaShop's return and refund policy. Conditions and process for product returns.",
+    "section1": "General Regulations",
+    "section2": "Return Conditions",
+    "section3": "Return Process",
+    "section4": "Refund Methods",
+    "section5": "Defective Product Returns",
+    "section6": "Special Cases"
+  },
+  "shippingPolicy": {
+    "title": "Shipping Policy",
+    "description": "AsiaShop's shipping and delivery policy. Shipping methods, timing, and costs.",
+    "section1": "Shipping Coverage",
+    "section2": "Shipping Methods",
+    "section3": "Delivery Time",
+    "section4": "Shipping Costs",
+    "section5": "Delivery Process",
+    "section6": "Special Cases"
+  },
+  "help": {
+    "title": "Help Center",
+    "description": "We're here to help! Find answers to frequently asked questions or contact our support team directly.",
+    "quickActions": "Popular Topics",
+    "trackOrder": "Track Order",
+    "returns": "Product Returns",
+    "payment": "Payment Methods",
+    "warranty": "Product Warranty",
+    "contact": "Contact Support",
+    "orderGuide": "Shopping Guide",
+    "faq": "Frequently Asked Questions",
+    "otherTopics": "Other Topics",
+    "needHelp": "Need More Help?",
+    "popularArticles": "Popular Articles"
+  }
+}

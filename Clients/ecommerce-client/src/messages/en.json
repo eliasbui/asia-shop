@@ -1,0 +1,66 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "price": "Price",
+    "search": "Search",
+    "searchPlaceholder": "Search products...",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "account": "Account",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile",
+    "addresses": "Addresses",
+    "orders": "Orders",
+    "wishlist": "Wishlist"
+  },
+  "product": {
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock",
+    "lowStock": "Low Stock",
+    "description": "Description",
+    "specifications": "Specifications",
+    "reviews": "Reviews",
+    "addToCartSuccess": "Added to Cart",
+    "variant": "Variant"
+  },
+  "cart": {
+    "empty": "Your cart is empty",
+    "total": "Total",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "discount": "Discount",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "updateCart": "Update Cart",
+    "continueShopping": "Continue Shopping"
+  },
+  "checkout": {
+    "shipping": "Shipping Information",
+    "payment": "Payment Method",
+    "review": "Review Order",
+    "placeOrder": "Place Order",
+    "shippingAddress": "Shipping Address",
+    "billingAddress": "Billing Address",
+    "orderSummary": "Order Summary"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me",
+    "loginTitle": "Login to Your Account",
+    "registerTitle": "Create New Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "otp": "OTP Code",
+    "twoFactor": "Two-Factor Authentication",
+    "google": "Login with Google"
+  }
+}
