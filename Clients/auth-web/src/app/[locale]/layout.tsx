@@ -3,7 +3,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Inter } from "next/font/google";
 import { locales } from "@/i18n/config";
-import "@/app/globals.css";
+import "../globals.css";
 
 const inter = Inter({ subsets: ["latin", "vietnamese"] });
 

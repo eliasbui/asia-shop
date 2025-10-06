@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,9 +19,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
-  const t = useTranslations('auth');
-  const router = useRouter();
-  
+  const t = useTranslations('auth');  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -73,7 +70,7 @@ export default function ForgotPasswordPage() {
             {t('passwordResetSent')}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            We've sent you an email with instructions to reset your password.
+            We have sent you an email with instructions to reset your password.
           </p>
         </div>
         
@@ -94,7 +91,7 @@ export default function ForgotPasswordPage() {
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-900">{t('forgotPassword')}</h2>
         <p className="mt-2 text-sm text-gray-600">
-          Enter your email address and we'll send you a link to reset your password.
+          Enter your email address and we will send you a link to reset your password.
         </p>
       </div>
       
