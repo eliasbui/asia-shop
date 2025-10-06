@@ -42,8 +42,18 @@ public static class ServiceCollectionExtensions
         {
             options.AddPolicy("DefaultCorsPolicy", policy =>
             {
-                policy.WithOrigins(configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ??
-                                   ["http://localhost:3000"])
+                var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ??
+                                    new[]
+                                    {
+                                        "http://localhost:3000", // ecommerce-web
+                                        "http://localhost:3001", // auth-web
+                                        "http://localhost:3002", // admin-panel
+                                        "https://shop.asiashop.com", // Production ecommerce
+                                        "https://auth.asiashop.com", // Production auth service
+                                        "https://admin.asiashop.com" // Production admin panel
+                                    };
+                
+                policy.WithOrigins(allowedOrigins)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();

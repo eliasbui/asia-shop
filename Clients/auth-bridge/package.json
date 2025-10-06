@@ -1,0 +1,26 @@
+{
+  "name": "@asiashop/auth-bridge",
+  "version": "1.0.0",
+  "description": "Authentication bridge for Asia Shop applications",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "authentication",
+    "bridge",
+    "cross-domain",
+    "asiashop"
+  ],
+  "author": "Asia Shop Team",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "zustand": "^4.0.0"
+  }
+}

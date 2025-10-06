@@ -1,0 +1,24 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "orders": "Orders",
+    "promotions": "Promotions",
+    "payouts": "Payouts",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "title": "Seller Overview",
+    "revenue": "Revenue",
+    "orders": "Orders",
+    "conversion": "Conversion",
+    "lowStock": "Low Stock"
+  },
+  "common": {
+    "viewAll": "View all",
+    "empty": "No records yet",
+    "retry": "Retry",
+    "loading": "Loading"
+  }
+}

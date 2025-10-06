@@ -1,0 +1,24 @@
+{
+  "nav": {
+    "dashboard": "Bảng điều khiển",
+    "products": "Sản phẩm",
+    "orders": "Đơn hàng",
+    "promotions": "Khuyến mãi",
+    "payouts": "Thanh toán",
+    "reports": "Báo cáo",
+    "settings": "Cài đặt"
+  },
+  "dashboard": {
+    "title": "Tổng quan người bán",
+    "revenue": "Doanh thu",
+    "orders": "Đơn hàng",
+    "conversion": "Tỷ lệ chuyển đổi",
+    "lowStock": "Hàng sắp hết"
+  },
+  "common": {
+    "viewAll": "Xem tất cả",
+    "empty": "Chưa có dữ liệu",
+    "retry": "Thử lại",
+    "loading": "Đang tải"
+  }
+}
