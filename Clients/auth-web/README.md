@@ -55,7 +55,7 @@ Update the environment variables:
 
 ```env
 # API Configuration
-NEXT_PUBLIC_API_BASE_URL=http://localhost:5001/api/v1/auth
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5001
 NEXT_PUBLIC_API_TIMEOUT=30000
 
 # Application Configuration
@@ -164,7 +164,7 @@ npm start
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | Base URL for the authentication API | `http://localhost:5001/api/v1/auth` |
+| `NEXT_PUBLIC_API_BASE_URL` | Base URL for the authentication API | `http://localhost:5001` |
 | `NEXT_PUBLIC_API_TIMEOUT` | Request timeout in milliseconds | `30000` |
 | `NEXT_PUBLIC_APP_NAME` | Application name | `Asia Shop Authentication` |
 | `NEXT_PUBLIC_APP_URL` | Application URL | `http://localhost:3001` |
