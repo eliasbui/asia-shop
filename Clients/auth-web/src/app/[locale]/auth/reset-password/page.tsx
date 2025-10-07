@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useTranslations, useLocale } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -14,6 +14,7 @@ import { authClient } from '@/lib/api/auth-client';
 
 // Form validation schema
 const resetPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(1, 'Please confirm your password'),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -23,9 +24,9 @@ const resetPasswordSchema = z.object({
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const t = useTranslations('auth');
-  const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +61,7 @@ export default function ResetPasswordPage() {
       setIsLoading(true);
       setError(null);
       
-      await authClient.resetPassword(token, data.password);
+      await authClient.resetPassword(data.email, token, data.password, data.confirmPassword);
       setSuccess(true);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : t('serverError');
@@ -99,7 +100,7 @@ export default function ResetPasswordPage() {
         
         <div className="text-center">
           <Link
-            href="/auth/forgot-password"
+            href={`/${locale}/auth/forgot-password`}
             className="font-medium text-primary hover:text-primary/80"
           >
             Request a new password reset
@@ -138,7 +139,7 @@ export default function ResetPasswordPage() {
         
         <div className="text-center">
           <Link
-            href="/auth/login"
+            href={`/${locale}/auth/login`}
             className="font-medium text-primary hover:text-primary/80"
           >
             Proceed to login
@@ -165,13 +166,29 @@ export default function ResetPasswordPage() {
       
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
         <div>
+          <Label htmlFor="email">{t('email')}</Label>
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            {...register('email')}
+            className="mt-1 input-glow"
+          />
+          {errors.email && (
+            <p className="mt-1 text-sm text-red-600">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
+
+        <div>
           <Label htmlFor="password">{t('password')}</Label>
           <Input
             id="password"
             type="password"
             autoComplete="new-password"
             {...register('password')}
-            className="mt-1"
+            className="mt-1 input-glow"
           />
           {errors.password && (
             <p className="mt-1 text-sm text-red-600">
@@ -187,7 +204,7 @@ export default function ResetPasswordPage() {
             type="password"
             autoComplete="new-password"
             {...register('confirmPassword')}
-            className="mt-1"
+            className="mt-1 input-glow"
           />
           {errors.confirmPassword && (
             <p className="mt-1 text-sm text-red-600">
@@ -196,19 +213,31 @@ export default function ResetPasswordPage() {
           )}
         </div>
         
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full button-glow" disabled={isLoading}>
           {isLoading ? t('loading') : t('resetPassword')}
         </Button>
       </form>
       
       <div className="text-center">
         <Link
-          href="/auth/login"
+          href={`/${locale}/auth/login`}
           className="font-medium text-primary hover:text-primary/80"
         >
           Back to login
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="space-y-6 animate-pulse">
+      <div className="h-20 bg-muted rounded-lg"></div>
+      <div className="h-12 bg-muted rounded-lg"></div>
+      <div className="h-12 bg-muted rounded-lg"></div>
+    </div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

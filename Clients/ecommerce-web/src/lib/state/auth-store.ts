@@ -1,6 +1,6 @@
 /**
  * Authentication state management with Zustand
- * Stores user info and access token in memory only (not persisted)
+ * Integrated with auth-bridge for cross-domain authentication
  */
 import { create } from 'zustand';
 import type { User } from '@/lib/types';
@@ -22,7 +22,7 @@ interface AuthActions {
 
 type AuthStore = AuthState & AuthActions;
 
-export const useAuthStore = create<AuthStore>((set) => ({
+export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   accessToken: null,
   isAuthenticated: false,
@@ -39,13 +39,17 @@ export const useAuthStore = create<AuthStore>((set) => ({
   },
 
   clearAuth: () => {
-    apiClient.setAccessToken(null);
-    set({
-      user: null,
-      accessToken: null,
-      isAuthenticated: false,
-      isLoading: false,
-    });
+    const state = get();
+    // Only clear if we're not already in the process of loading
+    if (!state.isLoading) {
+      apiClient.setAccessToken(null);
+      set({
+        user: null,
+        accessToken: null,
+        isAuthenticated: false,
+        isLoading: false,
+      });
+    }
   },
 
   setUser: (user) => {

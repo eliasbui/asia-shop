@@ -4,23 +4,50 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Link } from "./link";
 import { useTranslations } from "next-intl";
-import { ShoppingCart, User, Search, Menu } from "lucide-react";
-import { useCartStore } from "@/lib/state";
+import { ShoppingCart, User, Search, Menu, LogOut } from "lucide-react";
+import { useCartStore } from "../../lib/state/cart-store";
 import { Badge } from "./badge";
 import { ThemeToggle } from "./theme-toggle";
 import { LanguageSwitcher } from "./language-switcher";
+import { useAuthActions } from "../../hooks/use-auth-actions";
+import { Button } from "./button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 export function Header() {
   const t = useTranslations("nav");
   const router = useRouter();
   const itemCount = useCartStore((state) => state.getItemCount());
   const [searchQuery, setSearchQuery] = useState("");
+  const { isAuthenticated, user, login, logout } = useAuthActions();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/s?q=${encodeURIComponent(searchQuery.trim())}`);
     }
+  };
+
+  const handleLogin = () => {
+    login(window.location.href);
+  };
+
+  const handleRegister = () => {
+    login(window.location.href);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    router.push("/");
+  };
+
+  const handleAccount = () => {
+    router.push("/account");
   };
 
   return (
@@ -104,9 +131,37 @@ export function Header() {
             </Link>
 
             {/* Account */}
-            <Link href="/account" className="p-2 hover:bg-accent rounded-md">
-              <User className="w-5 h-5" />
-            </Link>
+            {isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="p-2 hover:bg-accent rounded-md">
+                    <User className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <div className="px-2 py-1.5 text-sm font-medium">
+                    {user?.firstName} {user?.lastName}
+                  </div>
+                  <div className="px-2 py-1 text-xs text-muted-foreground">
+                    {user?.email}
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleAccount}>
+                    <User className="mr-2 h-4 w-4" />
+                    {t("account")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    {t("logout")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={handleLogin} className="p-2 hover:bg-accent rounded-md">
+                <User className="w-5 h-5" />
+              </Button>
+            )}
 
             {/* Mobile Menu */}
             <button

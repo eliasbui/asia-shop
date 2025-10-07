@@ -64,9 +64,11 @@ export class AuthBridge {
    * Load authentication state from cookies
    */
   private loadStateFromCookies(): void {
+    console.log('[AuthBridge] Loading auth state from cookies...');
     const { accessToken, refreshToken } = this.getAuthCookies();
     
     if (accessToken) {
+      console.log('[AuthBridge] Access token found in cookies');
       this.state = {
         ...this.state,
         accessToken,
@@ -78,11 +80,13 @@ export class AuthBridge {
       // Verify token with backend
       this.verifyToken(accessToken);
     } else {
+      console.log('[AuthBridge] No access token found in cookies');
       this.state = {
         ...this.state,
         isAuthenticated: false,
         isLoading: false,
       };
+      this.notifyListeners();
     }
   }
 
@@ -93,12 +97,13 @@ export class AuthBridge {
     try {
       // Check if API URL is configured
       if (!this.config.apiUrl) {
-        console.warn('API URL not configured, skipping token verification');
+        console.warn('[AuthBridge] API URL not configured, skipping token verification');
         this.state.isLoading = false;
         this.notifyListeners();
         return;
       }
       
+      console.log('[AuthBridge] Verifying token with backend...');
       // Get current user from API
       const response = await fetch(`${this.config.apiUrl}/me`, {
         method: 'GET',
@@ -110,17 +115,19 @@ export class AuthBridge {
       
       if (response.ok) {
         const user = await response.json();
+        console.log('[AuthBridge] Token verification successful, user:', user.email);
         this.updateState({
           user,
           isAuthenticated: true,
           isLoading: false,
         });
       } else {
+        console.warn('[AuthBridge] Token verification failed with status:', response.status);
         // Token is invalid, clear auth state
         this.clearAuth();
       }
     } catch (error) {
-      console.error('Token verification failed:', error);
+      console.error('[AuthBridge] Token verification error:', error);
       
       // Clear auth state on error
       this.clearAuth();
@@ -157,6 +164,8 @@ export class AuthBridge {
   private setupMessageListener(): void {
     if (typeof window === 'undefined') return;
 
+    console.log('[AuthBridge] Setting up message listener...');
+
     this.messageHandler = (event: MessageEvent) => {
       // Only accept messages from allowed origins
       const allowedOrigins = [
@@ -165,7 +174,14 @@ export class AuthBridge {
         ...(this.config.allowedOrigins || []),
       ];
       
+      // Log all auth-related messages for debugging
+      if (event.data && event.data.type === 'auth-state-change') {
+        console.log('[AuthBridge] Received auth state change message from:', event.origin);
+        console.log('[AuthBridge] Message payload:', event.data.payload);
+      }
+      
       if (allowedOrigins.indexOf(event.origin) === -1) {
+        console.warn('[AuthBridge] Rejected message from unauthorized origin:', event.origin);
         return;
       }
 
@@ -177,6 +193,7 @@ export class AuthBridge {
       ) {
         const { user, isAuthenticated } = event.data.payload;
         
+        console.log('[AuthBridge] Updating auth state from message:', { isAuthenticated, hasUser: !!user });
         this.updateState({
           user,
           isAuthenticated,
@@ -186,6 +203,7 @@ export class AuthBridge {
     };
 
     window.addEventListener('message', this.messageHandler);
+    console.log('[AuthBridge] Message listener setup complete');
   }
 
   /**

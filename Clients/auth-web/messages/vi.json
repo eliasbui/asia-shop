@@ -14,7 +14,10 @@
     "sort": "Sắp xếp",
     "viewAll": "Xem tất cả",
     "learnMore": "Tìm hiểu thêm",
-    "backToHome": "Về trang chủ"
+    "backToHome": "Về trang chủ",
+    "darkMode": "Chế độ tối",
+    "lightMode": "Chế độ sáng",
+    "language": "Ngôn ngữ"
   },
   "nav": {
     "home": "Trang chủ",
@@ -43,12 +46,58 @@
     "verify2FA": "Xác thực 2FA",
     "resetPassword": "Đặt lại mật khẩu",
     "createNewPassword": "Tạo mật khẩu mới",
-    "passwordResetSent": "Email đặt lại mật khẩu đã được gửi",
+    "passwordResetSent": "Đã gửi Email Đặt Lại Mật Khẩu",
     "passwordResetSuccess": "Đặt lại mật khẩu thành công",
     "invalidCredentials": "Thông tin đăng nhập không hợp lệ",
     "registrationSuccess": "Đăng ký thành công",
     "loginSuccess": "Đăng nhập thành công",
-    "logoutSuccess": "Đăng xuất thành công"
+    "logoutSuccess": "Đăng xuất thành công",
+    "loading": "Đang đăng nhập...",
+    "welcomeBack": "Chào Mừng Trở Lại",
+    "welcomeTitle": "Bắt Đầu Hành Trình Của Bạn",
+    "slogan": "Cổng Chào Đến Tinh Hoa Châu Á",
+    "sloganDescription": "Khám phá các sản phẩm chính hãng từ khắp châu Á. Tham gia cùng hàng ngàn khách hàng hài lòng trong hành trình mua sắm.",
+    "orContinueWith": "Hoặc tiếp tục với",
+    "serverError": "Đã xảy ra lỗi máy chủ",
+    "mfaSetup": "Thiết Lập Xác Thực Hai Yếu Tố",
+    "mfaVerify": "Xác Minh Mã Xác Thực",
+    "mfaEnable": "Bật 2FA",
+    "mfaDisable": "Tắt 2FA",
+    "mfaCode": "Mã Xác Thực",
+    "backupCode": "Mã Dự Phòng",
+    "backupCodes": "Mã Dự Phòng",
+    "saveBackupCodes": "Lưu các mã dự phòng này ở nơi an toàn",
+    "downloadBackupCodes": "Tải Mã Dự Phòng",
+    "scanQrCode": "Quét Mã QR",
+    "enterCodeManually": "Hoặc nhập mã thủ công",
+    "verifyCode": "Xác Minh Mã",
+    "sendEmailOtp": "Gửi mã qua email",
+    "otpSent": "OTP đã được gửi đến email của bạn",
+    "authenticatorApp": "Ứng Dụng Xác Thực",
+    "mfaEnabled": "Xác thực hai yếu tố đã được bật thành công",
+    "mfaDisabled": "Xác thực hai yếu tố đã được tắt",
+    "features": {
+      "products": {
+        "title": "10,000+ Sản phẩm",
+        "description": "Sản phẩm chính hãng từ Châu Á"
+      },
+      "payment": {
+        "title": "Thanh toán An toàn",
+        "description": "100% giao dịch bảo mật"
+      },
+      "delivery": {
+        "title": "Giao hàng Nhanh",
+        "description": "Có giao hàng nhanh"
+      },
+      "rating": {
+        "title": "Đánh giá Cao",
+        "description": "4.9/5 khách hàng hài lòng"
+      }
+    },
+    "testimonial": {
+      "quote": "Trải nghiệm mua sắm Châu Á tuyệt vời nhất!",
+      "author": "Sarah Chen, Khách hàng thường xuyên"
+    }
   },
   "validation": {
     "required": "Trường này là bắt buộc",

@@ -35,9 +35,6 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={inter.className}>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <div className="flex flex-col min-h-screen">

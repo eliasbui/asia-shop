@@ -3,7 +3,13 @@
  * Provides helper functions for managing authentication state across domains
  */
 
-import type { User, AuthTokens } from '@/lib/types';
+import type { User } from '@/lib/types';
+
+interface AuthTokens {
+  accessToken: string;
+  refreshToken?: string;
+  expiresIn?: number;
+}
 
 // Cookie configuration
 const COOKIE_CONFIG = {
@@ -72,43 +78,59 @@ export function getAuthCookies(): { accessToken: string | null; refreshToken: st
 export function broadcastAuthState(state: { user: User | null; isAuthenticated: boolean }, targetOrigin?: string): void {
   if (typeof window === 'undefined') return;
 
-  // Default to parent origin for iframe scenarios
-  const origin = targetOrigin || window.location.origin;
+  console.log('[broadcastAuthState] Broadcasting auth state:', { 
+    isAuthenticated: state.isAuthenticated,
+    hasUser: !!state.user 
+  });
+
+  // Get all allowed origins
+  const allowedOrigins = [
+    process.env.NEXT_PUBLIC_ECOMMERCE_WEB_URL,
+    process.env.NEXT_PUBLIC_ADMIN_PANEL_URL,
+    targetOrigin,
+    '*', // Allow all origins for postMessage (the receiver will validate)
+  ].filter(Boolean) as string[];
+
+  const message = {
+    type: 'auth-state-change',
+    payload: {
+      user: state.user,
+      isAuthenticated: state.isAuthenticated,
+      timestamp: Date.now(),
+    },
+  };
 
   // Send message to parent window
   if (window.parent !== window) {
-    window.parent.postMessage(
-      {
-        type: 'auth-state-change',
-        payload: {
-          user: state.user,
-          isAuthenticated: state.isAuthenticated,
-          timestamp: Date.now(),
-        },
-      },
-      origin
-    );
+    allowedOrigins.forEach(origin => {
+      try {
+        window.parent.postMessage(message, origin);
+        console.log('[broadcastAuthState] Sent to parent with origin:', origin);
+      } catch (e) {
+        console.warn('[broadcastAuthState] Failed to send to parent:', e);
+      }
+    });
   }
 
   // Send message to all child windows
   Array.from(window.frames).forEach(frame => {
-    try {
-      frame.postMessage(
-        {
-          type: 'auth-state-change',
-          payload: {
-            user: state.user,
-            isAuthenticated: state.isAuthenticated,
-            timestamp: Date.now(),
-          },
-        },
-        origin
-      );
-    } catch (e) {
-      // Cross-origin error, ignore
-      console.warn('Failed to send message to frame:', e);
-    }
+    allowedOrigins.forEach(origin => {
+      try {
+        frame.postMessage(message, origin);
+        console.log('[broadcastAuthState] Sent to frame with origin:', origin);
+      } catch (e) {
+        console.warn('[broadcastAuthState] Failed to send to frame:', e);
+      }
+    });
   });
+
+  // Also dispatch a custom event for same-origin communication
+  window.dispatchEvent(new CustomEvent('auth:state-change', { 
+    detail: { 
+      user: state.user, 
+      isAuthenticated: state.isAuthenticated 
+    } 
+  }));
 }
 
 /**

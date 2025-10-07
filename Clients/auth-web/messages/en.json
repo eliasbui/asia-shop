@@ -14,7 +14,10 @@
     "sort": "Sort",
     "viewAll": "View all",
     "learnMore": "Learn more",
-    "backToHome": "Back to home"
+    "backToHome": "Back to home",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode",
+    "language": "Language"
   },
   "nav": {
     "home": "Home",
@@ -43,12 +46,58 @@
     "verify2FA": "Verify 2FA",
     "resetPassword": "Reset Password",
     "createNewPassword": "Create New Password",
-    "passwordResetSent": "Password reset email sent",
+    "passwordResetSent": "Password Reset Email Sent",
     "passwordResetSuccess": "Password reset successful",
     "invalidCredentials": "Invalid credentials",
     "registrationSuccess": "Registration successful",
     "loginSuccess": "Login successful",
-    "logoutSuccess": "Logout successful"
+    "logoutSuccess": "Logout successful",
+    "loading": "Signing in...",
+    "welcomeBack": "Welcome Back",
+    "welcomeTitle": "Start Your Journey With Us",
+    "slogan": "Your Gateway to Asian Excellence",
+    "sloganDescription": "Discover authentic products from across Asia. Join thousands of satisfied customers in their shopping journey.",
+    "orContinueWith": "Or continue with",
+    "serverError": "Server error occurred",
+    "mfaSetup": "Setup Two-Factor Authentication",
+    "mfaVerify": "Verify Authentication Code",
+    "mfaEnable": "Enable 2FA",
+    "mfaDisable": "Disable 2FA",
+    "mfaCode": "Authentication Code",
+    "backupCode": "Backup Code",
+    "backupCodes": "Backup Codes",
+    "saveBackupCodes": "Save these backup codes in a secure location",
+    "downloadBackupCodes": "Download Backup Codes",
+    "scanQrCode": "Scan QR Code",
+    "enterCodeManually": "Or enter the code manually",
+    "verifyCode": "Verify Code",
+    "sendEmailOtp": "Send code via email",
+    "otpSent": "OTP sent to your email",
+    "authenticatorApp": "Authenticator App",
+    "mfaEnabled": "Two-factor authentication enabled successfully",
+    "mfaDisabled": "Two-factor authentication disabled",
+    "features": {
+      "products": {
+        "title": "10,000+ Products",
+        "description": "Authentic Asian products"
+      },
+      "payment": {
+        "title": "Secure Payment",
+        "description": "100% secure transactions"
+      },
+      "delivery": {
+        "title": "Fast Delivery",
+        "description": "Express shipping available"
+      },
+      "rating": {
+        "title": "Top Rated",
+        "description": "4.9/5 customer satisfaction"
+      }
+    },
+    "testimonial": {
+      "quote": "The best Asian shopping experience I've ever had!",
+      "author": "Sarah Chen, Regular Customer"
+    }
   },
   "validation": {
     "required": "This field is required",

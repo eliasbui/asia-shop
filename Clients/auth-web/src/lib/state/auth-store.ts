@@ -92,12 +92,16 @@ export const useAuthStore = create<AuthStore>()(
       login: async (email, password) => {
         try {
           set({ isLoading: true });
-          const response = await authClient.login({ email, password });
+          const response = await authClient.login({ 
+            emailOrUsername: email, 
+            password,
+            rememberMe: false
+          });
           
           get().setAuth(
             response.user,
-            response.tokens.accessToken,
-            response.tokens.refreshToken
+            response.accessToken,
+            response.refreshToken
           );
           
           return response;
@@ -110,12 +114,16 @@ export const useAuthStore = create<AuthStore>()(
       register: async (userData) => {
         try {
           set({ isLoading: true });
-          const response = await authClient.register(userData);
+          const response = await authClient.register({
+            ...userData,
+            userName: userData.userName || userData.email.split('@')[0],
+            autoConfirmEmail: false
+          });
           
           get().setAuth(
             response.user,
-            response.tokens.accessToken,
-            response.tokens.refreshToken
+            response.accessToken,
+            response.refreshToken
           );
           
           return response;
@@ -179,8 +187,8 @@ export const useAuthStore = create<AuthStore>()(
           
           get().setAuth(
             response.user,
-            response.tokens.accessToken,
-            response.tokens.refreshToken
+            response.accessToken,
+            response.refreshToken
           );
           
           return response;

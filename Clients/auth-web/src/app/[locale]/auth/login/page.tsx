@@ -1,15 +1,18 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/common/button';
 import { Input } from '@/components/common/input';
 import { Label } from '@/components/common/label';
+import { LoadingSpinner } from '@/components/common/loading-spinner';
 import { useAuthStore } from '@/lib/state/auth-store';
 
 // Form validation schema
@@ -20,9 +23,9 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const t = useTranslations('auth');
-  const tValidation = useTranslations('validation');
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, isLoading, isAuthenticated } = useAuthStore();
@@ -49,18 +52,41 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       setError(null);
+      console.log('[LoginPage] Attempting login...');
       await login(data.email, data.password);
+      console.log('[LoginPage] Login successful, cookies set');
+      
+      // Wait a bit for cookies to be set and broadcast to complete
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       // Redirect to return URL or default
       if (returnUrl && returnUrl !== '/') {
-        // If returnUrl is external, use redirect helper
-        setTimeout(() => {
-          window.location.href = returnUrl;
-        }, 500);
+        console.log('[LoginPage] Redirecting to returnUrl:', returnUrl);
+        // Check if returnUrl is external (different origin)
+        try {
+          const returnUrlObj = new URL(returnUrl);
+          const currentOrigin = window.location.origin;
+          
+          if (returnUrlObj.origin !== currentOrigin) {
+            // External redirect - use full page redirect
+            console.log('[LoginPage] External redirect detected');
+            window.location.href = returnUrl;
+          } else {
+            // Same-origin redirect - use Next.js router
+            console.log('[LoginPage] Same-origin redirect');
+            router.push(returnUrl);
+          }
+        } catch {
+          // If URL parsing fails, treat as relative path
+          console.log('[LoginPage] Relative path redirect');
+          router.push(returnUrl);
+        }
       } else {
-        router.push(returnUrl);
+        console.log('[LoginPage] Redirecting to home');
+        router.push('/');
       }
     } catch (err: unknown) {
+      console.error('[LoginPage] Login failed:', err);
       const errorMessage = err instanceof Error ? err.message : t('invalidCredentials');
       setError(errorMessage);
     }
@@ -69,63 +95,96 @@ export default function LoginPage() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900">{t('login')}</h2>
-        <p className="mt-2 text-sm text-gray-600">
+        <h2 className="text-3xl font-bold text-card-foreground mb-2">{t('welcomeBack')}</h2>
+        <p className="text-sm text-muted-foreground">
           {t('noAccount')}{' '}
           <Link
-            href={`/auth/register${returnUrl !== '/' ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`}
-            className="font-medium text-primary hover:text-primary/80"
+            href={`/${locale}/auth/register${returnUrl !== '/' ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`}
+            className="font-semibold text-primary hover:text-primary/80 transition-colors"
           >
             {t('register')}
           </Link>
         </p>
       </div>
       
-      {error && (
-        <div className="p-3 bg-red-50 text-red-700 rounded-md text-sm">
-          {error}
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="p-4 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm flex items-center gap-2"
+          >
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <span>{error}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
-      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
         <div>
-          <Label htmlFor="email">{t('email')}</Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            {...register('email')}
-            className="mt-1"
-          />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.email.message}
-            </p>
-          )}
+          <Label htmlFor="email" className="text-card-foreground font-medium">{t('email')}</Label>
+          <div className="relative mt-1.5">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              id="email"
+              type="email"
+              autoComplete="email"
+              {...register('email')}
+              className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+              placeholder="you@example.com"
+            />
+          </div>
+          <AnimatePresence mode="wait">
+            {errors.email && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-1.5 text-sm text-destructive flex items-center gap-1"
+              >
+                <AlertCircle className="w-4 h-4" />
+                {errors.email.message}
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
         
         <div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="password">{t('password')}</Label>
+            <Label htmlFor="password" className="text-card-foreground font-medium">{t('password')}</Label>
             <Link
-              href="/auth/forgot-password"
-              className="text-sm text-primary hover:text-primary/80"
+              href={`/${locale}/auth/forgot-password`}
+              className="text-sm text-primary hover:text-primary/80 transition-colors font-medium"
             >
               {t('forgotPassword')}
             </Link>
           </div>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            {...register('password')}
-            className="mt-1"
-          />
-          {errors.password && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.password.message}
-            </p>
-          )}
+          <div className="relative mt-1.5">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              {...register('password')}
+              className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+              placeholder="••••••••"
+            />
+          </div>
+          <AnimatePresence mode="wait">
+            {errors.password && (
+              <motion.p
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-1.5 text-sm text-destructive flex items-center gap-1"
+              >
+                <AlertCircle className="w-4 h-4" />
+                {errors.password.message}
+              </motion.p>
+            )}
+          </AnimatePresence>
         </div>
         
         <div className="flex items-center">
@@ -133,25 +192,40 @@ export default function LoginPage() {
             id="remember-me"
             name="remember-me"
             type="checkbox"
-            className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            className="h-4 w-4 rounded border-input text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
           />
-          <Label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+          <Label htmlFor="remember-me" className="ml-2 block text-sm text-card-foreground cursor-pointer">
             {t('rememberMe')}
           </Label>
         </div>
         
-        <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? t('loading') : t('login')}
-        </Button>
+        <div>
+          <Button 
+            type="submit" 
+            className="w-full h-11 text-base font-semibold button-glow" 
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <LoadingSpinner size="sm" className="text-primary-foreground" />
+                {t('loading')}
+              </span>
+            ) : (
+              <span className="relative z-10">{t('login')}</span>
+            )}
+          </Button>
+        </div>
       </form>
       
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300" />
+            <div className="w-full border-t border-border" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Or continue with</span>
+            <span className="px-3 bg-card text-muted-foreground font-medium">
+              {t('orContinueWith')}
+            </span>
           </div>
         </div>
         
@@ -159,7 +233,7 @@ export default function LoginPage() {
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className="w-full h-11 text-base font-medium hover:bg-accent transition-all duration-300 hover:scale-[1.02] button-glow"
             onClick={() => {
               // TODO: Implement OAuth login
               console.log('Google OAuth login');
@@ -188,5 +262,18 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="space-y-6 animate-pulse">
+      <div className="h-20 bg-muted rounded-lg"></div>
+      <div className="h-12 bg-muted rounded-lg"></div>
+      <div className="h-12 bg-muted rounded-lg"></div>
+      <div className="h-12 bg-muted rounded-lg"></div>
+    </div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

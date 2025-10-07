@@ -7,10 +7,15 @@ import type {
   RegisterData, 
   LoginCredentials, 
   AuthResponse, 
-  ApiError 
+  ApiError,
+  MfaSetupResponse,
+  MfaEnableResponse,
+  MfaStatusResponse,
+  VerifyMfaRequest,
+  SendEmailOtpRequest
 } from '@/lib/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api/v1/auth';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001';
 const API_TIMEOUT = Number(process.env.NEXT_PUBLIC_API_TIMEOUT) || 30000;
 
 class AuthClient {
@@ -32,17 +37,18 @@ class AuthClient {
   }
 
   /**
-   * Handle API errors
+   * Handle API errors from Server BaseResponse
    */
   private async handleError(response: Response): Promise<never> {
     let error: ApiError;
 
     try {
       const data = await response.json();
+      // Server returns BaseResponse with success, message, errors
       error = {
-        code: data.code || "UNKNOWN_ERROR",
+        code: data.code || `ERROR_${response.status}`,
         message: data.message || response.statusText || "An error occurred",
-        details: data.details,
+        details: data.errors ? { errors: data.errors } : data.details,
       };
     } catch {
       error = {
@@ -85,7 +91,14 @@ class AuthClient {
         return undefined as T;
       }
 
-      return await response.json();
+      const result = await response.json();
+      
+      // Server returns BaseResponse, extract data
+      if (result.success !== undefined) {
+        return result.data as T;
+      }
+      
+      return result as T;
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === "AbortError") {
@@ -100,10 +113,10 @@ class AuthClient {
   }
 
   /**
-   * Login with email and password
+   * Login with email/username and password
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/login', {
+    return this.request<AuthResponse>('/api/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
@@ -113,7 +126,7 @@ class AuthClient {
    * Register a new user
    */
   async register(userData: RegisterData): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/register', {
+    return this.request<AuthResponse>('/api/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -123,7 +136,7 @@ class AuthClient {
    * Logout the current user
    */
   async logout(accessToken: string): Promise<void> {
-    return this.request<void>('/logout', {
+    return this.request<void>('/api/v1/auth/logout', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -135,7 +148,7 @@ class AuthClient {
    * Refresh access token using refresh token
    */
   async refreshToken(refreshToken: string): Promise<AuthResponse> {
-    return this.request<AuthResponse>('/refresh', {
+    return this.request<AuthResponse>('/api/v1/auth/refresh', {
       method: 'POST',
       body: JSON.stringify({ refreshToken }),
     });
@@ -145,7 +158,7 @@ class AuthClient {
    * Get current user profile
    */
   async getCurrentUser(accessToken: string): Promise<User> {
-    return this.request<User>('/me', {
+    return this.request<User>('/api/v1/auth/me', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -157,36 +170,135 @@ class AuthClient {
    * Initiate password reset
    */
   async forgotPassword(email: string): Promise<void> {
-    return this.request<void>('/forgot-password', {
+    return this.request<void>('/api/v1/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
   }
 
   /**
-   * Reset password with token
+   * Reset password with token - Server expects email, token, newPassword, confirmPassword
    */
-  async resetPassword(token: string, newPassword: string): Promise<void> {
-    return this.request<void>('/reset-password', {
+  async resetPassword(
+    email: string,
+    token: string,
+    newPassword: string,
+    confirmPassword: string
+  ): Promise<void> {
+    return this.request<void>('/api/v1/auth/reset-password', {
       method: 'POST',
-      body: JSON.stringify({ token, newPassword }),
+      body: JSON.stringify({ 
+        email, 
+        token, 
+        newPassword, 
+        confirmPassword 
+      }),
     });
   }
 
   /**
-   * Change password
+   * Change password - Server expects currentPassword, newPassword, confirmPassword
    */
   async changePassword(
     accessToken: string,
     currentPassword: string,
-    newPassword: string
+    newPassword: string,
+    confirmPassword: string
   ): Promise<void> {
-    return this.request<void>('/change-password', {
+    return this.request<void>('/api/v1/auth/change-password', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ currentPassword, newPassword }),
+      body: JSON.stringify({ 
+        currentPassword, 
+        newPassword,
+        confirmPassword 
+      }),
+    });
+  }
+
+  // ==================== MFA Methods ====================
+
+  /**
+   * Setup MFA - Generate QR code and secret
+   */
+  async setupMfa(accessToken: string): Promise<MfaSetupResponse> {
+    return this.request<MfaSetupResponse>('/api/v1/mfa/setup', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+  }
+
+  /**
+   * Enable MFA - Verify TOTP code and get backup codes
+   */
+  async enableMfa(accessToken: string, totpCode: string): Promise<MfaEnableResponse> {
+    return this.request<MfaEnableResponse>('/api/v1/mfa/enable', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ totpCode }),
+    });
+  }
+
+  /**
+   * Verify MFA code during login
+   */
+  async verifyMfa(request: VerifyMfaRequest): Promise<boolean> {
+    return this.request<boolean>('/api/v1/mfa/verify', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    });
+  }
+
+  /**
+   * Disable MFA
+   */
+  async disableMfa(accessToken: string, password: string, mfaCode: string): Promise<boolean> {
+    return this.request<boolean>('/api/v1/mfa/disable', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ password, mfaCode }),
+    });
+  }
+
+  /**
+   * Generate new backup codes
+   */
+  async generateBackupCodes(accessToken: string): Promise<string[]> {
+    return this.request<string[]>('/api/v1/mfa/backup-codes/generate', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+  }
+
+  /**
+   * Get MFA status
+   */
+  async getMfaStatus(accessToken: string): Promise<MfaStatusResponse> {
+    return this.request<MfaStatusResponse>('/api/v1/mfa/status', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+  }
+
+  /**
+   * Send email OTP
+   */
+  async sendEmailOtp(request: SendEmailOtpRequest): Promise<boolean> {
+    return this.request<boolean>('/api/v1/mfa/email-otp/send', {
+      method: 'POST',
+      body: JSON.stringify(request),
     });
   }
 }

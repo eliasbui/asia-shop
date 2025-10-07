@@ -1,11 +1,8 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { Inter } from "next/font/google";
 import { locales } from "@/i18n/config";
-import "../globals.css";
-
-const inter = Inter({ subsets: ["latin", "vietnamese"] });
+import { ThemeProvider } from "@/components/providers/theme-provider";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -13,11 +10,13 @@ export function generateStaticParams() {
 
 export default async function LocaleLayout({
   children,
-  params: { locale },
+  params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
+  const { locale } = await params;
+  
   // Validate locale
   const isValidLocale = locales.some((l) => l === locale);
   if (!isValidLocale) {
@@ -27,18 +26,18 @@ export default async function LocaleLayout({
   // Enable static rendering
   setRequestLocale(locale);
 
-  const messages = await getMessages();
+  const messages = await getMessages({ locale });
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={inter.className}>
-        <a href="#main-content" className="skip-link">
-          Skip to main content
-        </a>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <NextIntlClientProvider messages={messages}>
+        {children}
+      </NextIntlClientProvider>
+    </ThemeProvider>
   );
 }
