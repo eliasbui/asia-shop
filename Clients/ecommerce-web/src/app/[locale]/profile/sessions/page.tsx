@@ -39,7 +39,7 @@ const sessionTimeoutFormSchema = z.object({
 });
 
 export default function SessionsPage() {
-  const { isAuthenticated, user } = useAuthBridge();
+  const { isAuthenticated, redirectToAuth } = useAuthBridge();
   const queryClient = useQueryClient();
   const [showSettings, setShowSettings] = useState(false);
 
@@ -138,7 +138,7 @@ export default function SessionsPage() {
       <div className="container mx-auto py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Please login to view your sessions</h1>
-          <Button onClick={() => window.location.href = "/auth/login"}>
+          <Button onClick={() => redirectToAuth()}>
             Login
           </Button>
         </div>

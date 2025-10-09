@@ -105,7 +105,7 @@ const actionTypes = [
 ];
 
 export default function ActivityPage() {
-  const { isAuthenticated } = useAuthBridge();
+  const { isAuthenticated, redirectToAuth } = useAuthBridge();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [selectedAction, setSelectedAction] = useState("");
@@ -175,7 +175,7 @@ export default function ActivityPage() {
       <div className="container mx-auto py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Please login to view your activity</h1>
-          <Button onClick={() => window.location.href = "/auth/login"}>
+          <Button onClick={() => redirectToAuth()}>
             Login
           </Button>
         </div>

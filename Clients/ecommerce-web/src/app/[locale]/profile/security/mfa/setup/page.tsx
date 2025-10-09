@@ -21,7 +21,7 @@ const verifyFormSchema = z.object({
 });
 
 export default function MfaSetupPage() {
-  const { isAuthenticated, user } = useAuthBridge();
+  const { isAuthenticated, redirectToAuth } = useAuthBridge();
   const queryClient = useQueryClient();
   const [step, setStep] = useState<"setup" | "verify" | "complete">("setup");
   const [setupData, setSetupData] = useState<MfaSetupResponse | null>(null);
@@ -94,7 +94,7 @@ export default function MfaSetupPage() {
       <div className="container mx-auto py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Please login to setup MFA</h1>
-          <Button onClick={() => window.location.href = "/auth/login"}>
+          <Button onClick={() => redirectToAuth()}>
             Login
           </Button>
         </div>

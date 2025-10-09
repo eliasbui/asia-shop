@@ -90,7 +90,7 @@ const currencies = [
 ];
 
 export default function PreferencesPage() {
-  const { isAuthenticated, user } = useAuthBridge();
+  const { isAuthenticated, redirectToAuth } = useAuthBridge();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("general");
 
@@ -206,7 +206,7 @@ export default function PreferencesPage() {
       <div className="container mx-auto py-8">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Please login to manage your preferences</h1>
-          <Button onClick={() => window.location.href = "/auth/login"}>
+          <Button onClick={() => redirectToAuth()}>
             Login
           </Button>
         </div>

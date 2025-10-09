@@ -32,6 +32,7 @@ const emailOtpFormSchema = z.object({
 
 export default function MfaVerifyPage() {
   const searchParams = useSearchParams();
+  const { redirectToAuth } = useAuthBridge();
   const queryClient = useQueryClient();
   const [mfaMethod, setMfaMethod] = useState<"totp" | "backup" | "email">("totp");
   const [userId, setUserId] = useState<string>("");
@@ -177,7 +178,7 @@ export default function MfaVerifyPage() {
   const handleBackToLogin = () => {
     sessionStorage.removeItem("mfaUserId");
     sessionStorage.removeItem("pendingLoginData");
-    window.location.href = "/auth/login";
+    redirectToAuth();
   };
 
   if (!userId) {
