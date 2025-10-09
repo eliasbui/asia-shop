@@ -108,14 +108,14 @@ function RegisterForm() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="firstName" className="text-card-foreground font-medium">{t('firstName')}</Label>
-            <div className="relative mt-1.5">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <div className="relative mt-1.5 animated-gradient-border">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
               <Input
                 id="firstName"
                 type="text"
                 autoComplete="given-name"
                 {...register('firstName')}
-                className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+                className="pl-10 h-11 bg-transparent border-0 focus:border-0 focus:ring-0 focus:outline-none transition-colors"
                 placeholder="John"
               />
             </div>
@@ -136,14 +136,14 @@ function RegisterForm() {
           
           <div>
             <Label htmlFor="lastName" className="text-card-foreground font-medium">{t('lastName')}</Label>
-            <div className="relative mt-1.5">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <div className="relative mt-1.5 animated-gradient-border">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
               <Input
                 id="lastName"
                 type="text"
                 autoComplete="family-name"
                 {...register('lastName')}
-                className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+                className="pl-10 h-11 bg-transparent border-0 focus:border-0 focus:ring-0 focus:outline-none transition-colors"
                 placeholder="Doe"
               />
             </div>
@@ -165,14 +165,14 @@ function RegisterForm() {
         
         <div>
           <Label htmlFor="email" className="text-card-foreground font-medium">{t('email')}</Label>
-          <div className="relative mt-1.5">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <div className="relative mt-1.5 animated-gradient-border">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
             <Input
               id="email"
               type="email"
               autoComplete="email"
               {...register('email')}
-              className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+              className="pl-10 h-11 bg-transparent border-0 focus:border-0 focus:ring-0 focus:outline-none transition-colors"
               placeholder="you@example.com"
             />
           </div>
@@ -193,14 +193,14 @@ function RegisterForm() {
         
         <div>
           <Label htmlFor="password" className="text-card-foreground font-medium">{t('password')}</Label>
-          <div className="relative mt-1.5">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <div className="relative mt-1.5 animated-gradient-border">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
             <Input
               id="password"
               type="password"
               autoComplete="new-password"
               {...register('password')}
-              className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+              className="pl-10 h-11 bg-transparent border-0 focus:border-0 focus:ring-0 focus:outline-none transition-colors"
               placeholder="••••••••"
             />
           </div>
@@ -221,14 +221,14 @@ function RegisterForm() {
         
         <div>
           <Label htmlFor="confirmPassword" className="text-card-foreground font-medium">{t('confirmPassword')}</Label>
-          <div className="relative mt-1.5">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <div className="relative mt-1.5 animated-gradient-border">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
             <Input
               id="confirmPassword"
               type="password"
               autoComplete="new-password"
               {...register('confirmPassword')}
-              className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+              className="pl-10 h-11 bg-transparent border-0 focus:border-0 focus:ring-0 focus:outline-none transition-colors"
               placeholder="••••••••"
             />
           </div>
@@ -262,7 +262,7 @@ function RegisterForm() {
         <div>
           <Button 
             type="submit" 
-            className="w-full h-11 text-base font-semibold button-glow" 
+            className="w-full h-11 text-base font-semibold animated-gradient-border-button text-white border-0" 
             disabled={isLoading}
           >
             {isLoading ? (

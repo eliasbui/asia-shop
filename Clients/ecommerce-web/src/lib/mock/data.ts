@@ -14,8 +14,8 @@ export const mockProducts: Product[] = [
       processor: "A17 Pro chip",
     },
     media: [
-      { url: "https://via.placeholder.com/600x600", alt: "iPhone 15 Pro Max" },
-      { url: "https://via.placeholder.com/600x600", alt: "iPhone 15 Pro Max Side" },
+      { url: "https://placehold.co/600x600/png?text=iPhone+15+Pro+Max", alt: "iPhone 15 Pro Max" },
+      { url: "https://placehold.co/600x600/png?text=iPhone+15+Pro+Max+Side", alt: "iPhone 15 Pro Max Side" },
     ],
     rating: 4.8,
     reviewCount: 1250,
@@ -69,7 +69,7 @@ export const mockProducts: Product[] = [
       processor: "Snapdragon 8 Gen 3",
     },
     media: [
-      { url: "https://via.placeholder.com/600x600", alt: "Samsung Galaxy S24 Ultra" },
+      { url: "https://placehold.co/600x600/png?text=Galaxy+S24+Ultra", alt: "Samsung Galaxy S24 Ultra" },
     ],
     rating: 4.7,
     reviewCount: 980,
@@ -95,7 +95,7 @@ export const mockProducts: Product[] = [
       processor: "Apple M3 chip",
     },
     media: [
-      { url: "https://via.placeholder.com/600x600", alt: "MacBook Air M3" },
+      { url: "https://placehold.co/600x600/png?text=MacBook+Air+M3", alt: "MacBook Air M3" },
     ],
     rating: 4.9,
     reviewCount: 650,
@@ -121,7 +121,7 @@ export const mockUser: User = {
   email: "john.doe@example.com",
   phone: "0912345678",
   name: "John Doe",
-  avatar: "https://via.placeholder.com/150",
+  avatar: "https://placehold.co/150x150/png?text=JD",
   createdAt: "2024-01-01T00:00:00Z",
 };
 
@@ -189,7 +189,7 @@ function generateMockProducts(count: number): Product[] {
       storage: ["128GB", "256GB"],
     },
     media: [
-      { url: "https://via.placeholder.com/600x600", alt: `Product ${i + 4}` },
+      { url: `https://placehold.co/600x600/png?text=Product+${i + 4}`, alt: `Product ${i + 4}` },
     ],
     rating: Math.random() * 2 + 3,
     reviewCount: Math.floor(Math.random() * 1000),

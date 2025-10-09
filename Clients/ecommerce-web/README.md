@@ -88,12 +88,26 @@ cd Clients/ecommerce-web
 npm install
 ```
 
-3. Run the development server:
+3. Copy environment file:
+```bash
+cp .env.local.example .env.local
+```
+
+4. Run the development server:
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### First Run
+
+By default, the application uses **Mock API** (MSW) for development:
+- No backend services required
+- Instant setup
+- Mock data for all features
+
+To use **Real Backend APIs**, see the [API Integration Guide](./API_INTEGRATION.md).
 
 ## 📝 Available Scripts
 
@@ -252,6 +266,44 @@ NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
 NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your-recaptcha-key
 ```
 
+## 🐛 Common Issues
+
+### Images Not Loading in Development
+
+If you see placeholder image errors, this is normal in development when using external placeholder services. The application will still function correctly.
+
+**Solution**: Images from the real Product API will load properly when connected to the backend.
+
+### Port Already in Use
+
+If port 3000 is already in use:
+
+```bash
+# Use a different port
+PORT=3001 npm run dev
+```
+
+### MSW Service Worker Not Found
+
+If you see "Failed to register service worker" in the browser console:
+
+```bash
+# Regenerate the service worker
+npx msw init public/ --save
+npm run dev
+```
+
+### Build Errors After Git Pull
+
+After pulling new changes:
+
+```bash
+# Clean install
+rm -rf node_modules .next
+npm install
+npm run build
+```
+
 ## 📄 License
 
 MIT
@@ -266,4 +318,7 @@ MIT
 
 ## 💬 Support
 
-For issues and questions, please use the GitHub issues page.
+For issues and questions, please use the GitHub issues page or refer to:
+- [API Integration Guide](./API_INTEGRATION.md) - Backend API setup
+- [Next.js Documentation](https://nextjs.org/docs)
+- [next-intl Documentation](https://next-intl-docs.vercel.app/)

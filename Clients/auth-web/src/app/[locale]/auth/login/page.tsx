@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useForm } from 'react-hook-form';
@@ -29,12 +29,13 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, isLoading, isAuthenticated } = useAuthStore();
-  
+
   const [error, setError] = useState<string | null>(null);
-  
-  // Get return URL from query params
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get return URL from query params and validate it
   const returnUrl = searchParams.get('returnUrl') || '/';
-  
+
   const {
     register,
     handleSubmit,
@@ -43,52 +44,95 @@ function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated (with loading state to prevent flicker)
+  useEffect(() => {
+    console.log('[LoginPage] useEffect triggered:', { isAuthenticated, isSubmitting });
+    if (isAuthenticated && !isSubmitting) {
+      console.log('[LoginPage] User authenticated and not submitting, redirecting...');
+      performRedirect();
+    }
+  }, [isAuthenticated, isSubmitting]);
+
+  const performRedirect = () => {
+    // Prevent redirect loops by checking if we're already on the target URL
+    if (typeof window !== 'undefined') {
+      const currentPath = window.location.pathname + window.location.search;
+      const targetPath = returnUrl === '/' ? `/${locale}` : returnUrl;
+
+      console.log('[LoginPage] performRedirect called:', {
+        currentPath,
+        targetPath,
+        returnUrl,
+        locale,
+      });
+
+      if (currentPath !== targetPath) {
+        console.log('[LoginPage] Redirecting to:', targetPath);
+
+        // Check if returnUrl is external (different origin) or absolute URL
+        try {
+          const returnUrlObj = new URL(targetPath, window.location.origin);
+          const currentOrigin = window.location.origin;
+
+          console.log('[LoginPage] Parsed URL:', {
+            targetOrigin: returnUrlObj.origin,
+            currentOrigin,
+            isExternal: returnUrlObj.origin !== currentOrigin,
+          });
+
+          if (returnUrlObj.origin !== currentOrigin) {
+            // External redirect - use full page redirect
+            console.log('[LoginPage] External redirect detected');
+            window.location.href = targetPath;
+          } else {
+            // Same-origin redirect - use Next.js router
+            console.log('[LoginPage] Same-origin redirect');
+            router.push(targetPath);
+          }
+        } catch (error) {
+          // If URL parsing fails, treat as relative path
+          console.log('[LoginPage] URL parsing failed, using relative path redirect:', error);
+          router.push(targetPath);
+        }
+      } else {
+        console.log('[LoginPage] Already on target URL, skipping redirect');
+      }
+    }
+  };
+
+  // Prevent rendering form if authenticated
   if (isAuthenticated) {
-    router.push(returnUrl);
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <LoadingSpinner size="lg" className="mx-auto text-primary" />
+          <p className="text-muted-foreground">Redirecting...</p>
+        </div>
+      </div>
+    );
   }
 
   const onSubmit = async (data: LoginFormData) => {
     try {
       setError(null);
+      setIsSubmitting(true);
       console.log('[LoginPage] Attempting login...');
       await login(data.email, data.password);
       console.log('[LoginPage] Login successful, cookies set');
-      
+
       // Wait a bit for cookies to be set and broadcast to complete
       await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Set isSubmitting to false so useEffect can trigger
+      setIsSubmitting(false);
       
-      // Redirect to return URL or default
-      if (returnUrl && returnUrl !== '/') {
-        console.log('[LoginPage] Redirecting to returnUrl:', returnUrl);
-        // Check if returnUrl is external (different origin)
-        try {
-          const returnUrlObj = new URL(returnUrl);
-          const currentOrigin = window.location.origin;
-          
-          if (returnUrlObj.origin !== currentOrigin) {
-            // External redirect - use full page redirect
-            console.log('[LoginPage] External redirect detected');
-            window.location.href = returnUrl;
-          } else {
-            // Same-origin redirect - use Next.js router
-            console.log('[LoginPage] Same-origin redirect');
-            router.push(returnUrl);
-          }
-        } catch {
-          // If URL parsing fails, treat as relative path
-          console.log('[LoginPage] Relative path redirect');
-          router.push(returnUrl);
-        }
-      } else {
-        console.log('[LoginPage] Redirecting to home');
-        router.push('/');
-      }
+      console.log('[LoginPage] isSubmitting set to false, waiting for redirect...');
+      // The useEffect hook will handle the redirect automatically
     } catch (err: unknown) {
       console.error('[LoginPage] Login failed:', err);
       const errorMessage = err instanceof Error ? err.message : t('invalidCredentials');
       setError(errorMessage);
+      setIsSubmitting(false);
     }
   };
 
@@ -125,14 +169,14 @@ function LoginForm() {
       <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
         <div>
           <Label htmlFor="email" className="text-card-foreground font-medium">{t('email')}</Label>
-          <div className="relative mt-1.5">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <div className="relative mt-1.5 animated-gradient-border">
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
             <Input
               id="email"
               type="email"
               autoComplete="email"
               {...register('email')}
-              className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+              className="pl-10 h-11 bg-transparent border-0 focus:border-0 focus:ring-0 focus:outline-none transition-colors"
               placeholder="you@example.com"
             />
           </div>
@@ -161,14 +205,14 @@ function LoginForm() {
               {t('forgotPassword')}
             </Link>
           </div>
-          <div className="relative mt-1.5">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <div className="relative mt-1.5 animated-gradient-border">
+            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
             <Input
               id="password"
               type="password"
               autoComplete="current-password"
               {...register('password')}
-              className="pl-10 h-11 bg-background border-input focus:border-primary transition-colors input-glow"
+              className="pl-10 h-11 bg-transparent border-0 focus:border-0 focus:ring-0 focus:outline-none transition-colors"
               placeholder="••••••••"
             />
           </div>
@@ -200,12 +244,12 @@ function LoginForm() {
         </div>
         
         <div>
-          <Button 
-            type="submit" 
-            className="w-full h-11 text-base font-semibold button-glow" 
-            disabled={isLoading}
+          <Button
+            type="submit"
+            className="w-full h-11 text-base font-semibold animated-gradient-border-button text-white border-0"
+            disabled={isLoading || isSubmitting}
           >
-            {isLoading ? (
+            {isLoading || isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
                 <LoadingSpinner size="sm" className="text-primary-foreground" />
                 {t('loading')}

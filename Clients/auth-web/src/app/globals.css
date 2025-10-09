@@ -159,3 +159,95 @@ body {
 .animate-float-slow {
   animation: float-slow 8s ease-in-out infinite;
 }
+
+/* Animated gradient border styles */
+@keyframes gradient-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient-border {
+  position: relative;
+  background: white;
+  border-radius: 0.5rem;
+}
+
+.animated-gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(45deg, #8b5cf6, #6366f1, #8b5cf6, #a855f7, #8b5cf6);
+  background-size: 300% 300%;
+  border-radius: inherit;
+  animation: gradient-border 3s ease infinite;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  opacity: 0.8;
+}
+
+.animated-gradient-border:focus-within::before {
+  animation-duration: 2s;
+  opacity: 1;
+}
+
+.animated-gradient-border-dark {
+  position: relative;
+  background: hsl(var(--card));
+  border-radius: 0.5rem;
+}
+
+.animated-gradient-border-dark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(45deg, #8b5cf6, #6366f1, #8b5cf6, #a855f7, #8b5cf6);
+  background-size: 300% 300%;
+  border-radius: inherit;
+  animation: gradient-border 3s ease infinite;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  opacity: 1;
+}
+
+.animated-gradient-border-dark:focus-within::before {
+  animation-duration: 2s;
+  opacity: 1;
+}
+
+.animated-gradient-border-button {
+  background: linear-gradient(45deg, #8b5cf6, #6366f1, #8b5cf6, #a855f7, #8b5cf6);
+  background-size: 300% 300%;
+  animation: gradient-border 3s ease infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.animated-gradient-border-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+  animation: gradient-border 2s ease infinite;
+  opacity: 0.5;
+}
+
+.animated-gradient-border-button:hover {
+  animation-duration: 2s;
+}
+
+.dark .animated-gradient-border {
+  background: hsl(var(--card));
+}

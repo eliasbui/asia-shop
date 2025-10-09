@@ -236,30 +236,6 @@ public static class AuthEndpoints
                 }
             });
 
-        // GET /api/v1/auth/me
-        authGroup.MapGet("/me", GetCurrentUserAsync)
-            .WithName("GetCurrentUser")
-            .WithSummary("Get current user profile")
-            .WithDescription(
-                "Gets the current authenticated user's profile information including roles, claims, and preferences")
-            .RequireAuthorization()
-            .Produces<CurrentUserResponse>(200, "application/json")
-            .Produces(401, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .Produces(404, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .Produces(500, contentType: "application/json", responseType: typeof(ProblemDetails))
-            .WithOpenApi(operation => new OpenApiOperation(operation)
-            {
-                Summary = "Get current user profile",
-                Description =
-                    "Gets the current authenticated user's profile information including roles, claims, and preferences",
-                Responses = new OpenApiResponses
-                {
-                    ["200"] = new OpenApiResponse { Description = "User profile retrieved successfully" },
-                    ["401"] = new OpenApiResponse { Description = "User not authenticated" },
-                    ["404"] = new OpenApiResponse { Description = "User not found" },
-                    ["500"] = new OpenApiResponse { Description = "Internal server error" }
-                }
-            });
     }
 
     /// <summary>

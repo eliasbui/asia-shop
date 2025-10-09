@@ -31,6 +31,13 @@ const TOKEN_EXPIRY = {
 export function setAuthCookies(tokens: AuthTokens): void {
   if (typeof window === 'undefined') return;
 
+  console.log('[AuthHelpers] Setting authentication cookies', {
+    hasAccessToken: !!tokens.accessToken,
+    hasRefreshToken: !!tokens.refreshToken,
+    domain: COOKIE_CONFIG.domain,
+    secure: COOKIE_CONFIG.secure,
+  });
+
   // Set access token cookie
   document.cookie = `access_token=${tokens.accessToken}; max-age=${TOKEN_EXPIRY.accessToken}; domain=${COOKIE_CONFIG.domain}; path=${COOKIE_CONFIG.path}; SameSite=${COOKIE_CONFIG.sameSite}; ${COOKIE_CONFIG.secure ? 'Secure;' : ''}`;
 
@@ -38,6 +45,8 @@ export function setAuthCookies(tokens: AuthTokens): void {
   if (tokens.refreshToken) {
     document.cookie = `refresh_token=${tokens.refreshToken}; max-age=${TOKEN_EXPIRY.refreshToken}; domain=${COOKIE_CONFIG.domain}; path=${COOKIE_CONFIG.path}; SameSite=${COOKIE_CONFIG.sameSite}; ${COOKIE_CONFIG.secure ? 'Secure;' : ''}`;
   }
+
+  console.log('[AuthHelpers] Cookies set successfully');
 }
 
 /**
@@ -209,27 +218,4 @@ export function redirectToOriginalApp(returnUrl?: string): void {
 export function isInIframe(): boolean {
   if (typeof window === 'undefined') return false;
   return window.parent !== window;
-}
-
-/**
- * Get authentication state from cookies
- */
-export async function getAuthStateFromCookies(): Promise<{ user: User | null; isAuthenticated: boolean }> {
-  if (typeof window === 'undefined') return { user: null, isAuthenticated: false };
-
-  const { accessToken } = getAuthCookies();
-
-  if (!accessToken) {
-    return { user: null, isAuthenticated: false };
-  }
-
-  try {
-    // Import authClient dynamically to avoid SSR issues
-    const { authClient } = await import('@/lib/api/auth-client');
-    const user = await authClient.getCurrentUser(accessToken);
-    return { user, isAuthenticated: true };
-  } catch (error) {
-    console.error('Failed to get user from token:', error);
-    return { user: null, isAuthenticated: false };
-  }
 }

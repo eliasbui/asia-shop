@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { initMSW } from "@/lib/mock/init-msw";
+import { Header } from "@/components/common/header";
 
 // Initialize MSW in development if enabled
 if (process.env.NODE_ENV === "development" && process.env.NEXT_PUBLIC_ENABLE_MSW === "true") {
@@ -39,34 +40,7 @@ export default function HomePage({
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6">
-            <h1 className="text-2xl font-bold">AsiaShop</h1>
-            <nav className="hidden md:flex gap-6">
-              <a href={`/${locale}`} className="text-sm font-medium hover:text-primary">
-                {t("navigation.home")}
-              </a>
-              <a href={`/${locale}/c/smartphones`} className="text-sm font-medium hover:text-primary">
-                {t("navigation.products")}
-              </a>
-              <a href={`/${locale}/deals`} className="text-sm font-medium hover:text-primary">
-                {t("navigation.deals")}
-              </a>
-            </nav>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm">
-              {t("common.login")}
-            </Button>
-            <Button variant="ghost" size="icon">
-              <ShoppingBag className="h-5 w-5" />
-              <span className="sr-only">{t("common.cart")}</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Header locale={locale} />
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-primary/10 to-primary/5 py-20">

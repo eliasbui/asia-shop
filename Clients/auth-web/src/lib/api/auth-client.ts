@@ -93,11 +93,24 @@ class AuthClient {
 
       const result = await response.json();
       
-      // Server returns BaseResponse, extract data
-      if (result.success !== undefined) {
+      console.log('[AuthClient] API response:', {
+        endpoint,
+        hasResult: !!result,
+        resultKeys: result ? Object.keys(result) : [],
+        hasSuccess: result?.success !== undefined,
+        hasIsSuccess: result?.isSuccess !== undefined,
+        hasData: !!result?.data,
+      });
+      
+      // Server returns BaseResponse with different formats
+      // Format 1: { success: true, data: {...} }
+      // Format 2: { isSuccess: true, data: {...} }
+      if (result.success !== undefined || result.isSuccess !== undefined) {
+        console.log('[AuthClient] Extracting data from BaseResponse wrapper');
         return result.data as T;
       }
       
+      console.log('[AuthClient] Using result as-is (no BaseResponse wrapper)');
       return result as T;
     } catch (error) {
       if (error instanceof Error) {
@@ -151,18 +164,6 @@ class AuthClient {
     return this.request<AuthResponse>('/api/v1/auth/refresh', {
       method: 'POST',
       body: JSON.stringify({ refreshToken }),
-    });
-  }
-
-  /**
-   * Get current user profile
-   */
-  async getCurrentUser(accessToken: string): Promise<User> {
-    return this.request<User>('/api/v1/auth/me', {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-      },
     });
   }
 
