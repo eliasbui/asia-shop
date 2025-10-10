@@ -73,4 +73,9 @@ public class RegisterCommand : IRequest<BaseResponse<LoginResponse>>
     /// Whether to automatically confirm email (for admin registration)
     /// </summary>
     public bool AutoConfirmEmail { get; set; } = false;
+
+    /// <summary>
+    /// Google reCAPTCHA token for bot detection
+    /// </summary>
+    public string? RecaptchaToken { get; set; }
 }

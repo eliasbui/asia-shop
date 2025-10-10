@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/common/button';
@@ -21,6 +22,7 @@ const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(1, 'Please confirm your password'),
+  recaptchaToken: z.string().min(1, 'reCAPTCHA token is required'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -34,6 +36,7 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { register: registerUser, isLoading, isAuthenticated } = useAuthStore();
+  const { executeRecaptcha } = useGoogleReCaptcha();
   
   const [error, setError] = useState<string | null>(null);
   const returnUrl = searchParams.get('returnUrl') || '/';
@@ -42,9 +45,20 @@ function RegisterForm() {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
+
+  useEffect(() => {
+    if (executeRecaptcha) {
+      const generateToken = async () => {
+        const token = await executeRecaptcha('register_action');
+        setValue('recaptchaToken', token);
+      };
+      generateToken();
+    }
+  }, [executeRecaptcha, setValue]);
 
   if (isAuthenticated) {
     router.push(returnUrl);
@@ -52,13 +66,22 @@ function RegisterForm() {
   }
 
   const onSubmit = async (data: RegisterFormData) => {
+    if (!executeRecaptcha) {
+      setError('reCAPTCHA not ready. Please try again.');
+      return;
+    }
+
     try {
       setError(null);
+
+      const token = await executeRecaptcha('register_action');
+
       await registerUser({
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         password: data.password,
+        recaptchaToken: token,
       });
       
       if (returnUrl && returnUrl !== '/') {

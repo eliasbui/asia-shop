@@ -28,6 +28,7 @@ public class RegisterCommandHandler(
     RoleManager<Role> roleManager,
     ITokenService tokenService,
     IEmailService emailService,
+    IRecaptchaService recaptchaService,
     ILogger<RegisterCommandHandler> logger) : IRequestHandler<RegisterCommand, BaseResponse<LoginResponse>>
 {
     /// <summary>
@@ -40,6 +41,13 @@ public class RegisterCommandHandler(
     {
         try
         {
+            var isRecaptchaValid = await recaptchaService.ValidateRecaptchaAsync(request.RecaptchaToken);
+            if (!isRecaptchaValid)
+            {
+                logger.LogWarning("Invalid reCAPTCHA token for email: {Email}", request.Email);
+                return BaseResponse<LoginResponse>.Failure("reCAPTCHA validation failed.");
+            }
+
             logger.LogInformation("Registration attempt for email: {Email} from IP: {IpAddress}",
                 request.Email, request.IpAddress);
 

@@ -24,18 +24,22 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
 {
     private readonly UserManager<User> _userManager;
     private readonly ILogger<ResetPasswordCommandHandler> _logger;
+    private readonly IRecaptchaService _recaptchaService;
 
     /// <summary>
     /// Initializes a new instance of the ResetPasswordCommandHandler
     /// </summary>
     /// <param name="userManager">User manager</param>
     /// <param name="logger">Logger</param>
+    /// <param name="recaptchaService">Recaptcha service</param>
     public ResetPasswordCommandHandler(
         UserManager<User> userManager,
-        ILogger<ResetPasswordCommandHandler> logger)
+        ILogger<ResetPasswordCommandHandler> logger,
+        IRecaptchaService recaptchaService)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _recaptchaService = recaptchaService ?? throw new ArgumentNullException(nameof(recaptchaService));
     }
 
     /// <summary>
@@ -48,6 +52,13 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
     {
         try
         {
+            var isRecaptchaValid = await _recaptchaService.ValidateRecaptchaAsync(request.RecaptchaToken);
+            if (!isRecaptchaValid)
+            {
+                _logger.LogWarning("Invalid reCAPTCHA token for email: {Email}", request.Email);
+                return BaseResponse.Failure("reCAPTCHA validation failed.");
+            }
+
             _logger.LogInformation("Password reset attempt for email: {Email}", request.Email);
 
             // Find user by email

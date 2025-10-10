@@ -23,6 +23,7 @@ export interface LoginCredentials {
   emailOrUsername: string;
   password: string;
   rememberMe?: boolean;
+  recaptchaToken?: string;
 }
 
 export interface RegisterData {
@@ -35,6 +36,7 @@ export interface RegisterData {
   dateOfBirth?: string;
   requestedRole?: string;
   autoConfirmEmail?: boolean;
+  recaptchaToken?: string;
 }
 
 export interface ApiError {

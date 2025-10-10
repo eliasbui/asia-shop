@@ -158,6 +158,9 @@ public static class ServiceCollectionExtensions
         });
         services.AddScoped<IEmailService, ZohoEmailService>();
 
+        // Register Recaptcha service
+        services.AddHttpClient<IRecaptchaService, RecaptchaService>();
+
         return services;
     }
 

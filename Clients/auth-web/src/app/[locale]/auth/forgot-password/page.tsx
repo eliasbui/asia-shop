@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Mail, AlertCircle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/common/button';
@@ -16,6 +17,7 @@ import { authClient } from '@/lib/api/auth-client';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
+  recaptchaToken: z.string().min(1, 'reCAPTCHA token is required'),
 });
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
@@ -24,6 +26,8 @@ function ForgotPasswordForm() {
   const t = useTranslations('auth');
   const locale = useLocale();
   
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -32,16 +36,33 @@ function ForgotPasswordForm() {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
   });
 
+  useEffect(() => {
+    if (executeRecaptcha) {
+      const generateToken = async () => {
+        const token = await executeRecaptcha('forgot_password_action');
+        setValue('recaptchaToken', token);
+      };
+      generateToken();
+    }
+  }, [executeRecaptcha, setValue]);
+
   const onSubmit = async (data: ForgotPasswordFormData) => {
+    if (!executeRecaptcha) {
+      setError('reCAPTCHA not ready. Please try again.');
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
       
-      await authClient.forgotPassword(data.email);
+      const token = await executeRecaptcha('forgot_password_action');
+      await authClient.forgotPassword(data.email, token);
       setSuccess(true);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send reset email';
@@ -62,7 +83,7 @@ function ForgotPasswordForm() {
             {t('passwordResetSent')}
           </h2>
           <p className="text-sm text-muted-foreground">
-            We've sent a password reset link to your email. Please check your inbox and follow the instructions.
+            We&apos;ve sent a password reset link to your email. Please check your inbox and follow the instructions.
           </p>
         </div>
         
@@ -83,7 +104,7 @@ function ForgotPasswordForm() {
       <div className="text-center">
         <h2 className="text-3xl font-bold text-card-foreground mb-2">{t('forgotPassword')}</h2>
         <p className="text-sm text-muted-foreground">
-          Enter your email address and we'll send you a link to reset your password
+          Enter your email address and we&apos;ll send you a link to reset your password
         </p>
       </div>
       

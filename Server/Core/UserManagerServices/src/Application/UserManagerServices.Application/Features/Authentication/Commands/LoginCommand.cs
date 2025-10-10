@@ -43,4 +43,9 @@ public class LoginCommand : IRequest<BaseResponse<LoginResponse>>
     /// User agent for session tracking
     /// </summary>
     public string? UserAgent { get; set; }
+
+    /// <summary>
+    /// Google reCAPTCHA token for bot detection
+    /// </summary>
+    public string? RecaptchaToken { get; set; }
 }

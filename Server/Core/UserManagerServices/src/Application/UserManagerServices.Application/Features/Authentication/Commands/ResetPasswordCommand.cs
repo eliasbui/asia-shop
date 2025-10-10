@@ -37,4 +37,9 @@ public class ResetPasswordCommand : IRequest<BaseResponse>
     /// Confirm new password
     /// </summary>
     public string ConfirmPassword { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Google reCAPTCHA token for bot detection
+    /// </summary>
+    public string? RecaptchaToken { get; set; }
 }

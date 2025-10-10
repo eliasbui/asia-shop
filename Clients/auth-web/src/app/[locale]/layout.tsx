@@ -3,6 +3,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { locales } from "@/i18n/config";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { RecaptchaProvider } from "@/components/providers/recaptcha-provider";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -35,9 +36,11 @@ export default async function LocaleLayout({
       enableSystem
       disableTransitionOnChange
     >
-      <NextIntlClientProvider messages={messages}>
-        {children}
-      </NextIntlClientProvider>
+      <RecaptchaProvider>
+        <NextIntlClientProvider messages={messages}>
+          {children}
+        </NextIntlClientProvider>
+      </RecaptchaProvider>
     </ThemeProvider>
   );
 }

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/common/button';
@@ -19,6 +20,7 @@ import { useAuthStore } from '@/lib/state/auth-store';
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
+  recaptchaToken: z.string().min(1, 'reCAPTCHA token is required'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -29,6 +31,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, isLoading, isAuthenticated } = useAuthStore();
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,20 +43,12 @@ function LoginForm() {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
-  // Redirect if already authenticated (with loading state to prevent flicker)
-  useEffect(() => {
-    console.log('[LoginPage] useEffect triggered:', { isAuthenticated, isSubmitting });
-    if (isAuthenticated && !isSubmitting) {
-      console.log('[LoginPage] User authenticated and not submitting, redirecting...');
-      performRedirect();
-    }
-  }, [isAuthenticated, isSubmitting]);
-
-  const performRedirect = () => {
+  const performRedirect = useCallback(() => {
     // Prevent redirect loops by checking if we're already on the target URL
     if (typeof window !== 'undefined') {
       const currentPath = window.location.pathname + window.location.search;
@@ -98,7 +93,26 @@ function LoginForm() {
         console.log('[LoginPage] Already on target URL, skipping redirect');
       }
     }
-  };
+  }, [returnUrl, locale, router]);
+
+  // Redirect if already authenticated (with loading state to prevent flicker)
+  useEffect(() => {
+    console.log('[LoginPage] useEffect triggered:', { isAuthenticated, isSubmitting });
+    if (isAuthenticated && !isSubmitting) {
+      console.log('[LoginPage] User authenticated and not submitting, redirecting...');
+      performRedirect();
+    }
+  }, [isAuthenticated, isSubmitting, performRedirect]);
+
+  useEffect(() => {
+    if (executeRecaptcha) {
+      const generateToken = async () => {
+        const token = await executeRecaptcha('login_action');
+        setValue('recaptchaToken', token);
+      };
+      generateToken();
+    }
+  }, [executeRecaptcha, setValue]);
 
   // Prevent rendering form if authenticated
   if (isAuthenticated) {
@@ -113,11 +127,19 @@ function LoginForm() {
   }
 
   const onSubmit = async (data: LoginFormData) => {
+    if (!executeRecaptcha) {
+      setError('reCAPTCHA not ready. Please try again.');
+      return;
+    }
+
     try {
       setError(null);
       setIsSubmitting(true);
-      console.log('[LoginPage] Attempting login...');
-      await login(data.email, data.password);
+
+      const token = await executeRecaptcha('login_action');
+
+      console.log('[LoginPage] Attempting login with reCAPTCHA token...');
+      await login(data.email, data.password, token);
       console.log('[LoginPage] Login successful, cookies set');
 
       // Wait a bit for cookies to be set and broadcast to complete

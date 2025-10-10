@@ -170,10 +170,10 @@ class AuthClient {
   /**
    * Initiate password reset
    */
-  async forgotPassword(email: string): Promise<void> {
+  async forgotPassword(email: string, recaptchaToken?: string): Promise<void> {
     return this.request<void>('/api/v1/auth/forgot-password', {
       method: 'POST',
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, recaptchaToken }),
     });
   }
 
@@ -184,7 +184,8 @@ class AuthClient {
     email: string,
     token: string,
     newPassword: string,
-    confirmPassword: string
+    confirmPassword: string,
+    recaptchaToken?: string
   ): Promise<void> {
     return this.request<void>('/api/v1/auth/reset-password', {
       method: 'POST',
@@ -192,7 +193,8 @@ class AuthClient {
         email, 
         token, 
         newPassword, 
-        confirmPassword 
+        confirmPassword,
+        recaptchaToken
       }),
     });
   }

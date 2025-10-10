@@ -26,7 +26,8 @@ namespace UserManagerServices.Application.Features.Authentication.Handlers;
 public class ForgotPasswordCommandHandler(
     UserManager<User> userManager,
     ILogger<ForgotPasswordCommandHandler> logger,
-    IEmailService emailService) : IRequestHandler<ForgotPasswordCommand, BaseResponse>
+    IEmailService emailService,
+    IRecaptchaService recaptchaService) : IRequestHandler<ForgotPasswordCommand, BaseResponse>
 {
     /// <summary>
     /// Handles the forgot password command
@@ -38,6 +39,18 @@ public class ForgotPasswordCommandHandler(
     {
         try
         {
+            var isRecaptchaValid = await recaptchaService.ValidateRecaptchaAsync(request.RecaptchaToken);
+            if (!isRecaptchaValid)
+            {
+                logger.LogWarning("Invalid reCAPTCHA token for email: {Email}", request.Email);
+                // Return a generic success message to prevent user enumeration
+                return new BaseResponse
+                {
+                    IsSuccess = true,
+                    StatusCode = 200,
+                    Message = "If an account with that email exists, a password reset link has been sent."
+                };
+            }
             logger.LogInformation("Password reset request for email: {Email}", request.Email);
 
             // Find user by email

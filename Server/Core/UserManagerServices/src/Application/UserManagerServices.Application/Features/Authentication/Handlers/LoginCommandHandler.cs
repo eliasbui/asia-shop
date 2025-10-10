@@ -26,6 +26,7 @@ public class LoginCommandHandler(
     UserManager<User> userManager,
     SignInManager<User> signInManager,
     ITokenService tokenService,
+    IRecaptchaService recaptchaService,
     ILogger<LoginCommandHandler> logger) : IRequestHandler<LoginCommand, BaseResponse<LoginResponse>>
 {
     /// <summary>
@@ -38,6 +39,13 @@ public class LoginCommandHandler(
     {
         try
         {
+            var isRecaptchaValid = await recaptchaService.ValidateRecaptchaAsync(request.RecaptchaToken);
+            if (!isRecaptchaValid)
+            {
+                logger.LogWarning("Invalid reCAPTCHA token for user: {EmailOrUsername}", request.EmailOrUsername);
+                return BaseResponse<LoginResponse>.Failure("reCAPTCHA validation failed.");
+            }
+
             logger.LogInformation("Login attempt for user: {EmailOrUsername} from IP: {IpAddress}",
                 request.EmailOrUsername, request.IpAddress);
 

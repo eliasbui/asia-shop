@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Link from 'next/link';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { Button } from '@/components/common/button';
 import { Input } from '@/components/common/input';
 import { Label } from '@/components/common/label';
@@ -17,6 +18,7 @@ const resetPasswordSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string().min(1, 'Please confirm your password'),
+  recaptchaToken: z.string().min(1, 'reCAPTCHA token is required'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -28,6 +30,7 @@ function ResetPasswordForm() {
   const t = useTranslations('auth');
   const locale = useLocale();
   const searchParams = useSearchParams();
+  const { executeRecaptcha } = useGoogleReCaptcha();
   
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,18 +53,35 @@ function ResetPasswordForm() {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
   });
 
+  useEffect(() => {
+    if (executeRecaptcha) {
+      const generateToken = async () => {
+        const token = await executeRecaptcha('reset_password_action');
+        setValue('recaptchaToken', token);
+      };
+      generateToken();
+    }
+  }, [executeRecaptcha, setValue]);
+
   const onSubmit = async (data: ResetPasswordFormData) => {
     if (!token) return;
+
+    if (!executeRecaptcha) {
+      setError('reCAPTCHA not ready. Please try again.');
+      return;
+    }
     
     try {
       setIsLoading(true);
       setError(null);
       
-      await authClient.resetPassword(data.email, token, data.password, data.confirmPassword);
+      const recaptchaToken = await executeRecaptcha('reset_password_action');
+      await authClient.resetPassword(data.email, token, data.password, data.confirmPassword, recaptchaToken);
       setSuccess(true);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : t('serverError');

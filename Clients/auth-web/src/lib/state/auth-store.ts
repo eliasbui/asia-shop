@@ -39,7 +39,7 @@ interface AuthActions {
   setUser: (user: User) => void;
   setLoading: (isLoading: boolean) => void;
   setReturnUrl: (url: string | null) => void;
-  login: (email: string, password: string) => Promise<AuthResponse>;
+  login: (email: string, password: string, recaptchaToken?: string) => Promise<AuthResponse>;
   register: (userData: RegisterData) => Promise<AuthResponse>;
   logout: () => Promise<void>;
   refreshAuthToken: () => Promise<AuthResponse>;
@@ -132,7 +132,7 @@ export const useAuthStore = create<AuthStore>()(
         set({ returnUrl: url });
       },
 
-      login: async (email, password) => {
+      login: async (email, password, recaptchaToken) => {
         try {
           set({ isLoading: true });
           console.log('[AuthStore] Calling login API...');
@@ -141,6 +141,7 @@ export const useAuthStore = create<AuthStore>()(
             emailOrUsername: email,
             password,
             rememberMe: false,
+            recaptchaToken,
           });
 
           console.log('[AuthStore] API response received:', {

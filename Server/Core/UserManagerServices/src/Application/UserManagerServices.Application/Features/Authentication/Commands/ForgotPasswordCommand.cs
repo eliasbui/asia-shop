@@ -22,4 +22,9 @@ public class ForgotPasswordCommand : IRequest<BaseResponse>
     /// Email address to send password reset link
     /// </summary>
     public string Email { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Google reCAPTCHA token for bot detection
+    /// </summary>
+    public string? RecaptchaToken { get; set; }
 }
